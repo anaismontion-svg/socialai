@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/media', require('./routes/media'));
 app.use('/api/queue', require('./routes/queue'));
-app.get('/', (req, res) => {
+app.use((req, res) => {
 
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
