@@ -11,18 +11,11 @@ const REDIRECT_URI = process.env.META_REDIRECT_URI;
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
 const SCOPES = [
-  'pages_manage_posts',
-  'pages_read_engagement',
-  'pages_manage_engagement',
-  'pages_messaging',
-  'pages_read_user_content',
-  'read_insights',
-  'instagram_basic',
+  'instagram_business_basic',
   'instagram_manage_comments',
   'instagram_manage_messages',
   'instagram_content_publish',
-  'instagram_manage_insights',
-  'pages_show_list'
+  'instagram_manage_insights'
 ].join(',');
 
 router.get('/auth/meta', (req, res) => {
