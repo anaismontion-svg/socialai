@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 const APP_ID = process.env.META_APP_ID;
 const APP_SECRET = process.env.META_APP_SECRET;
@@ -29,7 +31,7 @@ router.get('/auth/meta', (req, res) => {
 });
 
 router.get('/auth/meta/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, client_id } = req.query;
   try {
     const { data: shortToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
       params: { client_id: APP_ID, client_secret: APP_SECRET, redirect_uri: REDIRECT_URI, code }
@@ -44,12 +46,23 @@ router.get('/auth/meta/callback', async (req, res) => {
       }
     });
 
-    const { data: pagesData } = await axios.get(`https://graph.facebook.com/v19.0/me/accounts`, {
-      params: { access_token: longToken.access_token }
+    const { data: igData } = await axios.get(`https://graph.instagram.com/v19.0/me`, {
+      params: {
+        fields: 'id,name,username',
+        access_token: longToken.access_token
+      }
     });
 
-    console.log('Pages connectées:', pagesData.data);
-    res.json({ success: true, pages: pagesData.data });
+    await supabase.from('social_accounts').upsert({
+      client_id: client_id || null,
+      platform: 'instagram',
+      account_id: igData.id,
+      account_name: igData.username || igData.name,
+      access_token: longToken.access_token,
+      token_expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+    }, { onConflict: 'account_id' });
+
+    res.json({ success: true, account: igData.username });
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).json({ error: 'Erreur OAuth Meta' });
