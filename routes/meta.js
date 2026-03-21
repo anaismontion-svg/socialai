@@ -108,14 +108,28 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
 
               if (classification.besoin_humain) {
                 console.log('🙋 Intervention humaine requise (', classification.categorie, ')');
-                const transitionReply = await generateHumanNeededReply(accounts.account_name, accounts.access_token, senderId);
+                const transitionReply = await generateHumanNeededReply(
+                  accounts.account_name,
+                  accounts.access_token,
+                  senderId,
+                  classification.categorie,
+                  messageText
+                );
                 await replyToDM(senderId, transitionReply, accounts.access_token);
                 continue;
               }
 
-              const reply = await generateReply(messageText, accounts.account_name, senderId, accounts.access_token, accounts.description);
-              console.log('🤖 Réponse DM:', reply);
-              await replyToDM(senderId, reply, accounts.access_token);
+              const reply = await generateReply(
+                messageText,
+                accounts.account_name,
+                senderId,
+                accounts.access_token,
+                accounts.description
+              );
+              if (reply) {
+                console.log('🤖 Réponse DM:', reply);
+                await replyToDM(senderId, reply, accounts.access_token);
+              }
 
             } catch (err) {
               console.error('❌ Erreur DM:', err.response?.data || err.message);
@@ -152,9 +166,17 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 continue;
               }
 
-              const reply = await generateReply(commentText, accounts.account_name, change.value?.from?.id || '', accounts.access_token, accounts.description);
-              console.log('🤖 Réponse commentaire:', reply);
-              await replyToComment(commentId, reply, accounts.access_token);
+              const reply = await generateReply(
+                commentText,
+                accounts.account_name,
+                change.value?.from?.id || '',
+                accounts.access_token,
+                accounts.description
+              );
+              if (reply) {
+                console.log('🤖 Réponse commentaire:', reply);
+                await replyToComment(commentId, reply, accounts.access_token);
+              }
 
             } catch (err) {
               console.error('❌ Erreur commentaire:', err.response?.data || err.message);

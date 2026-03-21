@@ -1,5 +1,6 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const axios = require('axios');
+const nodemailer = require('nodemailer');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -7,12 +8,28 @@ const conversationMemory = {};
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Statuts possibles : 'normal' | 'waiting_coordinates' | 'coordinates_received'
+function getMemory(senderId) {
+  if (!conversationMemory[senderId]) {
+    conversationMemory[senderId] = {
+      lastSeen: new Date(),
+      isFirstContact: true,
+      status: 'normal',
+      reason: null,
+      originalMessage: null
+    };
+  }
+  return conversationMemory[senderId];
+}
+
 function isNewDayOrFirstContact(senderId) {
   const now = new Date();
-  const memory = conversationMemory[senderId];
+  const memory = getMemory(senderId);
+  const isFirst = memory.isFirstContact;
 
-  if (!memory) {
-    conversationMemory[senderId] = { lastSeen: now, isFirstContact: true };
+  if (isFirst) {
+    memory.isFirstContact = false;
+    memory.lastSeen = now;
     return { isFirst: true, isNewDay: false };
   }
 
@@ -22,7 +39,7 @@ function isNewDayOrFirstContact(senderId) {
     lastSeen.getMonth() !== now.getMonth() ||
     lastSeen.getFullYear() !== now.getFullYear();
 
-  conversationMemory[senderId].lastSeen = now;
+  memory.lastSeen = now;
   return { isFirst: false, isNewDay };
 }
 
@@ -38,6 +55,55 @@ async function getPhoneNumber(accessToken) {
   return null;
 }
 
+async function sendEmailSummary(senderInfo, reason, coordinates) {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+
+    const reasonLabels = {
+      'partenariat': '🤝 Demande de partenariat',
+      'opportunite_commerciale': '💼 Opportunité commerciale',
+      'question_personnelle': '👤 Message personnel',
+      'plainte_grave': '⚠️ Réclamation grave',
+      'liste_attente': '🐱 Inscription liste d\'attente',
+      'hors_sujet': '❓ Demande hors sujet'
+    };
+
+    const subject = `[SocialAI] ${reasonLabels[reason] || 'Nouvelle demande'} — @lovequeendolls`;
+    const text = `
+Nouvelle demande reçue sur Instagram @lovequeendolls
+
+Type : ${reasonLabels[reason] || reason}
+ID Instagram : ${senderInfo.senderId}
+
+Coordonnées communiquées :
+${coordinates}
+
+Message original :
+${senderInfo.originalMessage || 'Non disponible'}
+
+---
+À rappeler dès que possible !
+    `.trim();
+
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: 'anais.montion@gmail.com',
+      subject,
+      text
+    });
+
+    console.log('📧 Email résumé envoyé à anais.montion@gmail.com');
+  } catch (err) {
+    console.error('❌ Erreur envoi email:', err.message);
+  }
+}
+
 async function classifyMessage(text) {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
@@ -47,15 +113,16 @@ async function classifyMessage(text) {
 Les catégories possibles sont :
 - "renseignement" : question sur les chatons, disponibilités, tarifs, délais, soins, race Ragdoll
 - "compliment" : message positif, coup de cœur, remerciement
-- "liste_attente" : demande pour s'inscrire sur la liste d'attente
+- "liste_attente" : la personne semble décidée à adopter et veut s'inscrire sur la liste d'attente
 - "partenariat" : proposition de collaboration, sponsoring, affiliation
 - "opportunite_commerciale" : opportunité business
 - "question_personnelle" : message qui semble venir d'un proche ou ami
 - "plainte_grave" : réclamation sérieuse, litige
+- "hors_sujet" : demande qui n'a rien à voir avec la chatterie
 - "autre" : tout le reste
 
 Réponds avec exactement ce format : {"categorie":"...","besoin_humain":true/false}
-besoin_humain doit être true pour : partenariat, opportunite_commerciale, question_personnelle, plainte_grave`,
+besoin_humain doit être true pour : partenariat, opportunite_commerciale, question_personnelle, plainte_grave, liste_attente, hors_sujet`,
     messages: [{ role: 'user', content: `Classifie ce message : "${text}"` }]
   });
 
@@ -67,40 +134,61 @@ besoin_humain doit être true pour : partenariat, opportunite_commerciale, quest
 }
 
 async function generateReply(context, accountName = '', senderId = '', accessToken = '', accountDescription = '') {
+  const memory = getMemory(senderId);
   const { isFirst, isNewDay } = isNewDayOrFirstContact(senderId);
+
+  // Si on attend les coordonnées
+  if (memory.status === 'waiting_coordinates') {
+    memory.status = 'coordinates_received';
+    await delay(2000);
+
+    // Envoyer l'email résumé
+    await sendEmailSummary(
+      { senderId, originalMessage: memory.originalMessage },
+      memory.reason,
+      context
+    );
+
+    return `Merci beaucoup pour ces informations ! 😊\n\nNous allons transmettre votre demande et quelqu'un de notre équipe reviendra vers vous très prochainement.\n\nÀ très vite ! ✨`;
+  }
+
+  // Si coordonnées déjà reçues — on ne répond plus
+  if (memory.status === 'coordinates_received') {
+    console.log('🔕 Coordonnées déjà reçues — message laissé en NON LU');
+    return null;
+  }
 
   let greeting = '';
   if (isFirst) {
     greeting = Math.random() > 0.5
-      ? 'Bonjour, enchantée, merci pour votre intérêt ! '
-      : 'Bonjour, merci beaucoup pour votre message ! ';
+      ? 'Bonjour, enchantée, merci pour votre intérêt ! 😊\n\n'
+      : 'Bonjour, merci beaucoup pour votre message ! 😊\n\n';
   } else if (isNewDay) {
-    greeting = 'Bonjour, ravie de vous retrouver ! ';
+    greeting = 'Bonjour, ravie de vous retrouver ! 😊\n\n';
   }
-
-  const contextInfo = accountDescription || '';
 
   const systemPrompt = `Tu es la community manager du compte Instagram @${accountName}.
 
 Contexte sur ce compte :
-${contextInfo}
+${accountDescription}
 
 Règles de communication :
 - Tu vouvoies TOUJOURS les personnes par défaut
 - Si la personne te tutoie, tu peux adopter le tutoiement naturellement
-- Ton ton est élégant, chaleureux et humain — jamais robotique
+- Ton ton est chaleureux, humain et naturel — jamais robotique ni trop formel
 - Tu utilises des émojis avec subtilité (2-3 max par message)
-- Tes réponses font 2-3 phrases, naturelles et variées
-- Tu ne répètes jamais la même formule
+- Tu aères toujours tes messages avec des sauts de ligne entre les idées
+- Maximum 2 phrases par bloc, puis saut de ligne
+- Tes réponses sont variées, jamais copiées-collées
 - Tu parles des Ragdolls avec passion et expertise
 - Tu ne "vends" pas un chaton — tu accompagnes les familles dans leur projet d'adoption
 - Tu mentionnes la liste d'attente sur www.lovequeendolls.com quand c'est pertinent
-- Tu invites toujours doucement à en savoir plus ou à poser des questions
+- Tu invites toujours doucement à poser des questions ou en savoir plus
 
 Règles absolues :
-- Ne commence JAMAIS par une salutation — elle est déjà gérée séparément
-- Ne sois JAMAIS générique ou copier-coller
-- Varie toujours tes formulations`;
+- Ne commence JAMAIS par une salutation — elle est déjà ajoutée automatiquement
+- Ne sois JAMAIS générique
+- Varie toujours tes formulations d'entrée en matière`;
 
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
@@ -116,26 +204,27 @@ Règles absolues :
   return greeting + body;
 }
 
-async function generateHumanNeededReply(accountName = '', accessToken = '', senderId = '') {
+async function generateHumanNeededReply(accountName = '', accessToken = '', senderId = '', reason = '', originalMessage = '') {
+  const memory = getMemory(senderId);
   const { isFirst, isNewDay } = isNewDayOrFirstContact(senderId);
+
+  // Mémoriser le contexte pour quand les coordonnées arrivent
+  memory.status = 'waiting_coordinates';
+  memory.reason = reason;
+  memory.originalMessage = originalMessage;
 
   let greeting = '';
   if (isFirst) {
     greeting = Math.random() > 0.5
-      ? 'Bonjour, enchantée, merci pour votre intérêt ! '
-      : 'Bonjour, merci beaucoup pour votre message ! ';
+      ? 'Bonjour, enchantée, merci pour votre intérêt ! 😊\n\n'
+      : 'Bonjour, merci beaucoup pour votre message ! 😊\n\n';
   } else if (isNewDay) {
-    greeting = 'Bonjour, ravie de vous retrouver ! ';
+    greeting = 'Bonjour, ravie de vous retrouver ! 😊\n\n';
   }
-
-  const phone = await getPhoneNumber(accessToken);
-  const contactLine = phone
-    ? `Si votre demande est urgente, n'hésitez pas à nous appeler directement au ${phone}. 📞`
-    : `Si votre demande est urgente, n'hésitez pas à nous contacter via notre profil. 📩`;
 
   await delay(2000);
 
-  return `${greeting}Nous avons bien reçu votre message et allons nous renseigner pour vous apporter la meilleure réponse possible. Nous revenons vers vous très rapidement ! ✨ ${contactLine}`;
+  return `${greeting}Merci pour votre message ! ✨\n\nPourriez-vous me donner votre nom et numéro de téléphone ?\n\nJe vais transmettre votre demande directement pour que l'on revienne vers vous au plus vite 😊`;
 }
 
 async function replyToComment(commentId, reply, accessToken) {
