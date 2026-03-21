@@ -2,13 +2,22 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
-const { classifyMessage, generateReply, generateHumanNeededReply, replyToComment, replyToDM } = require('./ai');
+const { classifyMessage, generateReply, generateHumanNeededReply, scheduleFollowUp, cancelFollowUp, processFollowUps, replyToComment, replyToDM } = require('./ai');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 const APP_SECRET = process.env.META_APP_SECRET;
 const REDIRECT_URI = process.env.META_REDIRECT_URI;
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
+
+// ── Job de relance — vérifie toutes les heures ────────────────────────────────
+setInterval(async () => {
+  console.log('⏰ Vérification des relances...');
+  await processFollowUps(supabase);
+}, 60 * 60 * 1000);
+
+// Lancer aussi au démarrage
+processFollowUps(supabase);
 
 router.get('/auth/meta', (req, res) => {
   res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights`);
@@ -103,6 +112,9 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 .single();
               if (!accounts) { console.warn('⚠️ Compte introuvable pour', entry.id); continue; }
 
+              // Quand un message arrive, annuler la relance en cours
+              await cancelFollowUp(supabase, senderId);
+
               const classification = await classifyMessage(messageText);
               console.log('🔍 Classification:', classification);
 
@@ -126,9 +138,13 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 accounts.access_token,
                 accounts.description
               );
+
               if (reply) {
                 console.log('🤖 Réponse DM:', reply);
                 await replyToDM(senderId, reply, accounts.access_token);
+
+                // Programmer une relance J+1 après chaque réponse de l'IA
+                await scheduleFollowUp(supabase, senderId, entry.id, accounts.access_token);
               }
 
             } catch (err) {

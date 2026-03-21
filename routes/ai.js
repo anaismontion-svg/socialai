@@ -8,7 +8,6 @@ const conversationMemory = {};
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Statuts possibles : 'normal' | 'waiting_coordinates' | 'coordinates_received'
 function getMemory(senderId) {
   if (!conversationMemory[senderId]) {
     conversationMemory[senderId] = {
@@ -142,7 +141,6 @@ async function generateReply(context, accountName = '', senderId = '', accessTok
     memory.status = 'coordinates_received';
     await delay(2000);
 
-    // Envoyer l'email résumé
     await sendEmailSummary(
       { senderId, originalMessage: memory.originalMessage },
       memory.reason,
@@ -182,8 +180,10 @@ Règles de communication :
 - Tes réponses sont variées, jamais copiées-collées
 - Tu parles des Ragdolls avec passion et expertise
 - Tu ne "vends" pas un chaton — tu accompagnes les familles dans leur projet d'adoption
-- Tu mentionnes la liste d'attente sur www.lovequeendolls.com quand c'est pertinent
-- Tu invites toujours doucement à poser des questions ou en savoir plus
+- Tu réponds UNIQUEMENT à ce qui est demandé, de façon détaillée et précise
+- Tu ne donnes JAMAIS d'informations supplémentaires non demandées
+- Tu ne redirige pas vers le site ou d'autres sujets sauf si c'est directement lié à la question
+- Si la personne veut en savoir plus, elle posera d'autres questions
 
 Règles absolues :
 - Ne commence JAMAIS par une salutation — elle est déjà ajoutée automatiquement
@@ -208,7 +208,6 @@ async function generateHumanNeededReply(accountName = '', accessToken = '', send
   const memory = getMemory(senderId);
   const { isFirst, isNewDay } = isNewDayOrFirstContact(senderId);
 
-  // Mémoriser le contexte pour quand les coordonnées arrivent
   memory.status = 'waiting_coordinates';
   memory.reason = reason;
   memory.originalMessage = originalMessage;
@@ -225,6 +224,61 @@ async function generateHumanNeededReply(accountName = '', accessToken = '', send
   await delay(2000);
 
   return `${greeting}Merci pour votre message ! ✨\n\nPourriez-vous me donner votre nom et numéro de téléphone ?\n\nJe vais transmettre votre demande directement pour que l'on revienne vers vous au plus vite 😊`;
+}
+
+async function scheduleFollowUp(supabase, senderId, accountId, accessToken) {
+  try {
+    const scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // J+1
+    await supabase.from('follow_ups').upsert({
+      sender_id: senderId,
+      account_id: accountId,
+      access_token: accessToken,
+      scheduled_at: scheduledAt,
+      sent: false
+    }, { onConflict: 'sender_id' });
+    console.log(`⏰ Relance programmée pour ${senderId} à ${scheduledAt}`);
+  } catch (err) {
+    console.error('❌ Erreur programmation relance:', err.message);
+  }
+}
+
+async function cancelFollowUp(supabase, senderId) {
+  try {
+    await supabase.from('follow_ups')
+      .update({ sent: true })
+      .eq('sender_id', senderId)
+      .eq('sent', false);
+    console.log(`✅ Relance annulée pour ${senderId}`);
+  } catch (err) {
+    console.error('❌ Erreur annulation relance:', err.message);
+  }
+}
+
+async function processFollowUps(supabase) {
+  try {
+    const now = new Date();
+    const { data: followUps } = await supabase
+      .from('follow_ups')
+      .select('*')
+      .eq('sent', false)
+      .lte('scheduled_at', now.toISOString());
+
+    if (!followUps || followUps.length === 0) return;
+
+    for (const followUp of followUps) {
+      const message = `Bonjour,\n\nJe ne sais pas si mon dernier message s'était bien envoyé, avez-vous bien reçu ma réponse ?\n\nMerci à vous ! 😊`;
+
+      await replyToDM(followUp.sender_id, message, followUp.access_token);
+
+      await supabase.from('follow_ups')
+        .update({ sent: true })
+        .eq('id', followUp.id);
+
+      console.log(`📬 Relance envoyée à ${followUp.sender_id}`);
+    }
+  } catch (err) {
+    console.error('❌ Erreur traitement relances:', err.message);
+  }
 }
 
 async function replyToComment(commentId, reply, accessToken) {
@@ -257,4 +311,13 @@ async function replyToDM(recipientId, reply, accessToken) {
   }
 }
 
-module.exports = { classifyMessage, generateReply, generateHumanNeededReply, replyToComment, replyToDM };
+module.exports = {
+  classifyMessage,
+  generateReply,
+  generateHumanNeededReply,
+  scheduleFollowUp,
+  cancelFollowUp,
+  processFollowUps,
+  replyToComment,
+  replyToDM
+};
