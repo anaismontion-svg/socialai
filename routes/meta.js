@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
+const { classifyMessage, generateReply, generateHumanNeededReply, replyToComment, replyToDM } = require('./ai');
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-const { generateReply, replyToComment, replyToDM } = require('./ai');
 
 const APP_SECRET = process.env.META_APP_SECRET;
 const REDIRECT_URI = process.env.META_REDIRECT_URI;
@@ -76,8 +77,7 @@ router.get('/webhook/meta', (req, res) => {
   }
 });
 
-router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (req, res) => {
-  const body = JSON.parse(req.body);
+const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;  const body = JSON.parse(req.body);
   res.sendStatus(200);
 
   if (body.object === 'instagram') {
@@ -90,7 +90,9 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
             const senderId = event.sender?.id;
             const messageText = event.message?.text;
             if (!messageText || senderId === entry.id) continue;
+
             console.log('📩 DM reçu de', senderId, ':', messageText);
+
             try {
               const { data: accounts } = await supabase
                 .from('social_accounts')
@@ -98,9 +100,21 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 .eq('account_id', entry.id)
                 .single();
               if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
-              const reply = await generateReply(messageText, 'professionnel', accounts.account_name);
+
+              const classification = await classifyMessage(messageText);
+              console.log('🔍 Classification:', classification);
+
+              if (classification.besoin_humain) {
+                console.log('🙋 Intervention humaine requise (', classification.categorie, ') — envoi message de transition');
+                const transitionReply = await generateHumanNeededReply(accounts.account_name, accounts.access_token, senderId);
+                await replyToDM(senderId, transitionReply, accounts.access_token);
+                continue;
+              }
+
+              const reply = await generateReply(messageText, accounts.account_name, senderId, accounts.access_token);
               console.log('🤖 Réponse DM:', reply);
               await replyToDM(senderId, reply, accounts.access_token);
+
             } catch (err) {
               console.error('❌ Erreur DM:', err.response?.data || err.message);
             }
@@ -112,11 +126,14 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
       if (entry.changes) {
         for (const change of entry.changes) {
           console.log('📣 Événement:', change.field, change.value);
+
           if (change.field === 'comments') {
             const commentId = change.value?.id;
             const commentText = change.value?.text;
             if (!commentId || !commentText) continue;
+
             console.log('💬 Commentaire reçu:', commentText);
+
             try {
               const { data: accounts } = await supabase
                 .from('social_accounts')
@@ -124,9 +141,19 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 .eq('account_id', entry.id)
                 .single();
               if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
-              const reply = await generateReply(commentText, 'professionnel', accounts.account_name);
+
+              const classification = await classifyMessage(commentText);
+              console.log('🔍 Classification:', classification);
+
+              if (classification.besoin_humain) {
+                console.log('🙋 Commentaire sensible (', classification.categorie, ') — laissé sans réponse publique');
+                continue; // Pas de réponse publique sur un commentaire sensible
+              }
+
+              const reply = await generateReply(commentText, accounts.account_name, change.value?.from?.id || '', accounts.access_token);
               console.log('🤖 Réponse commentaire:', reply);
               await replyToComment(commentId, reply, accounts.access_token);
+
             } catch (err) {
               console.error('❌ Erreur commentaire:', err.response?.data || err.message);
             }
