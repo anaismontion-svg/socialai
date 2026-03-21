@@ -17,6 +17,19 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Moteur de publication ─────────────────────────────────────────────────────
+const { processQueue, checkLowContent } = require('./routes/publisher');
+
+// Publier toutes les minutes
+setInterval(processQueue, 60 * 1000);
+
+// Vérifier le contenu faible toutes les 6 heures
+setInterval(checkLowContent, 6 * 60 * 60 * 1000);
+
+// Lancer au démarrage
+processQueue();
+checkLowContent();
+
 module.exports = app;
 
 if (require.main === module) {
