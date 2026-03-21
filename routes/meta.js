@@ -77,8 +77,7 @@ router.get('/webhook/meta', (req, res) => {
   }
 });
 
-const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;  const body = JSON.parse(req.body);
-  res.sendStatus(200);
+const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
   if (body.object === 'instagram') {
     for (const entry of body.entry) {
