@@ -47,7 +47,7 @@ router.get('/auth/meta/callback', async (req, res) => {
       }
     );
 
-    await supabase.from('social_accounts').upsert({
+    const { data: upsertData, error: upsertError } = await supabase.from('social_accounts').upsert({
       client_id: client_id || null,
       platform: 'instagram',
       account_id: igData.id,
@@ -56,7 +56,8 @@ router.get('/auth/meta/callback', async (req, res) => {
       token_expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
     }, { onConflict: 'account_id' });
 
-    res.json({ success: true, account: igData.username });
+    console.log('Upsert error:', upsertError);
+    res.json({ success: true, account: igData.username, dbError: upsertError });
   } catch (err) {
     console.error(err.response?.data || err.message);
     res.status(500).json({ error: 'Erreur OAuth Meta', details: err.response?.data });
