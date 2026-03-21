@@ -21,8 +21,6 @@ const SCOPES = [
 router.get('/auth/meta', (req, res) => {
   res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`);
 });
-https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=https://socialai-production-5ffb.up.railway.app/auth/meta/callback&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights
-
     const { data: longToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
       params: {
         grant_type: 'fb_exchange_token',
