@@ -28,25 +28,48 @@ router.get('/:clientId', async (req, res) => {
 
 router.post('/upload', upload.single('file'), async (req, res) => {
   try {
-    const { client_id } = req.body;
+    const { client_id, story_type } = req.body;
     const file = req.file;
     const imageData = fs.readFileSync(file.path);
     const base64Image = imageData.toString('base64');
     const mimeType = file.mimetype;
+    const isVideo = mimeType.startsWith('video');
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mimeType, data: base64Image }
-          },
-          {
-            type: 'text',
-            text: `Analyse cette image pour Instagram/Facebook. Réponds UNIQUEMENT en JSON valide sans markdown :
+    // ── Upload dans Supabase Storage ────────────────────────────────────────
+    const fileName = `${client_id}/${Date.now()}_${file.originalname}`;
+    const { data: storageData, error: storageError } = await supabase.storage
+      .from('media')
+      .upload(fileName, imageData, {
+        contentType: mimeType,
+        upsert: false
+      });
+
+    if (storageError) throw new Error(storageError.message);
+
+    // Récupérer l'URL publique
+    const { data: urlData } = supabase.storage
+      .from('media')
+      .getPublicUrl(fileName);
+
+    const publicUrl = urlData.publicUrl;
+
+    // ── Analyse IA (uniquement pour les images) ─────────────────────────────
+    let analyse = { sujet: 'Média uploadé', caption: '', hashtags: [] };
+
+    if (!isVideo) {
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mimeType, data: base64Image }
+            },
+            {
+              type: 'text',
+              text: `Analyse cette image pour Instagram/Facebook. Réponds UNIQUEMENT en JSON valide sans markdown :
 {
   "sujet": "description courte",
   "type_contenu": "avant_apres|produit|ambiance|coulisses|portrait|autre",
@@ -57,30 +80,34 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   "format_recommande": "post|story|reel",
   "heure_optimale": "18:30"
 }`
-          }
-        ]
-      }]
-    });
+            }
+          ]
+        }]
+      });
 
-    let analyse;
-    try {
-      analyse = JSON.parse(response.content[0].text);
-    } catch(e) {
-      analyse = { sujet: 'Média uploadé', caption: 'Caption à générer', hashtags: [] };
+      try {
+        analyse = JSON.parse(response.content[0].text);
+      } catch(e) {
+        analyse = { sujet: 'Média uploadé', caption: '', hashtags: [] };
+      }
     }
 
+    // ── Sauvegarder en base ─────────────────────────────────────────────────
     const { data, error } = await supabase
       .from('media')
       .insert([{
         client_id,
         filename: file.originalname,
-        type: mimeType.startsWith('video') ? 'video' : 'photo',
-        analyse: analyse,
-        caption: analyse.caption,
-        hashtags: analyse.hashtags,
+        type: isVideo ? 'video' : 'photo',
+        url: publicUrl,
+        analyse_data: analyse,
+        caption: analyse.caption || '',
+        hashtags: analyse.hashtags || [],
         statut: 'analyse',
-        qualite: analyse.qualite,
-        potentiel_viral: analyse.potentiel_viral
+        qualite: analyse.qualite || null,
+        potentiel_viral: analyse.potentiel_viral || null,
+        story_type: story_type || null,
+        used: false
       }])
       .select();
 
@@ -90,8 +117,30 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
   } catch(err) {
     console.error(err);
+    if (req.file?.path) fs.unlinkSync(req.file.path);
     res.status(500).json({ error: err.message });
   }
+});
+
+router.delete('/:id', async (req, res) => {
+  const { data: media } = await supabase
+    .from('media')
+    .select('url')
+    .eq('id', req.params.id)
+    .single();
+
+  if (media?.url) {
+    const path = media.url.split('/media/')[1];
+    if (path) await supabase.storage.from('media').remove([path]);
+  }
+
+  const { error } = await supabase
+    .from('media')
+    .delete()
+    .eq('id', req.params.id);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
 });
 
 module.exports = router;
