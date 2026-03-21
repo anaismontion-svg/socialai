@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const { generateReply, replyToComment, replyToDM } = require('./ai');
 
 const APP_SECRET = process.env.META_APP_SECRET;
 const REDIRECT_URI = process.env.META_REDIRECT_URI;
@@ -81,18 +82,58 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
 
   if (body.object === 'instagram') {
     for (const entry of body.entry) {
+
+      // ── DMs ──────────────────────────────────────────────────────────────
       if (entry.messaging) {
         for (const event of entry.messaging) {
           if (event.message) {
-            console.log('DM reçu:', event.message.text);
+            const senderId = event.sender?.id;
+            const messageText = event.message?.text;
+            if (!messageText || senderId === entry.id) continue;
+            console.log('📩 DM reçu de', senderId, ':', messageText);
+            try {
+              const { data: accounts } = await supabase
+                .from('social_accounts')
+                .select('access_token, account_name')
+                .eq('account_id', entry.id)
+                .single();
+              if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
+              const reply = await generateReply(messageText, 'professionnel', accounts.account_name);
+              console.log('🤖 Réponse DM:', reply);
+              await replyToDM(senderId, reply, accounts.access_token);
+            } catch (err) {
+              console.error('❌ Erreur DM:', err.response?.data || err.message);
+            }
           }
         }
       }
+
+      // ── Commentaires ─────────────────────────────────────────────────────
       if (entry.changes) {
         for (const change of entry.changes) {
-          console.log('Événement:', change.field, change.value);
+          console.log('📣 Événement:', change.field, change.value);
+          if (change.field === 'comments') {
+            const commentId = change.value?.id;
+            const commentText = change.value?.text;
+            if (!commentId || !commentText) continue;
+            console.log('💬 Commentaire reçu:', commentText);
+            try {
+              const { data: accounts } = await supabase
+                .from('social_accounts')
+                .select('access_token, account_name')
+                .eq('account_id', entry.id)
+                .single();
+              if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
+              const reply = await generateReply(commentText, 'professionnel', accounts.account_name);
+              console.log('🤖 Réponse commentaire:', reply);
+              await replyToComment(commentId, reply, accounts.access_token);
+            } catch (err) {
+              console.error('❌ Erreur commentaire:', err.response?.data || err.message);
+            }
+          }
         }
       }
+
     }
   }
 });
