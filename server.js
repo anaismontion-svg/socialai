@@ -30,6 +30,15 @@ setInterval(checkLowContent, 6 * 60 * 60 * 1000);
 processQueue();
 checkLowContent();
 
+// ── Planificateur automatique ─────────────────────────────────────────────────
+const { runScheduler } = require('./routes/scheduler');
+
+// Planifier tous les jours à minuit
+setInterval(runScheduler, 24 * 60 * 60 * 1000);
+
+// Lancer au démarrage
+runScheduler();
+
 module.exports = app;
 
 if (require.main === module) {
