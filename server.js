@@ -11,7 +11,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/media', require('./routes/media'));
 app.use('/api/queue', require('./routes/queue'));
-app.use('/', require('./routes/meta'));  // 
+app.use('/', require('./routes/meta'));
+
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -19,7 +21,7 @@ module.exports = app;
 
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
- app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SocialAI démarré sur http://localhost:${PORT}`);
   });
 }
