@@ -26,8 +26,8 @@ const SCOPES = [
 ].join(',');
 
 router.get('/auth/meta', (req, res) => {
-  const url = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${SCOPES}&response_type=code`;
-  res.redirect(url);
+  const igOAuthUrl = `https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`;
+  res.redirect(igOAuthUrl);
 });
 
 router.get('/auth/meta/callback', async (req, res) => {
