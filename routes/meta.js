@@ -1,47 +1,51 @@
-
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-const APP_ID = process.env.META_APP_ID;
 const APP_SECRET = process.env.META_APP_SECRET;
 const REDIRECT_URI = process.env.META_REDIRECT_URI;
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
-const SCOPES = [
-  'instagram_business_basic',
-  'instagram_manage_comments',
-  'instagram_manage_messages',
-  'instagram_content_publish',
-  'instagram_manage_insights'
-].join(',');
-
 router.get('/auth/meta', (req, res) => {
-  res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=1756229958687187&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`);
+  res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights`);
 });
+
 router.get('/auth/meta/callback', async (req, res) => {
   const { code, client_id } = req.query;
   try {
-    const { data: shortToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
-      params: { client_id: APP_ID, client_secret: APP_SECRET, redirect_uri: REDIRECT_URI, code }
-    });
-    const { data: longToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
-      params: {
-        grant_type: 'fb_exchange_token',
-        client_id: APP_ID,
+    const { data: tokenData } = await axios.post(
+      `https://api.instagram.com/oauth/access_token`,
+      new URLSearchParams({
+        client_id: '911028448504932',
         client_secret: APP_SECRET,
-        fb_exchange_token: shortToken.access_token
-      }
-    });
+        grant_type: 'authorization_code',
+        redirect_uri: REDIRECT_URI,
+        code
+      })
+    );
 
-    const { data: igData } = await axios.get(`https://graph.instagram.com/v19.0/me`, {
-      params: {
-        fields: 'id,name,username',
-        access_token: longToken.access_token
+    const { data: longToken } = await axios.get(
+      `https://graph.instagram.com/access_token`,
+      {
+        params: {
+          grant_type: 'ig_exchange_token',
+          client_secret: APP_SECRET,
+          access_token: tokenData.access_token
+        }
       }
-    });
+    );
+
+    const { data: igData } = await axios.get(
+      `https://graph.instagram.com/v19.0/me`,
+      {
+        params: {
+          fields: 'id,name,username',
+          access_token: longToken.access_token
+        }
+      }
+    );
 
     await supabase.from('social_accounts').upsert({
       client_id: client_id || null,
@@ -55,7 +59,7 @@ router.get('/auth/meta/callback', async (req, res) => {
     res.json({ success: true, account: igData.username });
   } catch (err) {
     console.error(err.response?.data || err.message);
-    res.status(500).json({ error: 'Erreur OAuth Meta' });
+    res.status(500).json({ error: 'Erreur OAuth Meta', details: err.response?.data });
   }
 });
 
@@ -74,7 +78,7 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
   const body = JSON.parse(req.body);
   res.sendStatus(200);
 
-  if (body.object === 'page') {
+  if (body.object === 'instagram') {
     for (const entry of body.entry) {
       if (entry.messaging) {
         for (const event of entry.messaging) {
