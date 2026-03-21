@@ -10,6 +10,11 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 });
@@ -37,7 +42,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     // ── Upload dans Supabase Storage ────────────────────────────────────────
     const fileName = `${client_id}/${Date.now()}_${file.originalname}`;
-    const { data: storageData, error: storageError } = await supabase.storage
+    const { data: storageData, error: storageError } = await supabaseAdmin.storage
       .from('media')
       .upload(fileName, imageData, {
         contentType: mimeType,
@@ -47,7 +52,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     if (storageError) throw new Error(storageError.message);
 
     // Récupérer l'URL publique
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseAdmin.storage
       .from('media')
       .getPublicUrl(fileName);
 
@@ -131,7 +136,7 @@ router.delete('/:id', async (req, res) => {
 
   if (media?.url) {
     const path = media.url.split('/media/')[1];
-    if (path) await supabase.storage.from('media').remove([path]);
+    if (path) await supabaseAdmin.storage.from('media').remove([path]);
   }
 
   const { error } = await supabase
