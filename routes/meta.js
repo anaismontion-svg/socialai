@@ -83,6 +83,7 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
 
   if (body.object === 'instagram') {
     for (const entry of body.entry) {
+      console.log('🔑 entry.id reçu:', entry.id);
 
       // ── DMs ──────────────────────────────────────────────────────────────
       if (entry.messaging) {
@@ -100,13 +101,13 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 .select('access_token, account_name')
                 .eq('account_id', entry.id)
                 .single();
-              if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
+              if (!accounts) { console.warn('⚠️ Compte introuvable pour', entry.id); continue; }
 
               const classification = await classifyMessage(messageText);
               console.log('🔍 Classification:', classification);
 
               if (classification.besoin_humain) {
-                console.log('🙋 Intervention humaine requise (', classification.categorie, ') — envoi message de transition');
+                console.log('🙋 Intervention humaine requise (', classification.categorie, ')');
                 const transitionReply = await generateHumanNeededReply(accounts.account_name, accounts.access_token, senderId);
                 await replyToDM(senderId, transitionReply, accounts.access_token);
                 continue;
@@ -141,13 +142,13 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
                 .select('access_token, account_name')
                 .eq('account_id', entry.id)
                 .single();
-              if (!accounts) { console.warn('⚠️ Compte introuvable'); continue; }
+              if (!accounts) { console.warn('⚠️ Compte introuvable pour', entry.id); continue; }
 
               const classification = await classifyMessage(commentText);
               console.log('🔍 Classification:', classification);
 
               if (classification.besoin_humain) {
-                console.log('🙋 Commentaire sensible (', classification.categorie, ') — laissé sans réponse publique');
+                console.log('🙋 Commentaire sensible (', classification.categorie, ') — laissé sans réponse');
                 continue;
               }
 
