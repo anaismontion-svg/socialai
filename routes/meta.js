@@ -19,7 +19,7 @@ const SCOPES = [
 ].join(',');
 
 router.get('/auth/meta', (req, res) => {
-  res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`);
+  res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=1756229958687187&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`);
 });
 router.get('/auth/meta/callback', async (req, res) => {
   const { code, client_id } = req.query;
