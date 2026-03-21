@@ -77,7 +77,9 @@ router.get('/webhook/meta', (req, res) => {
   }
 });
 
-const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (req, res) => {
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  res.sendStatus(200);
 
   if (body.object === 'instagram') {
     for (const entry of body.entry) {
@@ -146,7 +148,7 @@ const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
               if (classification.besoin_humain) {
                 console.log('🙋 Commentaire sensible (', classification.categorie, ') — laissé sans réponse publique');
-                continue; // Pas de réponse publique sur un commentaire sensible
+                continue;
               }
 
               const reply = await generateReply(commentText, accounts.account_name, change.value?.from?.id || '', accounts.access_token);
