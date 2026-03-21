@@ -19,16 +19,9 @@ const SCOPES = [
 ].join(',');
 
 router.get('/auth/meta', (req, res) => {
-  const igOAuthUrl = `https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`;
-  res.redirect(igOAuthUrl);
+  res.redirect(`https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=instagram_business_basic,instagram_manage_comments,instagram_manage_messages,instagram_content_publish,instagram_manage_insights`);
 });
-
-router.get('/auth/meta/callback', async (req, res) => {
-  const { code, client_id } = req.query;
-  try {
-    const { data: shortToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
-      params: { client_id: APP_ID, client_secret: APP_SECRET, redirect_uri: REDIRECT_URI, code }
-    });
+https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=911028448504932&redirect_uri=https://socialai-production-5ffb.up.railway.app/auth/meta/callback&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights
 
     const { data: longToken } = await axios.get(`https://graph.facebook.com/v19.0/oauth/access_token`, {
       params: {
