@@ -8,13 +8,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Espace client — pages dédiées ─────────────────────────────────────────────
-app.get('/login.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-app.get('/client.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'client.html'));
-});
+// ── Pages espace client ───────────────────────────────────────────────────────
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/client.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
 app.use('/api/clients', require('./routes/clients'));
@@ -24,7 +20,7 @@ app.use('/api/auth',    require('./routes/auth-portal').router);
 app.use('/api/portal',  require('./routes/client-portal'));
 app.use('/',            require('./routes/meta'));
 
-// ── Fallback SPA (back office uniquement) ─────────────────────────────────────
+// ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -33,8 +29,8 @@ app.use((req, res) => {
 const { processQueue, checkLowContent } = require('./routes/publisher');
 processQueue();
 checkLowContent();
-setInterval(processQueue,    1  * 60 * 1000);
-setInterval(checkLowContent, 6  * 60 * 60 * 1000);
+setInterval(processQueue,    60 * 1000);
+setInterval(checkLowContent, 6 * 60 * 60 * 1000);
 
 // ── Planificateur automatique ─────────────────────────────────────────────────
 const { runScheduler } = require('./routes/scheduler');
@@ -49,7 +45,7 @@ const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
     await syncAllClients();
     console.log('✅ Sync Instagram terminée');
   } catch (err) {
-    console.error('❌ Erreur sync Instagram au démarrage:', err.message);
+    console.error('❌ Erreur sync Instagram:', err.message);
   }
 })();
 setInterval(async () => {
