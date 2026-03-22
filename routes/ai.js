@@ -11,17 +11,33 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 function getMemory(senderId) {
   if (!conversationMemory[senderId]) {
     conversationMemory[senderId] = {
-      lastSeen: new Date(),
+      lastSeen: null,
       isFirstContact: true,
       status: 'normal',
       reason: null,
-      originalMessage: null
+      originalMessage: null,
+      firstName: null,
+      vouvoiement: true
     };
   }
   return conversationMemory[senderId];
 }
 
-function isNewDayOrFirstContact(senderId) {
+function extractFirstNameFromUsername(username) {
+  if (!username) return null;
+  // Supprimer les chiffres, underscores, points
+  const cleaned = username.replace(/[0-9._]/g, ' ').trim();
+  const words = cleaned.split(' ').filter(w => w.length > 2);
+  if (words.length === 0) return null;
+  // Retourner le premier mot capitalisé si ça ressemble à un prénom
+  const candidate = words[0];
+  if (candidate.length >= 3 && candidate.length <= 15) {
+    return candidate.charAt(0).toUpperCase() + candidate.slice(1).toLowerCase();
+  }
+  return null;
+}
+
+function getContactTiming(senderId) {
   const now = new Date();
   const memory = getMemory(senderId);
   const isFirst = memory.isFirstContact;
@@ -29,29 +45,16 @@ function isNewDayOrFirstContact(senderId) {
   if (isFirst) {
     memory.isFirstContact = false;
     memory.lastSeen = now;
-    return { isFirst: true, isNewDay: false };
+    return 'first';
   }
 
   const lastSeen = new Date(memory.lastSeen);
-  const isNewDay =
-    lastSeen.getDate() !== now.getDate() ||
-    lastSeen.getMonth() !== now.getMonth() ||
-    lastSeen.getFullYear() !== now.getFullYear();
-
+  const diffDays = (now - lastSeen) / (1000 * 60 * 60 * 24);
   memory.lastSeen = now;
-  return { isFirst: false, isNewDay };
-}
 
-async function getPhoneNumber(accessToken) {
-  if (process.env.CONTACT_PHONE) return process.env.CONTACT_PHONE;
-  try {
-    const { data } = await axios.get('https://graph.instagram.com/v19.0/me', {
-      params: { fields: 'phone_number', access_token: accessToken }
-    });
-    if (data.phone_number) return data.phone_number;
-  } catch (e) {}
-  console.warn('⚠️ Numéro de téléphone non disponible — ajoutez CONTACT_PHONE dans vos variables Railway');
-  return null;
+  if (diffDays > 3) return 'returning_long'; // plusieurs jours
+  if (diffDays > 0.04) return 'returning_short'; // quelques heures
+  return 'same_session'; // même conversation en cours
 }
 
 async function sendEmailSummary(senderInfo, reason, coordinates) {
@@ -132,9 +135,53 @@ besoin_humain doit être true pour : partenariat, opportunite_commerciale, quest
   }
 }
 
-async function generateReply(context, accountName = '', senderId = '', accessToken = '', accountDescription = '') {
+function buildGreeting(timing, memory, senderUsername = '') {
+  const vouvoiement = memory.vouvoiement !== false;
+  const vous = vouvoiement ? 'vous' : 'toi';
+  const votre = vouvoiement ? 'votre' : 'ton';
+
+  // Essayer d'extraire le prénom depuis le pseudo
+  const guessedName = extractFirstNameFromUsername(senderUsername);
+
+  switch (timing) {
+    case 'first': {
+      // 2 variantes pour le premier contact
+      const variants = [
+        `Bonjour,\nHeureuse de faire ${vous === 'vous' ? 'votre' : 'ta'} connaissance !`,
+        `Bonjour ! Merci pour ${vous === 'vous' ? 'votre' : 'ton'} message !`
+      ];
+      let greeting = variants[Math.floor(Math.random() * variants.length)];
+
+      // Proposer confirmation du prénom si on pense l'avoir deviné
+      if (guessedName && !memory.firstName) {
+        greeting += `\n\nHeureuse de ${vous === 'vous' ? 'vous' : 'te'} rencontrer ! ${guessedName}, c'est bien ça ?`;
+        memory.firstName = guessedName;
+        memory.firstNameConfirmed = false;
+      }
+
+      return greeting + '\n\n';
+    }
+
+    case 'returning_long':
+      return `Et bonjour ! Comment ${vous === 'vous' ? 'allez-vous' : 'vas-tu'} ?\n\n`;
+
+    case 'returning_short':
+      return `Et bonjour !\n\n`;
+
+    case 'same_session':
+    default:
+      return '';
+  }
+}
+
+async function generateReply(context, accountName = '', senderId = '', accessToken = '', accountDescription = '', senderUsername = '') {
   const memory = getMemory(senderId);
-  const { isFirst, isNewDay } = isNewDayOrFirstContact(senderId);
+
+  // Détecter le vouvoiement/tutoiement dans le message
+  const tutoiementKeywords = /\b(tu|toi|ton|ta|tes|t'|t'as|t'es)\b/i;
+  if (tutoiementKeywords.test(context)) {
+    memory.vouvoiement = false;
+  }
 
   // Si on attend les coordonnées
   if (memory.status === 'waiting_coordinates') {
@@ -156,45 +203,47 @@ async function generateReply(context, accountName = '', senderId = '', accessTok
     return null;
   }
 
-  let greeting = '';
-  if (isFirst) {
-    greeting = Math.random() > 0.5
-      ? 'Bonjour, enchantée, merci pour votre intérêt ! 😊\n\n'
-      : 'Bonjour, merci beaucoup pour votre message ! 😊\n\n';
-  } else if (isNewDay) {
-    greeting = 'Bonjour, ravie de vous retrouver ! 😊\n\n';
-  }
+  const timing = getContactTiming(senderId);
+  const greeting = buildGreeting(timing, memory, senderUsername);
+
+  const vouvoiement = memory.vouvoiement !== false;
 
   const systemPrompt = `Tu es la community manager du compte Instagram @${accountName}.
 
 Contexte sur ce compte :
 ${accountDescription}
 
-Règles de communication :
-- Tu vouvoies TOUJOURS les personnes par défaut
-- Si la personne te tutoie, tu peux adopter le tutoiement naturellement
-- Ton ton est chaleureux, humain et naturel — jamais robotique ni trop formel
-- Tu utilises des émojis avec subtilité (2-3 max par message)
-- Tu aères toujours tes messages avec des sauts de ligne entre les idées
-- Maximum 2 phrases par bloc, puis saut de ligne
-- Tes réponses sont variées, jamais copiées-collées
+RÈGLES ABSOLUES SUR LE CONTENU :
+- Ce compte parle EXCLUSIVEMENT de chats Ragdoll. Si quelqu'un dit "chiens", "lapins" ou toute autre espèce, corrige TOUJOURS gentiment : "Vous voulez dire nos Ragdolls ?" ou "Je crois que vous voulez parler de nos Ragdolls !"
 - Tu parles des Ragdolls avec passion et expertise
 - Tu ne "vends" pas un chaton — tu accompagnes les familles dans leur projet d'adoption
-- Tu réponds UNIQUEMENT à ce qui est demandé, de façon détaillée et précise
-- Tu ne donnes JAMAIS d'informations supplémentaires non demandées
-- Tu ne redirige pas vers le site ou d'autres sujets sauf si c'est directement lié à la question
-- Si la personne veut en savoir plus, elle posera d'autres questions
 
-Règles absolues :
-- Ne commence JAMAIS par une salutation — elle est déjà ajoutée automatiquement
+RÈGLES DE COMMUNICATION :
+- ${vouvoiement ? 'Tu vouvoies cette personne' : 'Tu tutoies cette personne (elle t\'a tutoié en premier)'}
+- Ton ton est chaleureux, humain et naturel — jamais robotique
+- Tu utilises des émojis avec subtilité (2-3 max par message)
+- Tu aères tes messages avec des sauts de ligne entre les idées
+- Maximum 2 phrases par bloc, puis saut de ligne
+- Tes réponses sont variées, jamais copiées-collées
+
+RÈGLES SUR LES INFORMATIONS PERSONNELLES :
+- Ne demande JAMAIS le numéro de téléphone ou les coordonnées dès le premier message
+- Essaie d'abord d'en savoir un peu plus sur la personne et son projet (sans être indiscret)
+- Le prénom est une information essentielle — s'il n'est pas encore connu, trouve un moment naturel pour le demander
+- Ce n'est qu'après avoir un peu échangé que tu peux demander gentiment : "Pourriez-vous m'envoyer votre numéro de téléphone ? Ce sera plus simple d'échanger directement de vive voix !"
+
+RÈGLES ABSOLUES DE FORMAT :
+- Ne commence JAMAIS par une salutation — elle est déjà ajoutée automatiquement avant ta réponse
 - Ne sois JAMAIS générique
-- Varie toujours tes formulations d'entrée en matière`;
+- Réponds UNIQUEMENT à ce qui est demandé, de façon précise
+- Ne donne pas d'informations non demandées
+- Varie toujours tes formulations`;
 
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 300,
     system: systemPrompt,
-    messages: [{ role: 'user', content: `Réponds à ce message reçu sur Instagram (sans salutation) : "${context}"` }]
+    messages: [{ role: 'user', content: `Réponds à ce message reçu sur Instagram (sans salutation, la salutation est déjà gérée) : "${context}"` }]
   });
 
   const body = message.content[0].text;
@@ -204,31 +253,35 @@ Règles absolues :
   return greeting + body;
 }
 
-async function generateHumanNeededReply(accountName = '', accessToken = '', senderId = '', reason = '', originalMessage = '') {
+async function generateHumanNeededReply(accountName = '', accessToken = '', senderId = '', reason = '', originalMessage = '', senderUsername = '') {
   const memory = getMemory(senderId);
-  const { isFirst, isNewDay } = isNewDayOrFirstContact(senderId);
+
+  // Détecter vouvoiement/tutoiement
+  const tutoiementKeywords = /\b(tu|toi|ton|ta|tes|t'|t'as|t'es)\b/i;
+  if (tutoiementKeywords.test(originalMessage)) {
+    memory.vouvoiement = false;
+  }
 
   memory.status = 'waiting_coordinates';
   memory.reason = reason;
   memory.originalMessage = originalMessage;
 
-  let greeting = '';
-  if (isFirst) {
-    greeting = Math.random() > 0.5
-      ? 'Bonjour, enchantée, merci pour votre intérêt ! 😊\n\n'
-      : 'Bonjour, merci beaucoup pour votre message ! 😊\n\n';
-  } else if (isNewDay) {
-    greeting = 'Bonjour, ravie de vous retrouver ! 😊\n\n';
-  }
+  const timing = getContactTiming(senderId);
+  const greeting = buildGreeting(timing, memory, senderUsername);
+  const vouvoiement = memory.vouvoiement !== false;
 
   await delay(2000);
 
-  return `${greeting}Merci pour votre message ! ✨\n\nPourriez-vous me donner votre nom et numéro de téléphone ?\n\nJe vais transmettre votre demande directement pour que l'on revienne vers vous au plus vite 😊`;
+  const phoneRequest = vouvoiement
+    ? `Pourriez-vous m'envoyer votre numéro de téléphone ? Ce sera plus simple d'échanger directement de vive voix ! 😊`
+    : `Pourrais-tu m'envoyer ton numéro de téléphone ? Ce sera plus simple d'échanger directement de vive voix ! 😊`;
+
+  return `${greeting}Merci pour votre message ! ✨\n\n${phoneRequest}\n\nJe vais transmettre votre demande pour que l'on revienne vers vous au plus vite.`;
 }
 
 async function scheduleFollowUp(supabase, senderId, accountId, accessToken) {
   try {
-    const scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // J+1
+    const scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await supabase.from('follow_ups').upsert({
       sender_id: senderId,
       account_id: accountId,
@@ -267,13 +320,8 @@ async function processFollowUps(supabase) {
 
     for (const followUp of followUps) {
       const message = `Bonjour,\n\nJe ne sais pas si mon dernier message s'était bien envoyé, avez-vous bien reçu ma réponse ?\n\nMerci à vous ! 😊`;
-
       await replyToDM(followUp.sender_id, message, followUp.access_token);
-
-      await supabase.from('follow_ups')
-        .update({ sent: true })
-        .eq('id', followUp.id);
-
+      await supabase.from('follow_ups').update({ sent: true }).eq('id', followUp.id);
       console.log(`📬 Relance envoyée à ${followUp.sender_id}`);
     }
   } catch (err) {
