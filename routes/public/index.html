@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,46 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0f;
-  --bg2:#111118;
-  --bg3:#18181f;
-  --bg4:#1e1e28;
-  --surface:#22222e;
-  --surface2:#2a2a38;
-  --border:#2e2e3e;
-  --border2:#3a3a4e;
-  --text:#f0f0f8;
-  --text2:#9090aa;
-  --text3:#5a5a72;
-  --accent:#ff3b6b;
-  --accent2:#c02250;
-  --purple:#8b5cf6;
-  --orange:#f97316;
-  --teal:#14b8a6;
-  --green:#22c55e;
-  --yellow:#eab308;
-  --r-sm:8px;
-  --r-md:12px;
-  --r-lg:16px;
-  --r-xl:24px;
-  --shadow:0 4px 24px rgba(0,0,0,0.4);
-  --glow:0 0 40px rgba(255,59,107,0.15);
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
+  --surface:#22222e;--surface2:#2a2a38;--border:#2e2e3e;--border2:#3a3a4e;
+  --text:#f0f0f8;--text2:#9090aa;--text3:#5a5a72;
+  --accent:#ff3b6b;--accent2:#c02250;--purple:#8b5cf6;
+  --orange:#f97316;--teal:#14b8a6;--green:#22c55e;--yellow:#eab308;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);--glow:0 0 40px rgba(255,59,107,0.15);
 }
 html{scroll-behavior:smooth}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  overflow-x:hidden;
-  font-size:14px;
-  line-height:1.6;
-}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.6}
 h1,h2,h3,h4{font-family:'Syne',sans-serif;line-height:1.2}
 button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
@@ -56,353 +27,152 @@ img{max-width:100%;display:block}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* ============================================================
-   LAYOUT
-   ============================================================ */
 .app{display:flex;height:100vh;overflow:hidden}
-.sidebar{
-  width:240px;flex-shrink:0;
-  background:var(--bg2);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  transition:width 0.3s ease;
-  z-index:10;
-}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{
-  height:56px;flex-shrink:0;
-  background:var(--bg2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 24px;gap:12px;
-}
+.topbar{height:56px;flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px}
 .content{flex:1;overflow-y:auto;padding:28px 28px 40px}
-
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
-.logo{
-  padding:20px 16px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.logo-icon{
-  width:32px;height:32px;border-radius:10px;
-  background:linear-gradient(135deg,var(--accent),var(--purple));
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
+.logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .logo-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.3px}
 .logo-tag{font-size:10px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase}
-
-.client-selector{
-  padding:12px;border-bottom:1px solid var(--border);
-}
-.client-btn{
-  width:100%;display:flex;align-items:center;gap:8px;
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:8px 10px;
-  color:var(--text);font-size:13px;transition:all 0.15s;
-}
+.client-selector{padding:12px;border-bottom:1px solid var(--border)}
+.client-btn{width:100%;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;color:var(--text);font-size:13px;transition:all 0.15s}
 .client-btn:hover{border-color:var(--border2);background:var(--surface)}
-.client-avatar{
-  width:28px;height:28px;border-radius:8px;
-  background:linear-gradient(135deg,var(--accent),var(--orange));
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:white;flex-shrink:0;
-}
+.client-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--orange));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0}
 .client-info{flex:1;text-align:left}
 .client-name{font-size:12px;font-weight:500}
 .client-plan{font-size:10px;color:var(--text3)}
 .chevron{color:var(--text3);font-size:10px}
-
 .nav{padding:8px;flex:1;overflow-y:auto}
 .nav-section{margin-bottom:20px}
-.nav-section-label{
-  font-size:10px;color:var(--text3);letter-spacing:1px;
-  text-transform:uppercase;padding:4px 8px 6px;
-}
-.nav-item{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 10px;border-radius:var(--r-sm);
-  color:var(--text2);font-size:13px;
-  transition:all 0.15s;cursor:pointer;
-  position:relative;
-}
+.nav-section-label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:4px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);color:var(--text2);font-size:13px;transition:all 0.15s;cursor:pointer;position:relative}
 .nav-item:hover{background:var(--bg3);color:var(--text)}
 .nav-item.active{background:var(--bg4);color:var(--text);font-weight:500}
-.nav-item.active::before{
-  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
-  width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0;
-}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0}
 .nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.8}
 .nav-item.active .nav-icon{opacity:1}
-.nav-badge{
-  margin-left:auto;background:var(--accent);color:white;
-  font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;
-}
-
-.sidebar-bottom{
-  padding:12px;border-top:1px solid var(--border);
-}
-.user-card{
-  display:flex;align-items:center;gap:8px;
-  padding:8px;border-radius:var(--r-md);
-  background:var(--bg3);
-}
-.user-avatar{
-  width:30px;height:30px;border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),var(--teal));
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;color:white;flex-shrink:0;
-}
+.nav-badge{margin-left:auto;background:var(--accent);color:white;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.sidebar-bottom{padding:12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r-md);background:var(--bg3)}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--teal));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
 .user-name{font-size:12px;font-weight:500}
 .user-role{font-size:10px;color:var(--text3)}
-
-/* ============================================================
-   TOPBAR
-   ============================================================ */
 .topbar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;flex:1}
 .topbar-actions{display:flex;gap:8px;align-items:center}
-.btn{
-  padding:7px 14px;font-size:13px;font-weight:500;
-  border-radius:var(--r-sm);border:1px solid var(--border2);
-  background:transparent;color:var(--text2);transition:all 0.15s;
-}
-.btn:hover{background:var(--surface);color:var(--text);border-color:var(--border2)}
-.btn-accent{
-  background:var(--accent);color:white;border-color:var(--accent);
-}
+.btn{padding:7px 14px;font-size:13px;font-weight:500;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);transition:all 0.15s}
+.btn:hover{background:var(--surface);color:var(--text)}
+.btn-accent{background:var(--accent);color:white;border-color:var(--accent)}
 .btn-accent:hover{background:var(--accent2);border-color:var(--accent2);color:white}
 .btn-ghost{border-color:transparent}
 .btn-ghost:hover{border-color:var(--border)}
-
-/* ============================================================
-   PANELS
-   ============================================================ */
+.btn-yellow{background:rgba(234,179,8,0.15);color:var(--yellow);border-color:rgba(234,179,8,0.3)}
+.btn-yellow:hover{background:rgba(234,179,8,0.25)}
+.btn-green{background:rgba(34,197,94,0.15);color:var(--green);border-color:rgba(34,197,94,0.3)}
+.btn-green:hover{background:rgba(34,197,94,0.25)}
+.btn-sm{padding:4px 10px;font-size:11px}
 .panel{display:none}
 .panel.active{display:block}
-
-/* ============================================================
-   CARDS
-   ============================================================ */
-.card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:20px;
-}
-.card-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
-}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:-0.2px}
-.card-action{
-  font-size:12px;color:var(--accent);background:none;border:none;
-  cursor:pointer;transition:opacity 0.15s;
-}
+.card-action{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;transition:opacity 0.15s}
 .card-action:hover{opacity:0.7}
-
-/* ============================================================
-   STAT CARDS
-   ============================================================ */
 .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}
-.stat-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:16px;position:relative;overflow:hidden;
-}
-.stat-card::after{
-  content:'';position:absolute;top:-30px;right:-30px;
-  width:80px;height:80px;border-radius:50%;
-  background:var(--glow-color,rgba(255,59,107,0.06));
-}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:-30px;right:-30px;width:80px;height:80px;border-radius:50%;background:var(--glow-color,rgba(255,59,107,0.06))}
 .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
 .stat-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px;letter-spacing:-1px}
 .stat-delta{font-size:11px;color:var(--text3)}
 .stat-delta.up{color:var(--green)}
-.stat-delta.down{color:var(--accent)}
 .stat-icon{font-size:18px;margin-bottom:8px}
-
-/* ============================================================
-   GRID HELPERS
-   ============================================================ */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
-
-/* ============================================================
-   MODAL OVERLAY
-   ============================================================ */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-  z-index:100;display:none;align-items:center;justify-content:center;padding:20px;
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
-.modal{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:var(--r-xl);padding:28px;width:100%;max-width:520px;
-  max-height:90vh;overflow-y:auto;
-  animation:slideUp 0.25s ease;
-}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-xl);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease}
 @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
-.modal-close{
-  width:28px;height:28px;border-radius:50%;background:var(--surface);
-  border:none;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;
-}
+.modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:none;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--surface2);color:var(--text)}
-
-/* ============================================================
-   FORM ELEMENTS
-   ============================================================ */
 .form-group{margin-bottom:16px}
 .form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500}
-.form-input{
-  width:100%;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;
-  transition:border-color 0.15s;
-}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;transition:border-color 0.15s}
 .form-input:focus{border-color:var(--accent)}
 .form-input::placeholder{color:var(--text3)}
 textarea.form-input{resize:vertical;min-height:80px}
-.form-select{
-  width:100%;background:var(--bg3);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;
-  appearance:none;
-}
+.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;appearance:none}
 
-/* ============================================================
-   CLIENT LIST
-   ============================================================ */
+/* CLIENT CARDS */
 .client-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.client-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:20px;
-  cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;
-}
-.client-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all 0.2s;position:relative;overflow:hidden}
+.client-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
 .client-card.active-client{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--glow)}
-.client-card-avatar{
-  width:48px;height:48px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:white;
-  margin-bottom:12px;
-}
+.client-card.paused-client{opacity:0.65;border-color:var(--yellow) !important}
+.client-card-avatar{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:white;margin-bottom:12px}
 .client-card-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:2px}
 .client-card-handle{font-size:12px;color:var(--text3);margin-bottom:12px}
 .client-card-stats{display:flex;gap:16px}
 .client-stat{text-align:center}
 .client-stat-val{font-size:14px;font-weight:600;font-family:'Syne',sans-serif}
 .client-stat-lbl{font-size:10px;color:var(--text3)}
-.client-card-status{
-  position:absolute;top:12px;right:12px;
-  font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;
-}
+.client-card-status{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
 .status-active{background:rgba(34,197,94,0.15);color:var(--green)}
 .status-paused{background:rgba(234,179,8,0.15);color:var(--yellow)}
-.add-client-card{
-  border:1px dashed var(--border2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:8px;min-height:140px;color:var(--text3);
-  transition:all 0.2s;
-}
+.add-client-card{border:1px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;color:var(--text3);transition:all 0.2s;cursor:pointer}
 .add-client-card:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,59,107,0.04)}
-.add-client-icon{font-size:24px}
-.add-client-label{font-size:13px;font-weight:500}
 
-/* ============================================================
-   MEDIA UPLOAD
-   ============================================================ */
-.upload-zone{
-  border:2px dashed var(--border2);border-radius:var(--r-lg);
-  padding:40px 20px;text-align:center;cursor:pointer;
-  transition:all 0.2s;background:var(--bg3);
-}
-.upload-zone:hover,.upload-zone.dragover{
-  border-color:var(--accent);background:rgba(255,59,107,0.04);
-}
+/* PLAN BADGE */
+.plan-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:0.3px}
+.plan-starter{background:rgba(20,184,166,0.15);color:var(--teal);border:1px solid rgba(20,184,166,0.3)}
+.plan-pro{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)}
+
+/* CLIENT ACTIONS BAR */
+.client-actions{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+
+/* PLAN SELECTOR */
+.plan-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.plan-option{border:2px solid var(--border);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all 0.2s;position:relative}
+.plan-option:hover{border-color:var(--border2)}
+.plan-option.selected-starter{border-color:var(--teal);background:rgba(20,184,166,0.06)}
+.plan-option.selected-pro{border-color:var(--purple);background:rgba(139,92,246,0.06)}
+.plan-option-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.plan-option-features{font-size:11px;color:var(--text3);line-height:1.7}
+.plan-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:white}
+.plan-option.selected-starter .plan-check{display:flex;background:var(--teal)}
+.plan-option.selected-pro .plan-check{display:flex;background:var(--purple)}
+
+/* PAUSE BANNER */
+.pause-banner{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px;color:var(--yellow)}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r-lg);padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg3)}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(255,59,107,0.04)}
 .upload-icon{font-size:36px;margin-bottom:12px}
 .upload-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:6px}
 .upload-sub{font-size:12px;color:var(--text3)}
-.upload-formats{
-  display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap;
-}
-.format-tag{
-  font-size:10px;padding:3px 8px;border-radius:10px;
-  background:var(--surface);border:1px solid var(--border);color:var(--text3);
-}
-
+.upload-formats{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.format-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text3)}
 .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px}
-.media-item{
-  border-radius:var(--r-md);overflow:hidden;position:relative;
-  background:var(--bg3);border:1px solid var(--border);aspect-ratio:1;
-  cursor:pointer;transition:all 0.2s;
-}
+.media-item{border-radius:var(--r-md);overflow:hidden;position:relative;background:var(--bg3);border:1px solid var(--border);aspect-ratio:1;cursor:pointer;transition:all 0.2s}
 .media-item:hover{border-color:var(--accent);transform:scale(1.02)}
-.media-thumb{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  font-size:36px;background:var(--bg4);
-}
-.media-overlay{
-  position:absolute;inset:0;background:rgba(0,0,0,0.6);
-  display:none;align-items:flex-end;padding:8px;
-}
+.media-thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg4)}
+.media-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:flex-end;padding:8px}
 .media-item:hover .media-overlay{display:flex}
 .media-info{font-size:10px;color:white}
-.media-type-badge{
-  position:absolute;top:6px;right:6px;
-  font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;
-}
+.media-type-badge{position:absolute;top:6px;right:6px;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600}
 .type-photo{background:rgba(20,184,166,0.8);color:white}
 .type-video{background:rgba(139,92,246,0.8);color:white}
-.type-reel{background:rgba(249,115,22,0.8);color:white}
-.media-ai-badge{
-  position:absolute;top:6px;left:6px;
-  font-size:9px;padding:2px 6px;border-radius:4px;
-  background:rgba(255,59,107,0.85);color:white;font-weight:600;
-}
-
-/* ============================================================
-   AI ANALYSIS
-   ============================================================ */
-.analysis-card{
-  background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));
-  border:1px solid rgba(139,92,246,0.2);
-  border-radius:var(--r-lg);padding:16px;margin-bottom:12px;
-}
-.analysis-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.analysis-icon{font-size:16px}
-.analysis-title{font-size:13px;font-weight:500}
-.analysis-score{
-  margin-left:auto;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-}
-.analysis-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.tag{
-  font-size:11px;padding:3px 9px;border-radius:10px;
-  background:var(--surface);border:1px solid var(--border);color:var(--text2);
-}
-.tag.highlight{background:rgba(255,59,107,0.12);border-color:rgba(255,59,107,0.3);color:var(--accent)}
-
-/* ============================================================
-   CONTENT QUEUE
-   ============================================================ */
-.queue-item{
-  display:flex;gap:12px;align-items:flex-start;
-  padding:14px;border-radius:var(--r-md);
-  background:var(--bg3);border:1px solid var(--border);
-  margin-bottom:10px;transition:all 0.15s;
-}
+.media-ai-badge{position:absolute;top:6px;left:6px;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,59,107,0.85);color:white;font-weight:600}
+.queue-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);margin-bottom:10px;transition:all 0.15s}
 .queue-item:hover{border-color:var(--border2)}
-.queue-thumb{
-  width:56px;height:56px;border-radius:var(--r-sm);
-  flex-shrink:0;background:var(--bg4);
-  display:flex;align-items:center;justify-content:center;font-size:22px;
-}
+.queue-thumb{width:56px;height:56px;border-radius:var(--r-sm);flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:22px}
 .queue-body{flex:1;min-width:0}
 .queue-title{font-size:13px;font-weight:500;margin-bottom:2px}
 .queue-meta{font-size:11px;color:var(--text3);margin-bottom:6px}
-.queue-caption{
-  font-size:12px;color:var(--text2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.queue-caption{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .queue-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 .queue-time{font-size:11px;color:var(--text3);white-space:nowrap}
 .queue-status{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
@@ -410,64 +180,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 .qs-generating{background:rgba(234,179,8,0.12);color:var(--yellow)}
 .qs-published{background:rgba(34,197,94,0.12);color:var(--green)}
 .qs-draft{background:var(--surface);color:var(--text3)}
-
-/* ============================================================
-   STORY BUILDER
-   ============================================================ */
-.story-phone{
-  width:160px;height:284px;border-radius:24px;
-  background:linear-gradient(180deg,#0f0f1a 0%,#1a0a2e 50%,#0a1a0f 100%);
-  border:2px solid var(--border2);position:relative;overflow:hidden;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:16px;flex-shrink:0;
-}
-.story-phone::before{
-  content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);
-  width:40px;height:3px;background:var(--border2);border-radius:2px;
-}
-.story-phone-content{text-align:center;z-index:1}
-.story-phone-icon{font-size:28px;margin-bottom:8px}
-.story-phone-title{
-  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
-  color:white;margin-bottom:4px;line-height:1.3;
-}
-.story-phone-sub{font-size:9px;color:rgba(255,255,255,0.6);line-height:1.4}
-.story-progress{
-  position:absolute;top:14px;left:8px;right:8px;
-  display:flex;gap:2px;
-}
-.story-bar{height:2px;border-radius:1px;flex:1;background:rgba(255,255,255,0.3)}
-.story-bar.active{background:white}
-.story-badge-phone{
-  position:absolute;bottom:12px;right:8px;
-  font-size:8px;padding:2px 6px;border-radius:4px;
-  background:rgba(255,255,255,0.15);color:white;
-}
-
-/* ============================================================
-   TRENDS & ANALYTICS
-   ============================================================ */
-.trend-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 0;border-bottom:1px solid var(--border);
-}
-.trend-item:last-child{border-bottom:none}
-.trend-rank{font-size:11px;color:var(--text3);width:18px;flex-shrink:0;font-weight:500}
-.trend-name{font-size:13px;font-weight:500;flex:1}
-.trend-bar-bg{width:100px;height:4px;background:var(--surface);border-radius:2px;flex-shrink:0}
-.trend-bar-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--purple))}
-.trend-pct{font-size:11px;color:var(--green);width:36px;text-align:right;flex-shrink:0;font-weight:500}
-.trend-delta{font-size:10px;color:var(--text3)}
-
-/* ============================================================
-   AUTOMATION STATUS
-   ============================================================ */
-.auto-status{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 14px;border-radius:var(--r-md);
-  border:1px solid var(--border);background:var(--bg3);
-  margin-bottom:8px;
-}
+.auto-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg3);margin-bottom:8px}
 .auto-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .dot-on{background:var(--green);box-shadow:0 0 8px var(--green)}
 .dot-off{background:var(--text3)}
@@ -475,49 +188,23 @@ textarea.form-input{resize:vertical;min-height:80px}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.2)}}
 .auto-label{flex:1;font-size:12px;font-weight:500}
 .auto-desc{font-size:11px;color:var(--text3)}
-.toggle{
-  width:36px;height:20px;background:var(--surface);border-radius:10px;
-  position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;
-}
+.toggle{width:36px;height:20px;background:var(--surface);border-radius:10px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
 .toggle.on{background:var(--green)}
-.toggle::after{
-  content:'';position:absolute;top:2px;left:2px;
-  width:16px;height:16px;border-radius:50%;background:white;
-  transition:transform 0.2s;
-}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:white;transition:transform 0.2s}
 .toggle.on::after{transform:translateX(16px)}
-
-/* ============================================================
-   LOG / ACTIVITY FEED
-   ============================================================ */
-.log-item{
-  display:flex;gap:10px;align-items:flex-start;
-  padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;
-}
+.log-item{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
 .log-item:last-child{border-bottom:none}
 .log-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
 .log-time{color:var(--text3);flex-shrink:0;font-size:11px;padding-top:1px}
 .log-text{color:var(--text2);flex:1;line-height:1.5}
 .log-text strong{color:var(--text);font-weight:500}
-
-/* ============================================================
-   CALENDAR
-   ============================================================ */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .cal-nav{display:flex;gap:4px}
-.cal-nav-btn{
-  width:28px;height:28px;border-radius:6px;background:var(--surface);
-  border:1px solid var(--border);color:var(--text2);font-size:12px;
-  display:flex;align-items:center;justify-content:center;
-}
+.cal-nav-btn{width:28px;height:28px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:12px;display:flex;align-items:center;justify-content:center}
 .cal-nav-btn:hover{background:var(--surface2);color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal-day-head{font-size:10px;color:var(--text3);text-align:center;padding:4px;letter-spacing:0.5px;text-transform:uppercase}
-.cal-day{
-  aspect-ratio:1;border-radius:6px;font-size:11px;
-  display:flex;flex-direction:column;align-items:center;padding:4px 2px;
-  cursor:pointer;transition:background 0.15s;position:relative;
-}
+.cal-day{aspect-ratio:1;border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:4px 2px;cursor:pointer;transition:background 0.15s}
 .cal-day:hover{background:var(--surface)}
 .cal-day.today{background:rgba(255,59,107,0.1)}
 .cal-day .day-num{font-size:11px;margin-bottom:2px;font-weight:500}
@@ -528,96 +215,52 @@ textarea.form-input{resize:vertical;min-height:80px}
 .cdot-post{background:var(--accent)}
 .cdot-story{background:var(--purple)}
 .cdot-reel{background:var(--orange)}
-
-/* ============================================================
-   SPINNER / LOADING
-   ============================================================ */
-.spinner{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(255,59,107,0.2);
-  border-top-color:var(--accent);
-  animation:spin 0.7s linear infinite;display:inline-block;
-}
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,59,107,0.2);border-top-color:var(--accent);animation:spin 0.7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-bar{
-  height:2px;background:var(--surface);border-radius:1px;overflow:hidden;
-}
-.loading-fill{
-  height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));
-  border-radius:1px;transition:width 0.3s ease;
-}
-
-/* ============================================================
-   PILL TABS
-   ============================================================ */
+.loading-bar{height:2px;background:var(--surface);border-radius:1px;overflow:hidden}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:1px;transition:width 0.3s ease}
 .tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r-sm);padding:3px;margin-bottom:16px}
-.tab{
-  flex:1;text-align:center;padding:6px;border-radius:6px;
-  font-size:12px;cursor:pointer;color:var(--text3);transition:all 0.15s;font-weight:500;
-}
+.tab{flex:1;text-align:center;padding:6px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text3);transition:all 0.15s;font-weight:500}
 .tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
-
-/* ============================================================
-   RESPONSIVE / MISC
-   ============================================================ */
-.section-title{
-  font-family:'Syne',sans-serif;font-size:20px;font-weight:700;
-  margin-bottom:6px;letter-spacing:-0.5px;
-}
+.section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
 .section-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
 .divider{height:1px;background:var(--border);margin:20px 0}
-.badge{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600;
-}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
 .badge-purple{background:rgba(139,92,246,0.15);color:var(--purple)}
 .badge-teal{background:rgba(20,184,166,0.15);color:var(--teal)}
 .badge-orange{background:rgba(249,115,22,0.15);color:var(--orange)}
 .badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
 .badge-red{background:rgba(255,59,107,0.15);color:var(--accent)}
-
-.empty-state{
-  text-align:center;padding:60px 20px;color:var(--text3);
-}
+.badge-yellow{background:rgba(234,179,8,0.15);color:var(--yellow)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
 .empty-sub{font-size:13px}
-
-/* ============================================================
-   PROGRESS BAR
-   ============================================================ */
 .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .progress-label{font-size:12px;color:var(--text2);width:100px;flex-shrink:0}
 .progress-bg{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
 .progress-fill{height:100%;border-radius:3px;transition:width 1s ease}
 .progress-val{font-size:11px;color:var(--text3);width:32px;text-align:right;flex-shrink:0}
-
-/* ============================================================
-   NOTIFICATION TOAST
-   ============================================================ */
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
-.toast{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:var(--r-md);padding:12px 16px;
-  font-size:13px;display:flex;align-items:center;gap:10px;
-  box-shadow:var(--shadow);min-width:260px;
-  animation:slideInRight 0.3s ease;
-}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);min-width:260px;animation:slideInRight 0.3s ease}
 @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 .toast-icon{font-size:16px;flex-shrink:0}
 .toast-text{flex:1}
 .toast.success{border-left:3px solid var(--green)}
 .toast.info{border-left:3px solid var(--purple)}
 .toast.warn{border-left:3px solid var(--yellow)}
+.trend-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.trend-item:last-child{border-bottom:none}
+.trend-rank{font-size:11px;color:var(--text3);width:18px;flex-shrink:0;font-weight:500}
+.trend-name{font-size:13px;font-weight:500;flex:1}
+.trend-bar-bg{width:100px;height:4px;background:var(--surface);border-radius:2px;flex-shrink:0}
+.trend-bar-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--purple))}
+.trend-pct{font-size:11px;color:var(--green);width:36px;text-align:right;flex-shrink:0;font-weight:500}
 </style>
 </head>
 <body>
 
-<!-- ============================================================
-     MODALS
-     ============================================================ -->
-
-<!-- Add Client Modal -->
+<!-- ── MODALS ── -->
 <div class="overlay" id="modal-add-client">
   <div class="modal">
     <div class="modal-header">
@@ -626,11 +269,16 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-group">
       <label class="form-label">Nom de l'entreprise *</label>
-      <input class="form-input" id="new-client-name" type="text" placeholder="Ex: Déco Paris">
+      <input class="form-input" id="new-client-name" type="text" placeholder="Ex: Love Queen Dolls">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email du client (pour l'espace client)</label>
+      <input class="form-input" id="new-client-email" type="email" placeholder="client@email.com">
     </div>
     <div class="form-group">
       <label class="form-label">Secteur d'activité</label>
       <select class="form-select form-input" id="new-client-sector">
+        <option>Élevage / Animaux</option>
         <option>Décoration intérieure</option>
         <option>Restauration</option>
         <option>Mode & Beauté</option>
@@ -652,19 +300,68 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-group">
       <label class="form-label">Description / Ton de communication</label>
-      <textarea class="form-input" id="new-client-desc" placeholder="Ex: Marque haut de gamme, ton chaleureux et inspirant, cible féminine 30-50 ans..."></textarea>
+      <textarea class="form-input" id="new-client-desc" placeholder="Ex: Chatterie ragdoll haut de gamme, ton chaleureux et passionné..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Plan</label>
-      <select class="form-select form-input" id="new-client-plan">
-        <option value="starter">Starter — 1 post/jour, stories auto</option>
-        <option value="pro" selected>Pro — 2 posts/jour, stories + reels auto</option>
-        <option value="enterprise">Enterprise — Illimité, prioritaire</option>
-      </select>
+      <label class="form-label">Forfait</label>
+      <div class="plan-selector">
+        <div class="plan-option selected-starter" id="plan-starter" onclick="selectPlan('starter')">
+          <div class="plan-check">✓</div>
+          <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
+          <div class="plan-option-features">
+            3 posts / semaine<br>
+            1 story / jour<br>
+            Analyse historique ✓<br>
+            1 post spécial / semaine<br>
+            DM & commentaires ✗
+          </div>
+        </div>
+        <div class="plan-option" id="plan-pro" onclick="selectPlan('pro')">
+          <div class="plan-check">✓</div>
+          <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
+          <div class="plan-option-features">
+            7 posts / semaine<br>
+            1 story / jour<br>
+            Recyclage top posts ✓<br>
+            Posts spéciaux illimités<br>
+            DM & commentaires ✓
+          </div>
+        </div>
+      </div>
+      <input type="hidden" id="new-client-plan" value="starter">
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
       <button class="btn" onclick="closeModal('modal-add-client')">Annuler</button>
       <button class="btn btn-accent" onclick="addClient()">Créer le compte →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal changement forfait -->
+<div class="overlay" id="modal-change-plan">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Changer le forfait</div>
+      <button class="modal-close" onclick="closeModal('modal-change-plan')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px">
+      Client : <strong id="change-plan-client-name" style="color:var(--text)"></strong>
+    </div>
+    <div class="plan-selector">
+      <div class="plan-option" id="modal-plan-starter" onclick="selectModalPlan('starter')">
+        <div class="plan-check">✓</div>
+        <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
+        <div class="plan-option-features">3 posts/sem · 1 story/jour<br>Analyse historique · 1 post spécial/sem<br>Pas de DM ni commentaires</div>
+      </div>
+      <div class="plan-option" id="modal-plan-pro" onclick="selectModalPlan('pro')">
+        <div class="plan-check">✓</div>
+        <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
+        <div class="plan-option-features">7 posts/sem · 1 story/jour<br>Recyclage · Posts spéciaux illimités<br>DM + commentaires IA</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn" onclick="closeModal('modal-change-plan')">Annuler</button>
+      <button class="btn btn-accent" onclick="confirmChangePlan()">Confirmer →</button>
     </div>
   </div>
 </div>
@@ -690,8 +387,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="modal-title">📤 Ajouter des médias</div>
       <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
     </div>
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
-         ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
       <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)">
       <div class="upload-icon">🗂️</div>
       <div class="upload-title">Glissez vos fichiers ici</div>
@@ -706,26 +402,20 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div id="upload-preview" style="margin-top:16px;display:none">
       <div style="font-size:13px;font-weight:500;margin-bottom:8px" id="upload-count"></div>
       <div id="upload-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-      <div style="margin-top:12px" id="upload-progress-bar">
+      <div style="margin-top:12px">
         <div class="loading-bar"><div class="loading-fill" id="upload-fill" style="width:0%"></div></div>
         <div style="font-size:11px;color:var(--text3);margin-top:4px" id="upload-status">Prêt à analyser</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn" onclick="closeModal('modal-upload')">Fermer</button>
-      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">
-        🤖 Analyser avec l'IA →
-      </button>
+      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">🤖 Analyser avec l'IA →</button>
     </div>
   </div>
 </div>
 
-<!-- ============================================================
-     APP SHELL
-     ============================================================ -->
+<!-- APP -->
 <div class="app">
-
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="logo">
       <div class="logo-icon">✦</div>
@@ -734,70 +424,47 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="logo-tag">Community Manager</div>
       </div>
     </div>
-
     <div class="client-selector">
       <button class="client-btn" onclick="openModal('modal-switch-client')">
-        <div class="client-avatar" id="sidebar-client-avatar">MB</div>
+        <div class="client-avatar" id="sidebar-client-avatar">LQ</div>
         <div class="client-info">
-          <div class="client-name" id="sidebar-client-name">Mon Business</div>
-          <div class="client-plan" id="sidebar-client-plan">Plan Pro</div>
+          <div class="client-name" id="sidebar-client-name">Lovequeendolls</div>
+          <div class="client-plan" id="sidebar-client-plan">Plan Starter</div>
         </div>
         <div class="chevron">▾</div>
       </button>
     </div>
-
     <nav class="nav">
       <div class="nav-section">
         <div class="nav-section-label">Principal</div>
         <div class="nav-item active" onclick="nav('dashboard')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10zm6-1l2 2 4-4-1.4-1.4L10 9.2 8.7 7.9 7.3 9.3z"/></svg>
-          Vue d'ensemble
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10zm6-1l2 2 4-4-1.4-1.4L10 9.2 8.7 7.9 7.3 9.3z"/></svg>Vue d'ensemble
         </div>
         <div class="nav-item" onclick="nav('clients')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
-          Clients
-          <div class="nav-badge" id="nav-client-count">3</div>
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>Clients
+          <div class="nav-badge" id="nav-client-count">1</div>
         </div>
       </div>
-
       <div class="nav-section">
         <div class="nav-section-label">Contenu</div>
         <div class="nav-item" onclick="nav('media')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
-          Médiathèque
-          <div class="nav-badge" id="nav-media-count">12</div>
-        </div>
-        <div class="nav-item" onclick="nav('ia')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.995 1.4-2 2-2s2 .957 2 2h-4z"/></svg>
-          Analyse IA
-        </div>
-        <div class="nav-item" onclick="nav('stories')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg>
-          Stories & Reels
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>Médiathèque
+          <div class="nav-badge" id="nav-media-count">0</div>
         </div>
         <div class="nav-item" onclick="nav('queue')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
-          File de publication
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>File de publication
         </div>
       </div>
-
       <div class="nav-section">
         <div class="nav-section-label">Analytics</div>
         <div class="nav-item" onclick="nav('calendar')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
-          Calendrier
-        </div>
-        <div class="nav-item" onclick="nav('trends')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-          Tendances
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>Calendrier
         </div>
         <div class="nav-item" onclick="nav('automation')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>
-          Automatisation
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>Automatisation
         </div>
       </div>
     </nav>
-
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar">AD</div>
@@ -809,12 +476,11 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Vue d'ensemble</div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" onclick="nav('automation')" id="auto-indicator" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)">
+        <button class="btn btn-ghost" id="auto-indicator" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)">
           <div class="auto-dot dot-on" style="width:6px;height:6px"></div> IA Active
         </button>
         <button class="btn" onclick="openModal('modal-upload')">📤 Ajouter des médias</button>
@@ -824,120 +490,28 @@ textarea.form-input{resize:vertical;min-height:80px}
 
     <div class="content">
 
-      <!-- ================================ DASHBOARD ================================ -->
+      <!-- DASHBOARD -->
       <div class="panel active" id="panel-dashboard">
         <div class="section-title">Bonjour 👋 Voici votre tableau de bord</div>
-        <div class="section-sub">Lundi 18 mars 2026 — 3 clients actifs, IA en cours d'exécution</div>
-
+        <div class="section-sub" id="dashboard-date">Chargement...</div>
         <div class="stats-grid">
           <div class="stat-card" style="--glow-color:rgba(255,59,107,0.08)">
-            <div class="stat-icon">👥</div>
-            <div class="stat-label">Abonnés total</div>
-            <div class="stat-value">34 820</div>
-            <div class="stat-delta up">↑ +1 240 ce mois</div>
+            <div class="stat-icon">👥</div><div class="stat-label">Clients actifs</div>
+            <div class="stat-value" id="stat-clients">0</div><div class="stat-delta">Comptes gérés</div>
           </div>
           <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)">
-            <div class="stat-icon">📊</div>
-            <div class="stat-label">Engagement moyen</div>
-            <div class="stat-value">5.2%</div>
-            <div class="stat-delta up">↑ +1.1% vs mois passé</div>
+            <div class="stat-icon">📸</div><div class="stat-label">Médias total</div>
+            <div class="stat-value" id="stat-medias">0</div><div class="stat-delta">Dans la médiathèque</div>
           </div>
           <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)">
-            <div class="stat-icon">🤖</div>
-            <div class="stat-label">Posts publiés auto</div>
-            <div class="stat-value">147</div>
-            <div class="stat-delta">Ce mois — 3 clients</div>
+            <div class="stat-icon">📅</div><div class="stat-label">Posts planifiés</div>
+            <div class="stat-value" id="stat-posts">0</div><div class="stat-delta">En file d'attente</div>
           </div>
           <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)">
-            <div class="stat-icon">⚡</div>
-            <div class="stat-label">Stories générées</div>
-            <div class="stat-value">312</div>
-            <div class="stat-delta up">↑ +28 cette semaine</div>
+            <div class="stat-icon">✅</div><div class="stat-label">Posts publiés</div>
+            <div class="stat-value" id="stat-published">0</div><div class="stat-delta">Au total</div>
           </div>
         </div>
-
-        <div class="grid-2">
-          <!-- Recent Activity -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">🔴 Activité IA en direct</div>
-              <button class="card-action" onclick="nav('automation')">Voir tout →</button>
-            </div>
-            <div id="live-log">
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--green)"></div>
-                <div class="log-time">14:32</div>
-                <div class="log-text"><strong>Déco Paris</strong> — Story «Tarifs» publiée sur Instagram ✅</div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--purple)"></div>
-                <div class="log-time">14:15</div>
-                <div class="log-text"><strong>Resto Lyon</strong> — Reel analysé, caption générée, planifié à 18h30</div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--yellow)"></div>
-                <div class="log-time">13:58</div>
-                <div class="log-text"><strong>FitStudio</strong> — 3 nouvelles photos détectées, analyse en cours… <span class="spinner"></span></div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--teal)"></div>
-                <div class="log-time">13:40</div>
-                <div class="log-text"><strong>Déco Paris</strong> — Post avant/après publié, 47 likes en 20 min 🔥</div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--accent)"></div>
-                <div class="log-time">12:00</div>
-                <div class="log-text"><strong>Resto Lyon</strong> — Story menu du jour générée et publiée automatiquement</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Queue preview -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">📋 Prochaines publications</div>
-              <button class="card-action" onclick="nav('queue')">File complète →</button>
-            </div>
-            <div class="queue-item">
-              <div class="queue-thumb">🛋️</div>
-              <div class="queue-body">
-                <div class="queue-title">Post avant/après — Salon Haussmann</div>
-                <div class="queue-meta">Déco Paris · Instagram</div>
-                <div class="queue-caption">✨ La transformation incroyable du salon de Marie à Paris...</div>
-              </div>
-              <div class="queue-right">
-                <div class="queue-time">Aujourd'hui 18:30</div>
-                <div class="queue-status qs-scheduled">Planifié</div>
-              </div>
-            </div>
-            <div class="queue-item">
-              <div class="queue-thumb">🍽️</div>
-              <div class="queue-body">
-                <div class="queue-title">Story menu du soir</div>
-                <div class="queue-meta">Resto Lyon · Instagram</div>
-                <div class="queue-caption">🌙 Notre carte du soir vous attend...</div>
-              </div>
-              <div class="queue-right">
-                <div class="queue-time">Aujourd'hui 19:00</div>
-                <div class="queue-status qs-generating"><span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span> Génère…</div>
-              </div>
-            </div>
-            <div class="queue-item">
-              <div class="queue-thumb">💪</div>
-              <div class="queue-body">
-                <div class="queue-title">Reel motivation du lundi</div>
-                <div class="queue-meta">FitStudio · Facebook + Instagram</div>
-                <div class="queue-caption">Commencez la semaine avec énergie ! 🔥</div>
-              </div>
-              <div class="queue-right">
-                <div class="queue-time">Demain 07:00</div>
-                <div class="queue-status qs-scheduled">Planifié</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Clients summary -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">👥 Clients actifs</div>
@@ -947,286 +521,54 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- ================================ CLIENTS ================================ -->
+      <!-- CLIENTS -->
       <div class="panel" id="panel-clients">
         <div class="section-title">Gestion des clients</div>
-        <div class="section-sub">Créez un compte par entreprise, l'IA s'occupe du reste.</div>
+        <div class="section-sub">Gérez les forfaits, mettez en pause ou réactivez le service IA pour chaque client.</div>
         <div class="client-grid" id="clients-grid"></div>
       </div>
 
-      <!-- ================================ MEDIA ================================ -->
+      <!-- MEDIA -->
       <div class="panel" id="panel-media">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
           <div>
             <div class="section-title">Médiathèque</div>
-            <div class="section-sub" id="media-client-name">Tous les médias de Mon Business</div>
+            <div class="section-sub" id="media-client-name">Médias du client actif</div>
           </div>
           <button class="btn btn-accent" onclick="openModal('modal-upload')">📤 Ajouter des médias</button>
         </div>
-
         <div class="tabs">
           <div class="tab active" onclick="filterMedia('all',this)">Tous</div>
           <div class="tab" onclick="filterMedia('photo',this)">Photos</div>
           <div class="tab" onclick="filterMedia('video',this)">Vidéos</div>
           <div class="tab" onclick="filterMedia('analysed',this)">Analysés ✓</div>
-          <div class="tab" onclick="filterMedia('pending',this)">En attente</div>
         </div>
-
         <div class="media-grid" id="media-grid"></div>
       </div>
 
-      <!-- ================================ IA ================================ -->
-      <div class="panel" id="panel-ia">
-        <div class="section-title">🤖 Analyse IA</div>
-        <div class="section-sub">L'IA analyse chaque média et génère automatiquement captions, hashtags et planning.</div>
-
-        <div class="grid-2">
-          <div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-header"><div class="card-title">Dernier média analysé</div></div>
-              <div style="display:flex;gap:12px;align-items:flex-start">
-                <div style="width:80px;height:80px;border-radius:var(--r-md);background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0">🛋️</div>
-                <div style="flex:1">
-                  <div style="font-size:13px;font-weight:500;margin-bottom:4px">salon-haussmann-apres.jpg</div>
-                  <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Photo · 2.4 MB · il y a 12 min</div>
-                  <div class="analysis-tags">
-                    <span class="tag highlight">Avant/Après</span>
-                    <span class="tag">Déco intérieure</span>
-                    <span class="tag">Haut de gamme</span>
-                    <span class="tag">Lumineux</span>
-                  </div>
-                </div>
-              </div>
-              <div style="margin-top:14px">
-                <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption générée</div>
-                <div style="font-size:12px;color:var(--text2);background:var(--bg3);border-radius:var(--r-sm);padding:10px;line-height:1.6;border:1px solid var(--border)">
-                  ✨ La transformation du salon de Marie à Paris — de l'espace terne à l'appartement de rêve en 4 semaines ! <br><br>
-                  Chaque détail compte : parquet en chêne, palette de neutres chauds, éclairage indirect... C'est ça notre signature. 🏠<br><br>
-                  #decorinterieur #avantapres #renovation #Paris #homedesign #luxedeco
-                </div>
-              </div>
-              <div style="display:flex;gap:6px;margin-top:10px">
-                <button class="btn" style="font-size:11px;padding:5px 10px">🔄 Regénérer</button>
-                <button class="btn" style="font-size:11px;padding:5px 10px">✏️ Modifier</button>
-                <button class="btn btn-accent" style="font-size:11px;padding:5px 10px">📅 Planifier</button>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="card-title">Scores d'analyse IA</div></div>
-              <div class="progress-row">
-                <div class="progress-label">Qualité visuelle</div>
-                <div class="progress-bg"><div class="progress-fill" style="width:92%;background:var(--green)"></div></div>
-                <div class="progress-val">92%</div>
-              </div>
-              <div class="progress-row">
-                <div class="progress-label">Potentiel viral</div>
-                <div class="progress-bg"><div class="progress-fill" style="width:78%;background:var(--orange)"></div></div>
-                <div class="progress-val">78%</div>
-              </div>
-              <div class="progress-row">
-                <div class="progress-label">Cohérence marque</div>
-                <div class="progress-bg"><div class="progress-fill" style="width:95%;background:var(--teal)"></div></div>
-                <div class="progress-val">95%</div>
-              </div>
-              <div class="progress-row">
-                <div class="progress-label">Engagement prédit</div>
-                <div class="progress-bg"><div class="progress-fill" style="width:84%;background:var(--purple)"></div></div>
-                <div class="progress-val">84%</div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="analysis-card" style="margin-bottom:12px">
-              <div class="analysis-header">
-                <div class="analysis-icon">🎯</div>
-                <div class="analysis-title">Recommandation de publication</div>
-                <div class="analysis-score" style="color:var(--green)">Score A+</div>
-              </div>
-              <div style="font-size:12px;color:var(--text2);line-height:1.6">
-                Ce contenu est idéal pour un <strong>post principal</strong> (pas une story). Publiez à <strong>18h30</strong> pour maximiser la portée auprès de votre audience cible (femmes 28-45 ans, actives en soirée).
-              </div>
-              <div class="analysis-tags">
-                <span class="tag highlight">Publier aujourd'hui</span>
-                <span class="tag">18h30</span>
-                <span class="tag">Format carré 1:1</span>
-              </div>
-            </div>
-
-            <div class="analysis-card" style="margin-bottom:12px">
-              <div class="analysis-header">
-                <div class="analysis-icon">🏷️</div>
-                <div class="analysis-title">Hashtags optimisés (IA)</div>
-              </div>
-              <div class="analysis-tags">
-                <span class="tag highlight">#avantapres</span>
-                <span class="tag highlight">#decorinterieur</span>
-                <span class="tag">#renovation</span>
-                <span class="tag">#homedesign</span>
-                <span class="tag">#paris</span>
-                <span class="tag">#interieur</span>
-                <span class="tag">#luxedeco</span>
-                <span class="tag">#architecturedinterieur</span>
-                <span class="tag">#designinterieur</span>
-                <span class="tag">#parquet</span>
-                <span class="tag">#salonmoderne</span>
-              </div>
-            </div>
-
-            <div class="analysis-card">
-              <div class="analysis-header">
-                <div class="analysis-icon">📈</div>
-                <div class="analysis-title">Tendances secteur détectées</div>
-              </div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:8px">L'IA a détecté ces tendances actives sur Instagram cette semaine :</div>
-              <div class="trend-item" style="padding:6px 0">
-                <div class="trend-name" style="font-size:12px">#renovationappartement</div>
-                <div class="trend-bar-bg"><div class="trend-bar-fill" style="width:88%"></div></div>
-                <div class="trend-pct">+34%</div>
-              </div>
-              <div class="trend-item" style="padding:6px 0">
-                <div class="trend-name" style="font-size:12px">#homestaging</div>
-                <div class="trend-bar-bg"><div class="trend-bar-fill" style="width:72%"></div></div>
-                <div class="trend-pct">+21%</div>
-              </div>
-              <div class="trend-item" style="padding:6px 0">
-                <div class="trend-name" style="font-size:12px">#interiordesign</div>
-                <div class="trend-bar-bg"><div class="trend-bar-fill" style="width:95%"></div></div>
-                <div class="trend-pct">+8%</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================ STORIES ================================ -->
-      <div class="panel" id="panel-stories">
-        <div class="section-title">Stories & Reels automatiques</div>
-        <div class="section-sub">L'IA crée et publie chaque jour des stories et reels adaptés à votre client.</div>
-
-        <div class="grid-2" style="margin-bottom:16px">
-          <div class="card">
-            <div class="card-header"><div class="card-title">🎬 Séquence du jour — Déco Paris</div></div>
-            <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px">
-              <div style="text-align:center;flex-shrink:0">
-                <div class="story-phone">
-                  <div class="story-progress"><div class="story-bar active"></div><div class="story-bar"></div><div class="story-bar"></div></div>
-                  <div class="story-phone-content">
-                    <div class="story-phone-icon">🏠</div>
-                    <div class="story-phone-title">Déco Paris</div>
-                    <div class="story-phone-sub">Experts depuis 2015<br>📍 Paris & IDF</div>
-                  </div>
-                  <div class="story-badge-phone">Publiée ✓</div>
-                </div>
-                <div style="font-size:10px;color:var(--text3);margin-top:6px">Présentation<br>09:00</div>
-              </div>
-              <div style="text-align:center;flex-shrink:0">
-                <div class="story-phone" style="background:linear-gradient(180deg,#0a1a0f 0%,#1a3a1a 50%,#0a1a0f 100%)">
-                  <div class="story-progress"><div class="story-bar active"></div><div class="story-bar active"></div><div class="story-bar"></div></div>
-                  <div class="story-phone-content">
-                    <div class="story-phone-icon">💰</div>
-                    <div class="story-phone-title">Nos Formules</div>
-                    <div class="story-phone-sub">Conseil : dès 200€<br>Complet : dès 1500€</div>
-                  </div>
-                  <div class="story-badge-phone">Publiée ✓</div>
-                </div>
-                <div style="font-size:10px;color:var(--text3);margin-top:6px">Tarifs<br>13:00</div>
-              </div>
-              <div style="text-align:center;flex-shrink:0">
-                <div class="story-phone" style="background:linear-gradient(135deg,#1a0a2e 0%,#2e0a1a 100%)">
-                  <div class="story-progress"><div class="story-bar active"></div><div class="story-bar active"></div><div class="story-bar active"></div></div>
-                  <div class="story-phone-content">
-                    <div class="story-phone-icon">✨</div>
-                    <div class="story-phone-title">Avant → Après</div>
-                    <div class="story-phone-sub">Swipez pour voir la<br>transformation 👉</div>
-                  </div>
-                  <div class="story-badge-phone">Planifiée 18h</div>
-                </div>
-                <div style="font-size:10px;color:var(--text3);margin-top:6px">Avant/Après<br>18:00</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div class="card-title">⚙️ Templates automatiques</div><button class="card-action">+ Ajouter</button></div>
-            <div id="story-templates">
-              <div class="auto-status">
-                <div class="auto-dot dot-on"></div>
-                <div>
-                  <div class="auto-label">Présentation entreprise</div>
-                  <div class="auto-desc">Chaque jour à 09:00 — Personnalisé par l'IA</div>
-                </div>
-                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-              </div>
-              <div class="auto-status">
-                <div class="auto-dot dot-on"></div>
-                <div>
-                  <div class="auto-label">Liste des tarifs</div>
-                  <div class="auto-desc">Chaque jour à 13:00 — Mis à jour auto</div>
-                </div>
-                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-              </div>
-              <div class="auto-status">
-                <div class="auto-dot dot-on"></div>
-                <div>
-                  <div class="auto-label">Avant / Après</div>
-                  <div class="auto-desc">Chaque jour à 18:00 — Depuis la médiathèque</div>
-                </div>
-                <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-              </div>
-              <div class="auto-status">
-                <div class="auto-dot dot-off"></div>
-                <div>
-                  <div class="auto-label">Témoignage client</div>
-                  <div class="auto-desc">Désactivé — Cliquez pour activer</div>
-                </div>
-                <div class="toggle" onclick="this.classList.toggle('on');this.previousElementSibling.previousElementSibling.previousElementSibling.className='auto-dot dot-on'"></div>
-              </div>
-              <div class="auto-status">
-                <div class="auto-dot dot-off"></div>
-                <div>
-                  <div class="auto-label">Reel hebdomadaire</div>
-                  <div class="auto-desc">Chaque lundi 07:00 — Vidéos médiathèque</div>
-                </div>
-                <div class="toggle" onclick="this.classList.toggle('on')"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================ QUEUE ================================ -->
+      <!-- QUEUE -->
       <div class="panel" id="panel-queue">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
           <div>
             <div class="section-title">File de publication</div>
-            <div class="section-sub">Tous les contenus planifiés par l'IA, prêts à être publiés.</div>
+            <div class="section-sub">Contenus planifiés par l'IA.</div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn">🔀 Réorganiser</button>
-            <button class="btn btn-accent" onclick="openModal('modal-upload')">+ Ajouter un média</button>
-          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-upload')">+ Ajouter un média</button>
         </div>
-        <div id="queue-list"></div>
+        <div id="queue-list"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div><div class="empty-sub">L'IA planifiera automatiquement les prochains posts.</div></div></div>
       </div>
 
-      <!-- ================================ CALENDAR ================================ -->
+      <!-- CALENDAR -->
       <div class="panel" id="panel-calendar">
         <div class="section-title">Calendrier éditorial</div>
-        <div class="section-sub">Vue d'ensemble des publications planifiées par l'IA.</div>
+        <div class="section-sub">Vue d'ensemble des publications planifiées.</div>
         <div class="card">
           <div class="cal-header">
-            <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600">Mars 2026</div>
+            <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600" id="cal-month-label">Mars 2026</div>
             <div class="cal-nav">
-              <button class="cal-nav-btn">‹</button>
-              <button class="cal-nav-btn">›</button>
+              <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+              <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
             </div>
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><div class="cdot cdot-post"></div> Post</div>
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><div class="cdot cdot-story"></div> Story</div>
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><div class="cdot cdot-reel"></div> Reel</div>
           </div>
           <div class="cal-grid">
             <div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div><div class="cal-day-head">Mer</div>
@@ -1236,350 +578,326 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
 
-      <!-- ================================ TRENDS ================================ -->
-      <div class="panel" id="panel-trends">
-        <div class="section-title">Tendances &amp; Analytics</div>
-        <div class="section-sub">L'IA surveille en permanence les tendances de votre secteur.</div>
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-header"><div class="card-title">🔥 Hashtags en hausse — Déco</div></div>
-            <div id="trends-list"></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">📊 Analyse audience</div></div>
-            <div class="progress-row"><div class="progress-label">Femmes 28-45</div><div class="progress-bg"><div class="progress-fill" style="width:73%;background:var(--accent)"></div></div><div class="progress-val">73%</div></div>
-            <div class="progress-row"><div class="progress-label">Hommes</div><div class="progress-bg"><div class="progress-fill" style="width:27%;background:var(--purple)"></div></div><div class="progress-val">27%</div></div>
-            <div class="divider"></div>
-            <div class="progress-row"><div class="progress-label">Mobile</div><div class="progress-bg"><div class="progress-fill" style="width:91%;background:var(--teal)"></div></div><div class="progress-val">91%</div></div>
-            <div class="progress-row"><div class="progress-label">Matin 7-9h</div><div class="progress-bg"><div class="progress-fill" style="width:68%;background:var(--orange)"></div></div><div class="progress-val">68%</div></div>
-            <div class="progress-row"><div class="progress-label">Soir 18-21h</div><div class="progress-bg"><div class="progress-fill" style="width:88%;background:var(--green)"></div></div><div class="progress-val">88%</div></div>
-            <div class="divider"></div>
-            <div style="font-size:12px;color:var(--text2)">
-              <div style="margin-bottom:6px"><strong style="color:var(--text)">Contenu le plus engagé :</strong> Avant/Après (+320% vs posts normaux)</div>
-              <div><strong style="color:var(--text)">Meilleure heure :</strong> 18h30 pour votre audience cible</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================================ AUTOMATION ================================ -->
+      <!-- AUTOMATION -->
       <div class="panel" id="panel-automation">
         <div class="section-title">⚡ Centre d'automatisation</div>
-        <div class="section-sub">Configurez le comportement autonome de l'IA pour chaque client.</div>
-
+        <div class="section-sub">Modules IA actifs pour votre agent community manager.</div>
         <div class="grid-2">
           <div class="card">
             <div class="card-header"><div class="card-title">🤖 Modules IA actifs</div></div>
-            <div class="auto-status">
-              <div class="auto-dot dot-on"></div>
-              <div>
-                <div class="auto-label">Analyse automatique des médias</div>
-                <div class="auto-desc">Dès qu'un média est uploadé, l'IA l'analyse immédiatement</div>
-              </div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="auto-status">
-              <div class="auto-dot dot-on"></div>
-              <div>
-                <div class="auto-label">Génération de captions</div>
-                <div class="auto-desc">Caption + hashtags générés automatiquement</div>
-              </div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="auto-status">
-              <div class="auto-dot dot-running"></div>
-              <div>
-                <div class="auto-label">Planification intelligente</div>
-                <div class="auto-desc">L'IA choisit la meilleure heure selon l'audience</div>
-              </div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="auto-status">
-              <div class="auto-dot dot-on"></div>
-              <div>
-                <div class="auto-label">Publication automatique</div>
-                <div class="auto-desc">Via Meta Graph API — aucune intervention requise</div>
-              </div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="auto-status">
-              <div class="auto-dot dot-on"></div>
-              <div>
-                <div class="auto-label">Stories quotidiennes auto</div>
-                <div class="auto-desc">3 stories/jour générées et publiées seules</div>
-              </div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="auto-status">
-              <div class="auto-dot dot-off"></div>
-              <div>
-                <div class="auto-label">Réponse aux commentaires</div>
-                <div class="auto-desc">L'IA répond automatiquement (bêta)</div>
-              </div>
-              <div class="toggle" onclick="this.classList.toggle('on')"></div>
-            </div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Analyse automatique des médias</div><div class="auto-desc">Dès qu'un média est uploadé</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Génération de captions</div><div class="auto-desc">Caption + hashtags automatiques</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-running"></div><div><div class="auto-label">Planification intelligente</div><div class="auto-desc">Meilleure heure selon l'audience</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Publication automatique</div><div class="auto-desc">Via Meta Graph API</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Sync historique Instagram</div><div class="auto-desc">Analyse des anciens posts au démarrage</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Recyclage top posts (PRO)</div><div class="auto-desc">Réutilise les posts performants</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse DM (PRO)</div><div class="auto-desc">Répond automatiquement aux messages</div></div><div class="toggle on"></div></div>
           </div>
-
-          <div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-header"><div class="card-title">📊 Statut en temps réel</div></div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--green)"></div>
-                <div class="log-time">14:32</div>
-                <div class="log-text"><strong>Déco Paris</strong> — Story «Tarifs» publiée ✅</div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--yellow)"></div>
-                <div class="log-time">14:15</div>
-                <div class="log-text"><strong>FitStudio</strong> — Analyse de 3 photos en cours… <span class="spinner"></span></div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--purple)"></div>
-                <div class="log-time">13:58</div>
-                <div class="log-text"><strong>Resto Lyon</strong> — Reel planifié à 18h30</div>
-              </div>
-              <div class="log-item">
-                <div class="log-dot" style="background:var(--teal)"></div>
-                <div class="log-time">13:40</div>
-                <div class="log-text"><strong>Déco Paris</strong> — Post publié, 47 likes ❤️</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header"><div class="card-title">🔗 Connexion Meta API</div></div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-                Pour la publication automatique, connectez l'API Meta Graph. Cette connexion est gérée par votre développeur backend.
-              </div>
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border)">
-                  <div style="font-size:12px;font-weight:500">Instagram (Déco Paris)</div>
-                  <div class="badge badge-green">✓ Connecté</div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📊 Forfaits</div></div>
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:8px">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--teal)">⚡ Starter</div>
+                  <div style="font-size:11px;color:var(--text3)">3 posts/sem · 1 story/jour · 1 post spécial/sem</div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border)">
-                  <div style="font-size:12px;font-weight:500">Facebook (Déco Paris)</div>
-                  <div class="badge badge-green">✓ Connecté</div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border)">
-                  <div style="font-size:12px;font-weight:500">Instagram (Resto Lyon)</div>
-                  <div class="badge badge-green">✓ Connecté</div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:var(--r-sm);background:var(--bg3);border:1px solid var(--border)">
-                  <div style="font-size:12px;font-weight:500">Instagram (FitStudio)</div>
-                  <div class="badge badge-orange">⏳ En attente</div>
-                </div>
+                <div class="badge badge-teal">Entrée de gamme</div>
               </div>
-              <button class="btn" style="width:100%;margin-top:12px;font-size:12px">+ Connecter un compte</button>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple)">🚀 Pro</div>
+                  <div style="font-size:11px;color:var(--text3)">7 posts/sem · Recyclage · DM · Commentaires</div>
+                </div>
+                <div class="badge badge-purple">Complet</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /app -->
+    </div>
+  </div>
+</div>
 
-<!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ============================================================
-// DATA
-// ============================================================
-let clients = [
-  {id:1, name:'Déco Paris', initials:'DP', handle:'@decoParis', sector:'Décoration intérieure',
-   color:'linear-gradient(135deg,#E1306C,#833AB4)', plan:'Pro',
-   followers:'12 480', engagement:'4.7%', posts:28, status:'active', active:true},
-  {id:2, name:'Resto Lyon', initials:'RL', handle:'@restoLyon', sector:'Restauration',
-   color:'linear-gradient(135deg,#f97316,#eab308)', plan:'Starter',
-   followers:'8 920', engagement:'6.1%', posts:31, status:'active', active:false},
-  {id:3, name:'FitStudio', initials:'FS', handle:'@fitStudio', sector:'Fitness & Bien-être',
-   color:'linear-gradient(135deg,#14b8a6,#8b5cf6)', plan:'Pro',
-   followers:'13 420', engagement:'4.8%', posts:22, status:'paused', active:false},
-];
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let clients = [];
+let activeClient = null;
+let mediaItems = [];
+let changePlanClientId = null;
+let changePlanSelected = 'starter';
+let calendarDate = new Date();
 
-let activeClient = clients[0];
+// ── INIT ───────────────────────────────────────────────────────────────────────
+async function init() {
+  const now = new Date();
+  document.getElementById('dashboard-date').textContent =
+    now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
+    ' — IA en cours d\'exécution';
 
-let mediaItems = [
-  {id:1, emoji:'🛋️', name:'salon-haussmann-apres.jpg', type:'photo', analysed:true, client:1},
-  {id:2, emoji:'🏠', name:'entree-moderne.jpg', type:'photo', analysed:true, client:1},
-  {id:3, emoji:'🛁', name:'sdb-renovation.jpg', type:'photo', analysed:true, client:1},
-  {id:4, emoji:'🎬', name:'timelapse-chantier.mp4', type:'video', analysed:true, client:1},
-  {id:5, emoji:'🍽️', name:'menu-printemps.jpg', type:'photo', analysed:true, client:2},
-  {id:6, emoji:'🥗', name:'plat-du-jour.jpg', type:'photo', analysed:false, client:2},
-  {id:7, emoji:'💪', name:'cours-muscu.mp4', type:'video', analysed:true, client:3},
-  {id:8, emoji:'🧘', name:'yoga-session.jpg', type:'photo', analysed:false, client:3},
-  {id:9, emoji:'🪑', name:'chaise-design.jpg', type:'photo', analysed:true, client:1},
-  {id:10, emoji:'🌿', name:'plante-interieur.jpg', type:'photo', analysed:false, client:1},
-  {id:11, emoji:'🎥', name:'reel-ambiance.mp4', type:'video', analysed:false, client:1},
-  {id:12, emoji:'✨', name:'detail-lustre.jpg', type:'photo', analysed:true, client:1},
-];
-
-let queueItems = [
-  {thumb:'🛋️', title:'Salon Haussmann — Avant/Après', client:'Déco Paris', net:'Instagram', time:'Aujourd\'hui 18:30', status:'scheduled', caption:'✨ La transformation du salon de Marie...'},
-  {thumb:'🍽️', title:'Story menu du soir', client:'Resto Lyon', net:'Instagram', time:'Aujourd\'hui 19:00', status:'generating', caption:'🌙 Notre carte du soir vous attend...'},
-  {thumb:'💪', title:'Reel motivation du lundi', client:'FitStudio', net:'Instagram + Facebook', time:'Demain 07:00', status:'scheduled', caption:'Commencez la semaine avec énergie ! 🔥'},
-  {thumb:'🏠', title:'Post présentation services', client:'Déco Paris', net:'Facebook', time:'Demain 10:00', status:'scheduled', caption:'🏠 Découvrez nos prestations sur mesure...'},
-  {thumb:'🥗', title:'Photo plat du jour', client:'Resto Lyon', net:'Instagram', time:'Demain 12:00', status:'draft', caption:'À générer...'},
-  {thumb:'✨', title:'Story tarifs hebdo', client:'Déco Paris', net:'Instagram', time:'Demain 13:00', status:'scheduled', caption:'💰 Nos formules pour tous les projets...'},
-];
-
-let trends = [
-  ['#renovationappartement',92,'+34%'],['#decorinterieur',88,'+18%'],
-  ['#avantapres',81,'+31%'],['#homedesign',74,'+12%'],
-  ['#homestaging',68,'+9%'],['#architecturedinterieur',61,'+7%'],
-  ['#interiordesign',95,'+5%'],
-];
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-const titles = {
-  dashboard:'Vue d\'ensemble', clients:'Gestion des clients',
-  media:'Médiathèque', ia:'Analyse IA', stories:'Stories & Reels automatiques',
-  queue:'File de publication', calendar:'Calendrier éditorial',
-  trends:'Tendances & Analytics', automation:'Centre d\'automatisation'
-};
-
-function nav(page) {
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('panel-'+page).classList.add('active');
-  document.getElementById('topbar-title').textContent = titles[page];
-  const navItems = document.querySelectorAll('.nav-item');
-  const pageOrder = ['dashboard','clients','media','ia','stories','queue','calendar','trends','automation'];
-  const idx = pageOrder.indexOf(page);
-  if(idx>=0) navItems[idx].classList.add('active');
-  if(page==='clients') renderClients();
-  if(page==='media') renderMedia('all');
-  if(page==='queue') renderQueue();
-  if(page==='calendar') buildCalendar();
-  if(page==='trends') renderTrends();
-  if(page==='dashboard') renderDashboardClients();
-  closeModal('modal-switch-client');
+  await loadClients();
+  renderDashboardClients();
+  renderSwitcherList();
 }
 
-// ============================================================
-// MODALS
-// ============================================================
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-document.querySelectorAll('.overlay').forEach(o=>{
-  o.addEventListener('click',e=>{if(e.target===o) o.classList.remove('open')})
-});
+// ── CLIENTS ────────────────────────────────────────────────────────────────────
+async function loadClients() {
+  try {
+    const r = await fetch('/api/clients');
+    clients = await r.json();
+    if (clients.length > 0 && !activeClient) {
+      activeClient = clients[0];
+      updateSidebarClient();
+    }
+    document.getElementById('nav-client-count').textContent = clients.length;
+    document.getElementById('stat-clients').textContent = clients.filter(c=>c.status==='active').length;
+  } catch(e) { console.error('Erreur chargement clients:', e); }
+}
 
-// ============================================================
-// CLIENTS
-// ============================================================
+function updateSidebarClient() {
+  if (!activeClient) return;
+  const initials = activeClient.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sidebar-client-avatar').textContent = initials;
+  document.getElementById('sidebar-client-name').textContent = activeClient.name;
+  document.getElementById('sidebar-client-plan').textContent = 'Plan ' + (activeClient.plan || 'starter').charAt(0).toUpperCase() + (activeClient.plan || 'starter').slice(1);
+}
+
+function getClientColor(idx) {
+  const colors = [
+    'linear-gradient(135deg,#E1306C,#833AB4)',
+    'linear-gradient(135deg,#f97316,#eab308)',
+    'linear-gradient(135deg,#14b8a6,#8b5cf6)',
+    'linear-gradient(135deg,#3b82f6,#06b6d4)',
+    'linear-gradient(135deg,#10b981,#059669)',
+  ];
+  return colors[idx % colors.length];
+}
+
 function renderClients() {
   const grid = document.getElementById('clients-grid');
-  grid.innerHTML = clients.map(c=>`
-    <div class="client-card${c.active?' active-client':''}" onclick="selectClient(${c.id})">
-      <div class="client-card-status status-${c.status}">${c.status==='active'?'● Actif':'⏸ Pause'}</div>
-      <div class="client-card-avatar" style="background:${c.color}">${c.initials}</div>
+  grid.innerHTML = clients.map((c, idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color = getClientColor(idx);
+    const isPaused = c.status === 'paused';
+    const plan = (c.plan || 'starter').toLowerCase();
+    const planLabel = plan === 'pro' ? '🚀 Pro' : '⚡ Starter';
+    const planClass = plan === 'pro' ? 'plan-pro' : 'plan-starter';
+    return `
+    <div class="client-card${c.id===activeClient?.id?' active-client':''}${isPaused?' paused-client':''}" onclick="selectClient('${c.id}')">
+      <div class="client-card-status status-${c.status}">${isPaused?'⏸ Pause':'● Actif'}</div>
+      <div class="client-card-avatar" style="background:${color}">${initials}</div>
       <div class="client-card-name">${c.name}</div>
-      <div class="client-card-handle">${c.handle} · ${c.sector}</div>
-      <div class="client-card-stats">
-        <div class="client-stat"><div class="client-stat-val">${c.followers}</div><div class="client-stat-lbl">Abonnés</div></div>
-        <div class="client-stat"><div class="client-stat-val">${c.engagement}</div><div class="client-stat-lbl">Engagement</div></div>
-        <div class="client-stat"><div class="client-stat-val">${c.posts}</div><div class="client-stat-lbl">Posts/mois</div></div>
+      <div class="client-card-handle">${c.instagram||'@'+c.name.toLowerCase().replace(/\s/g,'')} · ${c.sector||'Autre'}</div>
+      ${isPaused?`<div class="pause-banner" style="margin-top:8px;margin-bottom:4px;padding:8px 12px;font-size:12px">⏸ Service IA suspendu — non-paiement</div>`:''}
+      <div class="client-actions">
+        <span class="plan-badge ${planClass}">${planLabel}</span>
+        <button class="btn btn-sm" onclick="event.stopPropagation();openChangePlan('${c.id}','${c.name}','${plan}')">🔄 Forfait</button>
+        ${isPaused
+          ? `<button class="btn btn-green btn-sm" onclick="event.stopPropagation();togglePause('${c.id}','active')">▶ Réactiver</button>`
+          : `<button class="btn btn-yellow btn-sm" onclick="event.stopPropagation();togglePause('${c.id}','paused')">⏸ Pause</button>`
+        }
+        ${c.email?`<button class="btn btn-sm" onclick="event.stopPropagation();resetClientPassword('${c.id}')">🔑 Reset mdp</button>`:''}
       </div>
-      <div style="margin-top:12px"><span class="badge badge-purple">Plan ${c.plan}</span></div>
-    </div>
-  `).join('') + `
+    </div>`;
+  }).join('') + `
     <div class="client-card add-client-card" onclick="openModal('modal-add-client')">
-      <div class="add-client-icon">＋</div>
-      <div class="add-client-label">Ajouter un client</div>
+      <div style="font-size:24px">＋</div>
+      <div style="font-size:13px;font-weight:500">Ajouter un client</div>
       <div style="font-size:11px;color:var(--text3)">Nouveau compte entreprise</div>
-    </div>
-  `;
+    </div>`;
 }
 
 function renderDashboardClients() {
   const el = document.getElementById('dashboard-clients');
-  if(!el) return;
-  el.innerHTML = clients.map(c=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);cursor:pointer" onclick="selectClient(${c.id});nav('media')">
-      <div style="width:36px;height:36px;border-radius:10px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0">${c.initials}</div>
+  if (!el || clients.length === 0) {
+    if (el) el.innerHTML = '<div style="color:var(--text3);font-size:13px;grid-column:1/-1;padding:20px;text-align:center">Aucun client — créez votre premier client →</div>';
+    return;
+  }
+  el.innerHTML = clients.map((c,idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color = getClientColor(idx);
+    const plan = (c.plan||'starter').toLowerCase();
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);cursor:pointer${c.status==='paused'?';opacity:0.6':''}" onclick="selectClient('${c.id}');nav('media')">
+      <div style="width:36px;height:36px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0">${initials}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500">${c.name}</div>
-        <div style="font-size:11px;color:var(--text3)">${c.followers} abonnés · ${c.engagement}</div>
+        <div style="font-size:11px;color:var(--text3)">${plan==='pro'?'🚀 Pro':'⚡ Starter'}</div>
       </div>
-      <div class="badge badge-${c.status==='active'?'green':'orange'}">${c.status==='active'?'Actif':'Pause'}</div>
-    </div>
-  `).join('');
+      <div class="badge badge-${c.status==='active'?'green':'yellow'}">${c.status==='active'?'Actif':'Pause'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('stat-clients').textContent = clients.filter(c=>c.status==='active').length;
 }
 
 function selectClient(id) {
-  clients.forEach(c=>c.active=c.id===id);
-  activeClient = clients.find(c=>c.id===id);
-  document.getElementById('sidebar-client-avatar').textContent = activeClient.initials;
-  document.getElementById('sidebar-client-name').textContent = activeClient.name;
-  document.getElementById('sidebar-client-plan').textContent = 'Plan '+activeClient.plan;
-  document.getElementById('sidebar-client-avatar').style.background = activeClient.color;
+  activeClient = clients.find(c=>c.id===id||c.id===parseInt(id));
+  if (!activeClient) return;
+  updateSidebarClient();
   renderClients();
   renderSwitcherList();
-}
-
-function addClient() {
-  const name = document.getElementById('new-client-name').value.trim();
-  if(!name){toast('Veuillez saisir un nom de client','warn');return;}
-  const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const colors = [
-    'linear-gradient(135deg,#3b82f6,#06b6d4)',
-    'linear-gradient(135deg,#10b981,#059669)',
-    'linear-gradient(135deg,#f59e0b,#ef4444)',
-    'linear-gradient(135deg,#8b5cf6,#ec4899)',
-  ];
-  const c = {
-    id: Date.now(), name, initials,
-    handle: document.getElementById('new-client-ig').value || '@'+name.toLowerCase().replace(/\s/g,''),
-    sector: document.getElementById('new-client-sector').value,
-    color: colors[clients.length % colors.length],
-    plan: document.getElementById('new-client-plan').value==='starter'?'Starter':document.getElementById('new-client-plan').value==='enterprise'?'Enterprise':'Pro',
-    followers: '0', engagement: '0%', posts: 0, status:'active', active:false
-  };
-  clients.push(c);
-  document.getElementById('nav-client-count').textContent = clients.length;
-  closeModal('modal-add-client');
-  document.getElementById('new-client-name').value='';
-  document.getElementById('new-client-ig').value='';
-  renderClients();
-  renderSwitcherList();
-  toast(`Client "${name}" créé avec succès !`,'success');
+  closeModal('modal-switch-client');
 }
 
 function renderSwitcherList() {
   const el = document.getElementById('client-switch-list');
-  el.innerHTML = clients.map(c=>`
-    <div onclick="selectClient(${c.id})" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;border:1px solid ${c.active?'var(--accent)':'transparent'};background:${c.active?'rgba(255,59,107,0.06)':'transparent'}">
-      <div style="width:32px;height:32px;border-radius:9px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">${c.initials}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.handle} · Plan ${c.plan}</div></div>
-      ${c.active?'<div style="color:var(--accent);font-size:12px">✓</div>':''}
-    </div>
-  `).join('');
+  el.innerHTML = clients.map((c,idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color = getClientColor(idx);
+    const isActive = activeClient && c.id===activeClient.id;
+    return `
+    <div onclick="selectClient('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;border:1px solid ${isActive?'var(--accent)':'transparent'};background:${isActive?'rgba(255,59,107,0.06)':'transparent'}">
+      <div style="width:32px;height:32px;border-radius:9px;background:${color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">${initials}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.instagram||''} · ${(c.plan||'starter').charAt(0).toUpperCase()+(c.plan||'starter').slice(1)}</div></div>
+      ${isActive?'<div style="color:var(--accent);font-size:12px">✓</div>':''}
+    </div>`;
+  }).join('');
 }
 
-// ============================================================
-// MEDIA
-// ============================================================
-const mediaTypes = {photo:'Photo',video:'Vidéo',reel:'Reel'};
+// ── AJOUTER CLIENT ──────────────────────────────────────────────────────────────
+let selectedPlan = 'starter';
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('new-client-plan').value = plan;
+  document.getElementById('plan-starter').className = 'plan-option' + (plan==='starter'?' selected-starter':'');
+  document.getElementById('plan-pro').className = 'plan-option' + (plan==='pro'?' selected-pro':'');
+}
+
+async function addClient() {
+  const name = document.getElementById('new-client-name').value.trim();
+  if (!name) { toast('Veuillez saisir un nom de client','warn'); return; }
+  const email = document.getElementById('new-client-email').value.trim();
+  const body = {
+    name,
+    email: email || null,
+    sector: document.getElementById('new-client-sector').value,
+    instagram: document.getElementById('new-client-ig').value,
+    facebook: document.getElementById('new-client-fb').value,
+    description: document.getElementById('new-client-desc').value,
+    plan: selectedPlan,
+    solo_entrepreneur: true
+  };
+  try {
+    const r = await fetch('/api/clients', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    await loadClients();
+    closeModal('modal-add-client');
+    document.getElementById('new-client-name').value='';
+    document.getElementById('new-client-email').value='';
+    renderClients();
+    renderDashboardClients();
+    toast(`Client "${name}" créé${email?' — email de bienvenue envoyé':''} !`,'success');
+  } catch(e) {
+    toast('Erreur: '+e.message,'warn');
+  }
+}
+
+// ── CHANGER FORFAIT ────────────────────────────────────────────────────────────
+function openChangePlan(clientId, clientName, currentPlan) {
+  changePlanClientId = clientId;
+  changePlanSelected = currentPlan;
+  document.getElementById('change-plan-client-name').textContent = clientName;
+  selectModalPlan(currentPlan);
+  openModal('modal-change-plan');
+}
+
+function selectModalPlan(plan) {
+  changePlanSelected = plan;
+  document.getElementById('modal-plan-starter').className = 'plan-option' + (plan==='starter'?' selected-starter':'');
+  document.getElementById('modal-plan-pro').className = 'plan-option' + (plan==='pro'?' selected-pro':'');
+}
+
+async function confirmChangePlan() {
+  if (!changePlanClientId) return;
+  try {
+    const r = await fetch(`/api/clients/${changePlanClientId}`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ plan: changePlanSelected })
+    });
+    if (!r.ok) throw new Error();
+    await loadClients();
+    closeModal('modal-change-plan');
+    renderClients();
+    renderDashboardClients();
+    renderSwitcherList();
+    toast(`Forfait changé en ${changePlanSelected==='pro'?'🚀 Pro':'⚡ Starter'} !`,'success');
+  } catch {
+    toast('Erreur lors du changement de forfait','warn');
+  }
+}
+
+// ── PAUSE / RÉACTIVATION ───────────────────────────────────────────────────────
+async function togglePause(clientId, newStatus) {
+  const label = newStatus==='paused' ? 'Mise en pause' : 'Réactivation';
+  try {
+    const r = await fetch(`/api/clients/${clientId}`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!r.ok) throw new Error();
+    await loadClients();
+    renderClients();
+    renderDashboardClients();
+    renderSwitcherList();
+    toast(`${label} effectuée ✓`,'success');
+  } catch {
+    toast(`Erreur lors de la ${label.toLowerCase()}`,'warn');
+  }
+}
+
+// ── RESET MOT DE PASSE ─────────────────────────────────────────────────────────
+async function resetClientPassword(clientId) {
+  const adminKey = prompt('Clé admin :');
+  if (!adminKey) return;
+  try {
+    const r = await fetch('/api/auth/reset-password', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ clientId, adminKey })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    toast('Nouveau mot de passe provisoire envoyé par email ✓','success');
+  } catch(e) {
+    toast('Erreur: '+e.message,'warn');
+  }
+}
+
+// ── MÉDIAS ─────────────────────────────────────────────────────────────────────
+async function loadMedia() {
+  if (!activeClient) return;
+  try {
+    const r = await fetch(`/api/media/${activeClient.id}`);
+    mediaItems = await r.json();
+    document.getElementById('nav-media-count').textContent = mediaItems.length;
+    document.getElementById('stat-medias').textContent = mediaItems.length;
+    renderMedia('all');
+  } catch(e) { console.error(e); }
+}
 
 function renderMedia(filter) {
   const grid = document.getElementById('media-grid');
-  let items = mediaItems.filter(m=>m.client===activeClient.id);
-  if(filter==='photo') items=items.filter(m=>m.type==='photo');
-  if(filter==='video') items=items.filter(m=>m.type==='video'||m.type==='reel');
-  if(filter==='analysed') items=items.filter(m=>m.analysed);
-  if(filter==='pending') items=items.filter(m=>!m.analysed);
+  let items = [...mediaItems];
+  if (filter==='photo') items=items.filter(m=>m.type==='photo');
+  if (filter==='video') items=items.filter(m=>m.type==='video');
+  if (filter==='analysed') items=items.filter(m=>m.analyse_data);
+  if (!items.length) {
+    grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📷</div><div class="empty-title">Aucun média</div><div class="empty-sub">Uploadez des photos ou vidéos pour ce client.</div></div>';
+    return;
+  }
   grid.innerHTML = items.map(m=>`
-    <div class="media-item" onclick="toast('Analyse IA : ${m.name}','info')">
-      <div class="media-thumb">${m.emoji}</div>
+    <div class="media-item">
+      <div class="media-thumb">${m.url?`<img src="${m.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">`:( m.type==='video'?'🎬':'🖼️')}</div>
       <div class="media-type-badge type-${m.type}">${m.type}</div>
-      ${m.analysed?'<div class="media-ai-badge">IA ✓</div>':''}
-      <div class="media-overlay"><div class="media-info">${m.name}</div></div>
-    </div>
-  `).join('');
-  document.getElementById('nav-media-count').textContent = mediaItems.length;
+      ${m.analyse_data?'<div class="media-ai-badge">IA ✓</div>':''}
+      <div class="media-overlay"><div class="media-info">${m.filename||'média'}</div></div>
+    </div>`).join('');
+  document.getElementById('media-client-name').textContent = `Médias de ${activeClient?.name||''}`;
 }
 
 function filterMedia(filter, el) {
@@ -1588,150 +906,119 @@ function filterMedia(filter, el) {
   renderMedia(filter);
 }
 
-// ============================================================
-// UPLOAD
-// ============================================================
-let uploadedFiles = [];
-
-function dragOver(e) {e.preventDefault();document.getElementById('upload-zone').classList.add('dragover')}
-function dragLeave() {document.getElementById('upload-zone').classList.remove('dragover')}
-function dropFiles(e) {e.preventDefault();dragLeave();handleFiles(e.dataTransfer.files)}
+// ── UPLOAD ─────────────────────────────────────────────────────────────────────
+let uploadedFiles=[];
+function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover')}
+function dragLeave(){document.getElementById('upload-zone').classList.remove('dragover')}
+function dropFiles(e){e.preventDefault();dragLeave();handleFiles(e.dataTransfer.files)}
 
 function handleFiles(files) {
-  uploadedFiles = Array.from(files);
+  uploadedFiles=Array.from(files);
   if(!uploadedFiles.length) return;
-  const preview = document.getElementById('upload-preview');
-  const list = document.getElementById('upload-list');
-  const count = document.getElementById('upload-count');
-  preview.style.display='block';
-  count.textContent = `${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
-  list.innerHTML = uploadedFiles.slice(0,6).map(f=>{
-    const isVid = f.type.startsWith('video');
-    return `<div style="width:60px;height:60px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px">${isVid?'🎬':'🖼️'}</div>`;
-  }).join('') + (uploadedFiles.length>6?`<div style="width:60px;height:60px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text3)">+${uploadedFiles.length-6}</div>`:'');
+  document.getElementById('upload-preview').style.display='block';
+  document.getElementById('upload-count').textContent=`${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
+  document.getElementById('upload-list').innerHTML=uploadedFiles.slice(0,6).map(f=>`<div style="width:60px;height:60px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px">${f.type.startsWith('video')?'🎬':'🖼️'}</div>`).join('');
   document.getElementById('btn-analyze').style.display='flex';
 }
 
-function startAnalysis() {
-  const fill = document.getElementById('upload-fill');
-  const status = document.getElementById('upload-status');
-  const btn = document.getElementById('btn-analyze');
-  btn.disabled=true; btn.textContent='Analyse en cours…';
-  const steps = ['Envoi des fichiers…','Détection du contenu…','Génération des captions…','Optimisation des hashtags…','Planification intelligente…','Terminé !'];
-  let i=0;
-  const interval = setInterval(()=>{
-    const pct = Math.round((i+1)/steps.length*100);
-    fill.style.width = pct+'%';
-    status.textContent = steps[i];
-    i++;
-    if(i>=steps.length){
-      clearInterval(interval);
-      btn.textContent='✅ Terminé';
-      uploadedFiles.forEach((f,idx)=>{
-        const isVid = f.type.startsWith('video');
-        mediaItems.push({
-          id: Date.now()+idx,
-          emoji: isVid?'🎬':'🖼️',
-          name: f.name,
-          type: isVid?'video':'photo',
-          analysed:true,
-          client: activeClient.id
-        });
-      });
-      document.getElementById('nav-media-count').textContent = mediaItems.length;
-      setTimeout(()=>{
-        closeModal('modal-upload');
-        btn.disabled=false; btn.textContent='🤖 Analyser avec l\'IA →';
-        fill.style.width='0%'; status.textContent='Prêt à analyser';
-        document.getElementById('upload-preview').style.display='none';
-        uploadedFiles=[];
-        toast(`${uploadedFiles.length||'Vos'} médias analysés et planifiés par l'IA !`,'success');
-      },1200);
-    }
-  },600);
+async function startAnalysis() {
+  if(!activeClient){toast('Sélectionnez un client d\'abord','warn');return;}
+  const btn=document.getElementById('btn-analyze');
+  btn.disabled=true;btn.textContent='Analyse en cours…';
+  const fill=document.getElementById('upload-fill');
+  const status=document.getElementById('upload-status');
+  let completed=0;
+  for(const file of uploadedFiles){
+    const formData=new FormData();
+    formData.append('file',file);
+    formData.append('client_id',activeClient.id);
+    try{
+      await fetch('/api/media/upload',{method:'POST',body:formData});
+      completed++;
+      fill.style.width=Math.round(completed/uploadedFiles.length*100)+'%';
+      status.textContent=`${completed}/${uploadedFiles.length} fichiers traités…`;
+    }catch(e){console.error(e);}
+  }
+  status.textContent='✅ Terminé !';
+  await loadMedia();
+  setTimeout(()=>{
+    closeModal('modal-upload');
+    btn.disabled=false;btn.textContent='🤖 Analyser avec l\'IA →';
+    fill.style.width='0%';status.textContent='Prêt à analyser';
+    document.getElementById('upload-preview').style.display='none';
+    uploadedFiles=[];
+    toast(`${completed} média(s) analysés et planifiés !`,'success');
+  },1000);
 }
 
-// ============================================================
-// QUEUE
-// ============================================================
-const qsClass = {scheduled:'qs-scheduled',generating:'qs-generating',published:'qs-published',draft:'qs-draft'};
-const qsLabel = {scheduled:'Planifié',generating:'Génère…',published:'Publié',draft:'Brouillon'};
+// ── CALENDRIER ─────────────────────────────────────────────────────────────────
+const MONTHS_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-function renderQueue() {
-  document.getElementById('queue-list').innerHTML = queueItems.map((q,i)=>`
-    <div class="queue-item">
-      <div class="queue-thumb">${q.thumb}</div>
-      <div class="queue-body">
-        <div class="queue-title">${q.title}</div>
-        <div class="queue-meta">${q.client} · ${q.net}</div>
-        <div class="queue-caption">${q.caption}</div>
-      </div>
-      <div class="queue-right">
-        <div class="queue-time">${q.time}</div>
-        <div class="queue-status ${qsClass[q.status]}">${q.status==='generating'?'<span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span> ':''}${qsLabel[q.status]}</div>
-        <button class="btn btn-ghost" style="font-size:11px;padding:3px 8px" onclick="removeQueue(${i})">✕</button>
-      </div>
-    </div>
-  `).join('');
+function changeMonth(dir) {
+  calendarDate.setMonth(calendarDate.getMonth()+dir);
+  buildCalendar();
 }
-
-function removeQueue(i){queueItems.splice(i,1);renderQueue();toast('Contenu retiré de la file','info')}
-
-// ============================================================
-// CALENDAR
-// ============================================================
-const dotData = {3:['story'],5:['post','story'],8:['story'],10:['post','story','reel'],12:['story'],14:['post'],15:['story'],17:['post','story'],18:['post','story','reel'],19:['reel'],20:['story'],22:['post','story'],24:['post','story'],25:['story'],26:['reel'],27:['post'],28:['story'],29:['story'],31:['post','story']};
 
 function buildCalendar() {
-  const grid = document.getElementById('cal-grid');
-  if(grid.children.length) return;
-  const firstDay = 6;
-  const prevDays = [22,23,24,25,26,27,28];
+  const grid=document.getElementById('cal-grid');
+  const year=calendarDate.getFullYear();
+  const month=calendarDate.getMonth();
+  document.getElementById('cal-month-label').textContent=`${MONTHS_FR[month]} ${year}`;
+  grid.innerHTML='';
+  const firstDay=(new Date(year,month,1).getDay()+6)%7;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const daysInPrev=new Date(year,month,0).getDate();
+  const today=new Date();
   for(let i=0;i<firstDay;i++){
-    grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${prevDays[i]}</div></div>`;
+    grid.innerHTML+=`<div class="cal-day other-month"><div class="day-num">${daysInPrev-firstDay+1+i}</div></div>`;
   }
-  for(let d=1;d<=31;d++){
-    const isToday = d===18;
-    const dots = (dotData[d]||[]).map(t=>`<div class="cdot cdot-${t}"></div>`).join('');
-    grid.innerHTML += `<div class="cal-day${isToday?' today':''}"><div class="day-num">${d}</div><div class="cal-dots">${dots}</div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+    grid.innerHTML+=`<div class="cal-day${isToday?' today':''}"><div class="day-num">${d}</div></div>`;
   }
-  const total = firstDay+31;
-  const rem = total%7===0?0:7-(total%7);
-  for(let i=1;i<=rem;i++) grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
+  const total=firstDay+daysInMonth;
+  const rem=total%7===0?0:7-(total%7);
+  for(let i=1;i<=rem;i++) grid.innerHTML+=`<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
 }
 
-// ============================================================
-// TRENDS
-// ============================================================
-function renderTrends() {
-  document.getElementById('trends-list').innerHTML = trends.map(([tag,pct,delta],i)=>`
-    <div class="trend-item">
-      <div class="trend-rank">${i+1}</div>
-      <div class="trend-name">${tag}</div>
-      <div class="trend-bar-bg"><div class="trend-bar-fill" style="width:${pct}%"></div></div>
-      <div class="trend-pct">${delta}</div>
-    </div>
-  `).join('');
+// ── NAVIGATION ─────────────────────────────────────────────────────────────────
+const titles={dashboard:'Vue d\'ensemble',clients:'Gestion des clients',media:'Médiathèque',queue:'File de publication',calendar:'Calendrier éditorial',automation:'Centre d\'automatisation'};
+
+function nav(page) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+page).classList.add('active');
+  document.getElementById('topbar-title').textContent=titles[page]||page;
+  const pageOrder=['dashboard','clients','media','queue','calendar','automation'];
+  const idx=pageOrder.indexOf(page);
+  const navItems=document.querySelectorAll('.nav-item');
+  // map nav items to pages
+  const navMap={dashboard:0,clients:1,media:2,queue:3,calendar:4,automation:5};
+  if(navMap[page]!==undefined) navItems[navMap[page]]?.classList.add('active');
+  if(page==='clients') renderClients();
+  if(page==='media') loadMedia();
+  if(page==='calendar') buildCalendar();
+  if(page==='dashboard') renderDashboardClients();
+  closeModal('modal-switch-client');
 }
 
-// ============================================================
-// TOAST
-// ============================================================
-function toast(msg, type='info') {
-  const icons = {success:'✅',info:'💡',warn:'⚠️'};
-  const el = document.createElement('div');
+// ── MODALS ─────────────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})});
+
+// ── TOAST ──────────────────────────────────────────────────────────────────────
+function toast(msg,type='info'){
+  const icons={success:'✅',info:'💡',warn:'⚠️'};
+  const el=document.createElement('div');
   el.className=`toast ${type}`;
   el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-text">${msg}</div>`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(()=>el.remove(),3500);
 }
 
-// ============================================================
-// INIT
-// ============================================================
-renderDashboardClients();
-renderSwitcherList();
+// ── START ──────────────────────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
-

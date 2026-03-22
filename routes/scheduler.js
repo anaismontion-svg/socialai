@@ -1,26 +1,58 @@
 const { createClient } = require('@supabase/supabase-js');
 const { generateCaption, getTopPosts } = require('./publisher');
-
-// 🔧 FIX TEMPORAIRE — instagram-sync désactivé le temps de corriger le module ES
-// const { syncInstagramHistory, selectRecyclablePost, generateRecycledCaption, updatePostStats } = require('./instagram-sync');
+const { syncAllClients, updateAllStats, recalculateScores } = require('./instagram-sync');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 const BEST_HOURS = {
-  post: [9, 12, 18, 20],
+  post:  [9, 12, 18, 20],
   story: [8, 12, 17, 21]
 };
 
+// ─────────────────────────────────────────────
+// DÉFINITION DES FORFAITS
+// ─────────────────────────────────────────────
+const PLANS = {
+  starter: {
+    postsPerWeek:         3,
+    storiesPerDay:        1,
+    recyclage:            false,
+    reponseDM:            false,
+    reponseCommentaires:  false,
+    postsSpeciauxMax:     1,   // par semaine
+    analyseHistorique:    true,
+    voirModifierPosts:    1,   // nb de posts visibles dans l'espace client
+  },
+  pro: {
+    postsPerWeek:         7,
+    storiesPerDay:        1,
+    recyclage:            true,
+    reponseDM:            true,
+    reponseCommentaires:  true,
+    postsSpeciauxMax:     999, // illimité
+    analyseHistorique:    true,
+    voirModifierPosts:    999, // tous les posts
+  }
+};
+
+function getPlan(client) {
+  const plan = (client.plan || 'starter').toLowerCase();
+  return PLANS[plan] || PLANS.starter;
+}
+
+// ─────────────────────────────────────────────
+// UTILITAIRES DATES
+// ─────────────────────────────────────────────
 function getNextPublishDate(lastDate, frequency) {
   const date = new Date(lastDate || Date.now());
-  if(frequency === 'daily') {
+  if (frequency === 'daily') {
     date.setDate(date.getDate() + 1);
-  } else if(frequency === '3x_week') {
+  } else if (frequency === '3x_week') {
     const day = date.getDay();
-    if(day < 1) date.setDate(date.getDate() + (1 - day));
-    else if(day < 3) date.setDate(date.getDate() + (3 - day));
-    else if(day < 5) date.setDate(date.getDate() + (5 - day));
-    else date.setDate(date.getDate() + (8 - day));
+    if      (day < 1) date.setDate(date.getDate() + (1 - day));
+    else if (day < 3) date.setDate(date.getDate() + (3 - day));
+    else if (day < 5) date.setDate(date.getDate() + (5 - day));
+    else              date.setDate(date.getDate() + (8 - day));
   }
   const hour = BEST_HOURS.post[Math.floor(Math.random() * BEST_HOURS.post.length)];
   date.setHours(hour, 0, 0, 0);
@@ -28,38 +60,56 @@ function getNextPublishDate(lastDate, frequency) {
 }
 
 function getStoryTime(storyIndex) {
-  const now = new Date();
+  const now  = new Date();
   const hour = BEST_HOURS.story[storyIndex] || BEST_HOURS.story[0];
   now.setHours(hour, 0, 0, 0);
   return now;
 }
 
-async function getClientPhase(client) {
-  const createdAt = new Date(client.created_at);
-  const now = new Date();
-  const diffDays = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
-  return diffDays < 90 ? 'daily' : '3x_week';
+// ─────────────────────────────────────────────
+// PHASE DU CLIENT
+// ─────────────────────────────────────────────
+async function getClientFrequency(client) {
+  const plan = getPlan(client);
+  if (plan.postsPerWeek >= 7) return 'daily';
+  return '3x_week';
 }
 
+// ─────────────────────────────────────────────
+// MÉDIAS DISPONIBLES
+// ─────────────────────────────────────────────
 async function getAvailableMedia(clientId, storyType = null) {
   let query = supabase
     .from('media')
     .select('*')
     .eq('client_id', clientId)
     .eq('used', false);
-  if(storyType) query = query.eq('story_type', storyType);
+  if (storyType) query = query.eq('story_type', storyType);
   const { data } = await query.limit(1);
   return data?.[0] || null;
 }
 
+// ─────────────────────────────────────────────
+// SÉLECTION POST RECYCLABLE (PRO uniquement)
+// ─────────────────────────────────────────────
 async function selectRecyclablePost(clientId) {
   const twoMonthsAgo = new Date();
   twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-  // Récupérer les top posts éligibles au recyclage
+  const { data: recentRecycled } = await supabase
+    .from('queue')
+    .select('id')
+    .eq('client_id', clientId)
+    .eq('type', 'recycled')
+    .gte('created_at', oneWeekAgo.toISOString());
+
+  if (recentRecycled && recentRecycled.length > 0) {
+    console.log('⏭️ Un post recyclé a déjà été planifié cette semaine');
+    return null;
+  }
+
   const { data: topPosts } = await supabase
     .from('media')
     .select('*')
@@ -70,61 +120,67 @@ async function selectRecyclablePost(clientId) {
     .order('performance_score', { ascending: false })
     .limit(10);
 
-  if(!topPosts || topPosts.length === 0) return null;
-
-  // Vérifier qu'on n'a pas recyclé un post cette semaine
-  const { data: recentRecycled } = await supabase
-    .from('queue')
-    .select('id')
-    .eq('client_id', clientId)
-    .eq('type', 'recycled')
-    .gte('created_at', oneWeekAgo.toISOString());
-
-  if(recentRecycled && recentRecycled.length > 0) {
-    console.log('⏭️ Un post recyclé a déjà été planifié cette semaine');
-    return null;
-  }
-
+  if (!topPosts || topPosts.length === 0) return null;
   return topPosts[0];
 }
 
-async function generateRecycledCaption(originalCaption, client, performanceScore) {
+// ─────────────────────────────────────────────
+// GÉNÉRATION CAPTION RECYCLÉE
+// ─────────────────────────────────────────────
+async function generateRecycledCaption(originalCaption, client, performanceScore, postStats) {
   const Anthropic = require('@anthropic-ai/sdk');
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+  const statsContext = postStats
+    ? `Stats du post original : ${postStats.likes} likes | ${postStats.comments} commentaires | ${postStats.reach} reach`
+    : '';
+
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 400,
+    max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `Tu es un expert en community management Instagram.
+      content: `Tu es un expert en community management Instagram et copywriting viral.
 
 Ce post a obtenu un score de performance de ${performanceScore}/100 — il a très bien marché !
+${statsContext}
 
 Client : ${client.name}
 Secteur : ${client.sector || 'non précisé'}
-Ton : ${client.tone || 'professionnel'}
+Ton de communication : ${client.tone || 'professionnel'}
 
 Caption originale :
 "${originalCaption}"
 
-Réécris cette caption pour la rendre encore plus engageante et virale.
+Réécris cette caption pour la rendre encore plus engageante.
 - Garde l'essence du message original
-- Améliore l'accroche (première ligne cruciale)
+- Améliore l'accroche (les 2 premières lignes sont cruciales)
 - Ajoute un call-to-action plus fort
-- Optimise les hashtags (garde les performants, ajoute des tendances)
-- Rends-la 20% plus percutante
+- Optimise les hashtags
 - Maximum 150 mots
 
-Ne mets pas de guillemets autour de la caption.`
+Retourne uniquement la nouvelle caption, rien d'autre.`
     }]
   });
 
   return message.content[0].text;
 }
 
+// ─────────────────────────────────────────────
+// PLANIFICATION POSTS — 1 CLIENT
+// ─────────────────────────────────────────────
 async function schedulePostsForClient(client) {
-  console.log(`📅 Planification pour ${client.name}...`);
+  // ── Vérifier si le client est en pause ───────────────────────────────────
+  if (client.status === 'paused') {
+    console.log(`⏸️ ${client.name} est en pause — planification ignorée`);
+    return;
+  }
+
+  console.log(`📅 Planification pour ${client.name} (${client.plan || 'starter'})...`);
+
+  const plan = getPlan(client);
+  const frequency = await getClientFrequency(client);
+  const targetPerWeek = plan.postsPerWeek;
 
   const nextWeek = new Date();
   nextWeek.setDate(nextWeek.getDate() + 7);
@@ -134,13 +190,10 @@ async function schedulePostsForClient(client) {
     .select('id, scheduled_at')
     .eq('client_id', client.id)
     .eq('statut', 'planifie')
-    .eq('type', 'post')
+    .in('type', ['post', 'recycled'])
     .lte('scheduled_at', nextWeek.toISOString());
 
-  const phase = await getClientPhase(client);
-  const targetPerWeek = phase === 'daily' ? 7 : 3;
-
-  if(existingPosts && existingPosts.length >= targetPerWeek) {
+  if (existingPosts && existingPosts.length >= targetPerWeek) {
     console.log(`✅ ${client.name} a déjà ${existingPosts.length} posts planifiés`);
     return;
   }
@@ -151,72 +204,75 @@ async function schedulePostsForClient(client) {
     .from('queue')
     .select('scheduled_at')
     .eq('client_id', client.id)
-    .eq('type', 'post')
+    .in('type', ['post', 'recycled'])
     .order('scheduled_at', { ascending: false })
     .limit(1);
 
   let lastDate = lastPost?.[0]?.scheduled_at || new Date();
 
-  for(let i = 0; i < toCreate; i++) {
-    const scheduledAt = getNextPublishDate(lastDate, phase);
+  // Indice du post recyclé (uniquement en PRO)
+  const recycleIndex = plan.recyclage ? Math.floor(toCreate / 2) : -1;
+
+  for (let i = 0; i < toCreate; i++) {
+    const scheduledAt = getNextPublishDate(lastDate, frequency);
     lastDate = scheduledAt;
 
-    // ── Règle 80/20 : 1 post recyclé max par semaine ─────────────────────────
-    const shouldRecycle = i === Math.floor(toCreate / 2);
-    let media = null;
-    let caption = '';
+    let media    = null;
+    let caption  = '';
     let postType = 'post';
 
-    if(shouldRecycle) {
+    // ── Recyclage (PRO uniquement) ────────────────────────────────────────
+    if (i === recycleIndex && plan.recyclage) {
       const recyclable = await selectRecyclablePost(client.id);
-      if(recyclable) {
-        media = recyclable;
+      if (recyclable) {
+        media   = recyclable;
         caption = await generateRecycledCaption(
-          recyclable.caption,
-          client,
-          recyclable.performance_score
+          recyclable.caption, client, recyclable.performance_score,
+          { likes: recyclable.likes, comments: recyclable.comments, reach: recyclable.reach }
         );
         postType = 'recycled';
 
-        // Marquer comme recyclé
         await supabase.from('media').update({
-          recycled: true,
+          recycled:     true,
           last_used_at: new Date().toISOString(),
-          use_count: (recyclable.use_count || 0) + 1
+          use_count:    (recyclable.use_count || 0) + 1
         }).eq('id', recyclable.id);
 
-        console.log(`♻️ Post recyclé planifié pour ${client.name} (score: ${recyclable.performance_score})`);
+        console.log(`♻️ Post recyclé planifié pour ${client.name} (score: ${recyclable.performance_score}/100)`);
       }
     }
 
-    // Si pas de recyclage, prendre un nouveau média
-    if(!media) {
+    // ── Nouveau média ─────────────────────────────────────────────────────
+    if (!media) {
       media = await getAvailableMedia(client.id);
       const topPosts = await getTopPosts(client.id);
-      caption = await generateCaption(client, 'image', topPosts);
+      caption  = await generateCaption(client, 'image', topPosts);
       postType = 'post';
     }
 
     await supabase.from('queue').insert({
-      client_id: client.id,
-      media_id: media?.id || null,
-      media_url: media?.url || null,
+      client_id:    client.id,
+      media_id:     media?.id   || null,
+      media_url:    media?.url  || null,
       caption,
       scheduled_at: scheduledAt.toISOString(),
-      type: postType,
-      platform: 'instagram',
-      statut: 'planifie'
+      type:         postType,
+      platform:     'instagram',
+      statut:       'planifie'
     });
 
-    console.log(`📌 Post "${postType}" planifié pour ${client.name} le ${scheduledAt.toLocaleDateString()}`);
+    console.log(`📌 Post "${postType}" planifié pour ${client.name} le ${scheduledAt.toLocaleDateString('fr-FR')}`);
   }
 }
 
+// ─────────────────────────────────────────────
+// PLANIFICATION STORIES — 1 CLIENT
+// ─────────────────────────────────────────────
 async function scheduleStoriesForClient(client) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (client.status === 'paused') return;
+
+  const today    = new Date(); today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
 
   const { data: existingStories } = await supabase
     .from('queue')
@@ -227,27 +283,25 @@ async function scheduleStoriesForClient(client) {
     .gte('scheduled_at', today.toISOString())
     .lt('scheduled_at', tomorrow.toISOString());
 
-  if(existingStories && existingStories.length >= 4) return;
+  if (existingStories && existingStories.length >= 4) return;
 
   const storyTypes = [
-    { type: 'entreprise', label: 'Story entreprise' },
-    { type: 'tarifs', label: 'Story tarifs' },
+    { type: 'entreprise',  label: 'Story entreprise' },
+    { type: 'tarifs',      label: 'Story tarifs' },
     { type: 'avant_apres', label: 'Story avant/après' },
-    { type: 'repost', label: 'Repost du post du jour' }
+    { type: 'repost',      label: 'Repost du post du jour' }
   ];
 
-  for(let i = 0; i < storyTypes.length; i++) {
-    const storyDef = storyTypes[i];
+  for (let i = 0; i < storyTypes.length; i++) {
+    const storyDef    = storyTypes[i];
     const scheduledAt = getStoryTime(i);
-    const media = await getAvailableMedia(client.id, storyDef.type);
+    const media       = await getAvailableMedia(client.id, storyDef.type);
 
     let mediaUrl = media?.url || null;
-    if(storyDef.type === 'repost') {
+    if (storyDef.type === 'repost') {
       const { data: todayPost } = await supabase
-        .from('queue')
-        .select('media_url')
-        .eq('client_id', client.id)
-        .eq('type', 'post')
+        .from('queue').select('media_url')
+        .eq('client_id', client.id).eq('type', 'post')
         .gte('scheduled_at', today.toISOString())
         .lt('scheduled_at', tomorrow.toISOString())
         .limit(1);
@@ -255,38 +309,41 @@ async function scheduleStoriesForClient(client) {
     }
 
     await supabase.from('queue').insert({
-      client_id: client.id,
-      media_id: media?.id || null,
-      media_url: mediaUrl,
-      caption: storyDef.label,
+      client_id:    client.id,
+      media_id:     media?.id || null,
+      media_url:    mediaUrl,
+      caption:      storyDef.label,
       scheduled_at: scheduledAt.toISOString(),
-      type: 'story',
-      platform: 'instagram',
-      statut: 'planifie'
+      type:         'story',
+      platform:     'instagram',
+      statut:       'planifie'
     });
 
     console.log(`📸 Story "${storyDef.label}" planifiée pour ${client.name}`);
   }
 }
 
+// ─────────────────────────────────────────────
+// PLANIFICATEUR PRINCIPAL
+// ─────────────────────────────────────────────
 async function runScheduler() {
   console.log('🗓️ Lancement du planificateur...');
 
   const { data: clients } = await supabase
     .from('clients')
     .select('*')
-    .eq('status', 'active');
+    .in('status', ['active', 'paused']); // on charge les deux pour logger les pauses
 
-  if(!clients || clients.length === 0) {
-    console.log('Aucun client actif trouvé');
+  if (!clients || clients.length === 0) {
+    console.log('Aucun client trouvé');
     return;
   }
 
-  for(const client of clients) {
+  for (const client of clients) {
     try {
       await schedulePostsForClient(client);
       await scheduleStoriesForClient(client);
-    } catch(err) {
+    } catch (err) {
       console.error(`❌ Erreur planification pour ${client.name}:`, err.message);
     }
   }
@@ -294,4 +351,15 @@ async function runScheduler() {
   console.log('✅ Planificateur terminé');
 }
 
-module.exports = { runScheduler };
+// ─────────────────────────────────────────────
+// EXPORT
+// ─────────────────────────────────────────────
+module.exports = {
+  runScheduler,
+  schedulePostsForClient,
+  scheduleStoriesForClient,
+  selectRecyclablePost,
+  generateRecycledCaption,
+  getPlan,
+  PLANS
+};
