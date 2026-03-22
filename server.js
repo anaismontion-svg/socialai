@@ -8,14 +8,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── Espace client — pages dédiées ─────────────────────────────────────────────
+app.get('/login.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+app.get('/client.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'client.html'));
+});
+
 // ── Routes API ────────────────────────────────────────────────────────────────
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/media',   require('./routes/media'));
 app.use('/api/queue',   require('./routes/queue'));
+app.use('/api/auth',    require('./routes/auth-portal').router);
 app.use('/api/portal',  require('./routes/client-portal'));
 app.use('/',            require('./routes/meta'));
 
-// ── Fallback SPA ──────────────────────────────────────────────────────────────
+// ── Fallback SPA (back office uniquement) ─────────────────────────────────────
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -34,7 +43,6 @@ setInterval(runScheduler, 24 * 60 * 60 * 1000);
 
 // ── Synchronisation Instagram ─────────────────────────────────────────────────
 const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
-
 (async () => {
   try {
     console.log('🔄 Démarrage sync historique Instagram...');
@@ -44,16 +52,12 @@ const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
     console.error('❌ Erreur sync Instagram au démarrage:', err.message);
   }
 })();
-
 setInterval(async () => {
-  try {
-    await updateAllStats();
-  } catch (err) {
-    console.error('❌ Erreur mise à jour stats Instagram:', err.message);
-  }
+  try { await updateAllStats(); }
+  catch (err) { console.error('❌ Erreur stats Instagram:', err.message); }
 }, 24 * 60 * 60 * 1000);
 
-// ── Démarrage du serveur ──────────────────────────────────────────────────────
+// ── Démarrage ─────────────────────────────────────────────────────────────────
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, '0.0.0.0', () => {

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Espace — SocialAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0d14;--ink2:#1a1a26;--ink3:#252533;
+  --surface:#2e2e40;--border:#3a3a50;--border2:#4a4a64;
+  --chalk:#f5f4f0;--chalk2:#c8c6be;--chalk3:#7a7870;
+  --rose:#ff4d6d;--rose2:#cc2244;--mint:#00d4aa;--amber:#ffb340;--sky:#4da6ff;
+  --r:10px;--r2:16px;--r3:24px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Bricolage Grotesque',sans-serif;background:var(--ink);color:var(--chalk);min-height:100vh;font-size:14px;line-height:1.6}
+button{cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;border:none;outline:none}
+input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.header{background:var(--ink2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.header-brand{display:flex;align-items:center;gap:10px}
+.brand-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:15px}
+.brand-name{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+.brand-tag{font-size:10px;color:var(--chalk3);letter-spacing:0.8px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:10px}
+.header-client{display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px}
+.client-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.client-label{font-size:12px;color:var(--chalk2)}
+.btn-logout{font-size:11px;color:var(--chalk3);background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;transition:all 0.15s}
+.btn-logout:hover{color:var(--rose);border-color:var(--rose)}
+
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 64px}
+
+.s-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
+.s-sub{font-size:13px;color:var(--chalk3);margin-bottom:24px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px}
+.stat-pill{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.stat-pill-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-1px}
+.stat-pill-lbl{font-size:11px;color:var(--chalk3);text-transform:uppercase;letter-spacing:0.8px}
+
+.posts-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.posts-title{font-size:15px;font-weight:600}
+.posts-count{font-size:11px;color:var(--chalk3);background:var(--ink3);border:1px solid var(--border);padding:3px 10px;border-radius:20px}
+
+.post-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:10px;transition:border-color 0.2s;position:relative}
+.post-card:hover{border-color:var(--border2)}
+.post-card.editing{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+.post-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.post-thumb{width:52px;height:52px;border-radius:var(--r);flex-shrink:0;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
+.post-thumb img{width:100%;height:100%;object-fit:cover}
+.post-meta{flex:1}
+.post-date{font-size:11px;color:var(--chalk3);margin-bottom:4px;font-family:'DM Mono',monospace}
+.post-type{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px}
+.type-post{background:rgba(77,166,255,0.15);color:var(--sky)}
+.type-story{background:rgba(139,92,246,0.15);color:#a78bfa}
+.type-recycled{background:rgba(0,212,170,0.15);color:var(--mint)}
+.type-special{background:rgba(255,179,64,0.15);color:var(--amber)}
+.post-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.status-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.3px}
+.sb-planned{background:rgba(0,212,170,0.12);color:var(--mint)}
+
+.post-caption{font-size:13px;color:var(--chalk2);line-height:1.7;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
+.post-caption-edit{width:100%;background:var(--ink3);border:1px solid var(--rose);border-radius:var(--r);padding:12px;color:var(--chalk);font-size:13px;line-height:1.7;resize:vertical;min-height:100px;margin-bottom:12px;transition:all 0.15s}
+.post-caption-edit:focus{box-shadow:0 0 0 2px rgba(255,77,109,0.1)}
+
+.post-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--chalk2);transition:all 0.15s}
+.btn:hover{background:var(--surface);color:var(--chalk)}
+.btn-rose{background:var(--rose);color:white;border-color:var(--rose)}
+.btn-rose:hover{background:var(--rose2);border-color:var(--rose2);color:white}
+.btn-ghost{border-color:transparent;color:var(--chalk3)}
+.btn-ghost:hover{color:var(--rose);border-color:transparent;background:transparent}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+.divider{height:1px;background:var(--border);margin:28px 0}
+
+.special-section{background:linear-gradient(135deg,rgba(255,77,109,0.06),rgba(255,179,64,0.04));border:1px solid rgba(255,77,109,0.2);border-radius:var(--r2);padding:24px;margin-top:32px}
+.special-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.special-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.special-title{font-size:16px;font-weight:700}
+.special-sub{font-size:13px;color:var(--chalk3);margin-bottom:20px}
+
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;color:var(--chalk3);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
+.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--rose);outline:none}
+.form-input::placeholder{color:var(--chalk3)}
+textarea.form-input{resize:vertical;min-height:80px}
+
+.ai-toggle{display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:14px;cursor:pointer;transition:all 0.15s}
+.ai-toggle:hover{border-color:var(--border2)}
+.ai-toggle.active{border-color:var(--mint);background:rgba(0,212,170,0.04)}
+.toggle-knob{width:38px;height:22px;background:var(--surface);border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0}
+.ai-toggle.active .toggle-knob{background:var(--mint)}
+.toggle-knob::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:transform 0.2s}
+.ai-toggle.active .toggle-knob::after{transform:translateX(16px)}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle-desc{font-size:11px;color:var(--chalk3)}
+
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:14px}
+.upload-zone:hover{border-color:var(--rose);background:rgba(255,77,109,0.03)}
+
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+
+.empty{text-align:center;padding:48px 20px;color:var(--chalk3)}
+.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
+.empty-title{font-size:16px;font-weight:600;color:var(--chalk2);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;animation:tin 0.3s ease}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast.ok{border-left:3px solid var(--mint)}
+.toast.err{border-left:3px solid var(--rose)}
+.toast.info{border-left:3px solid var(--sky)}
+
+.spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,77,109,0.2);border-top-color:var(--rose);animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:12px;color:var(--chalk3)}
+
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .date-row{grid-template-columns:1fr}
+  .wrap{padding:20px 16px 48px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="brand-dot">✦</div>
+    <div>
+      <div class="brand-name">SocialAI</div>
+      <div class="brand-tag">Espace client</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-client">
+      <div class="client-dot"></div>
+      <div class="client-label" id="header-client-name">Chargement…</div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div id="stats-row" class="stats-row" style="display:none">
+    <div class="stat-pill">
+      <div class="stat-pill-val" id="stat-total">—</div>
+      <div class="stat-pill-lbl">Posts planifiés</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-pill-val" id="stat-week">—</div>
+      <div class="stat-pill-lbl">Cette semaine</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-pill-val" id="stat-stories">—</div>
+      <div class="stat-pill-lbl">Stories prévues</div>
+    </div>
+  </div>
+
+  <div class="posts-header">
+    <div class="posts-title">📅 Posts planifiés</div>
+    <div class="posts-count" id="posts-count">0 post</div>
+  </div>
+
+  <div id="posts-container">
+    <div class="loading-screen">
+      <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
+      <div>Chargement de vos posts…</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="special-section">
+    <div class="special-header">
+      <div class="special-icon">🚀</div>
+      <div><div class="special-title">Demander un post spécial</div></div>
+    </div>
+    <div class="special-sub">Événement, nouveauté, annonce importante… Décrivez votre besoin et l'IA s'occupe du reste.</div>
+
+    <div class="form-group">
+      <label class="form-label">Votre message / contexte *</label>
+      <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle collection printemps ! Je veux annoncer ça avec une belle caption..."></textarea>
+    </div>
+
+    <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
+      <div class="toggle-knob"></div>
+      <div>
+        <div class="toggle-label">Laisser l'IA écrire la caption</div>
+        <div class="toggle-desc">L'IA va rédiger une caption optimisée à partir de votre message</div>
+      </div>
+    </div>
+
+    <div id="manual-caption-section" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Votre caption</label>
+        <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption ici..."></textarea>
+      </div>
+    </div>
+
+    <div class="upload-zone" onclick="document.getElementById('special-file').click()">
+      <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
+      <div style="font-size:28px;margin-bottom:8px">📸</div>
+      <div style="font-size:12px;color:var(--chalk3)">Cliquez pour ajouter un visuel (optionnel)</div>
+      <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:8px;display:none"></div>
+    </div>
+
+    <div class="date-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Date souhaitée</label>
+        <input type="date" class="form-input" id="special-date">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Heure souhaitée</label>
+        <input type="time" class="form-input" id="special-time" value="18:00">
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:8px;align-items:center">
+      <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">🚀 Envoyer la demande</button>
+      <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const token = localStorage.getItem('portal_token');
+const clientId = localStorage.getItem('portal_client_id');
+
+// Vérifier l'auth au chargement
+async function checkAuth() {
+  if (!token || !clientId) {
+    window.location.href = '/login.html';
+    return false;
+  }
+  try {
+    const r = await fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!r.ok) {
+      window.location.href = '/login.html';
+      return false;
+    }
+    return true;
+  } catch {
+    window.location.href = '/login.html';
+    return false;
+  }
+}
+
+function logout() {
+  fetch('/api/auth/logout', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  localStorage.removeItem('portal_token');
+  localStorage.removeItem('portal_client_id');
+  localStorage.removeItem('portal_client_name');
+  window.location.href = '/login.html';
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+let posts = [];
+let aiEnabled = true;
+
+async function init() {
+  const ok = await checkAuth();
+  if (!ok) return;
+
+  const name = localStorage.getItem('portal_client_name') || 'Mon espace';
+  document.getElementById('header-client-name').textContent = name;
+  document.title = `${name} — SocialAI`;
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('special-date').min = today;
+  document.getElementById('special-date').value = today;
+
+  await loadPosts();
+}
+
+async function loadPosts() {
+  try {
+    const r = await fetch(`/api/portal/${clientId}/posts`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!r.ok) throw new Error('Erreur chargement');
+    posts = await r.json();
+    renderPosts();
+    updateStats();
+  } catch (e) {
+    document.getElementById('posts-container').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Erreur de chargement</div>
+        <div class="empty-sub">${e.message}</div>
+      </div>`;
+  }
+}
+
+function renderPosts() {
+  const container = document.getElementById('posts-container');
+  const count = document.getElementById('posts-count');
+  const filtered = posts.filter(p => p.type !== 'story');
+  count.textContent = `${filtered.length} post${filtered.length > 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📭</div>
+        <div class="empty-title">Aucun post planifié</div>
+        <div class="empty-sub">L'IA prépare vos prochaines publications automatiquement.</div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(post => {
+    const date = new Date(post.scheduled_at);
+    const dateStr = date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+    const timeStr = date.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    const typeMap = { post:'Post', story:'Story', recycled:'♻️ Recyclé', special:'⭐ Spécial' };
+    const classMap = { post:'type-post', story:'type-story', recycled:'type-recycled', special:'type-special' };
+
+    return `
+    <div class="post-card" id="card-${post.id}">
+      <div class="post-card-top">
+        <div class="post-thumb">
+          ${post.media_url
+            ? `<img src="${post.media_url}" alt="" onerror="this.parentElement.textContent='🖼️'">`
+            : '🖼️'}
+        </div>
+        <div class="post-meta">
+          <div class="post-date">${dateStr} à ${timeStr}</div>
+          <div class="post-type ${classMap[post.type] || 'type-post'}">${typeMap[post.type] || post.type}</div>
+        </div>
+        <div class="post-status">
+          <div class="status-badge sb-planned">Planifié</div>
+          ${post.modified_by_client ? '<div style="font-size:10px;color:var(--amber)">✏️ Modifié par vous</div>' : ''}
+          ${post.special_request ? '<div style="font-size:10px;color:var(--amber)">⭐ Post spécial</div>' : ''}
+        </div>
+      </div>
+      <div class="post-caption" id="caption-display-${post.id}">${escHtml(post.caption || 'Caption en cours de génération…')}</div>
+      <textarea class="post-caption-edit" id="caption-edit-${post.id}" style="display:none">${escHtml(post.caption || '')}</textarea>
+      <div class="post-actions">
+        <button class="btn btn-sm" id="btn-edit-${post.id}" onclick="startEdit('${post.id}')">✏️ Modifier la caption</button>
+        <button class="btn btn-rose btn-sm" id="btn-save-${post.id}" style="display:none" onclick="saveCaption('${post.id}')">💾 Enregistrer</button>
+        <button class="btn btn-ghost btn-sm" id="btn-cancel-${post.id}" style="display:none" onclick="cancelEdit('${post.id}')">Annuler</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const now = new Date();
+  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const postsOnly = posts.filter(p => p.type !== 'story');
+  const thisWeek = postsOnly.filter(p => new Date(p.scheduled_at) <= nextWeek);
+  const stories = posts.filter(p => p.type === 'story');
+  document.getElementById('stat-total').textContent = postsOnly.length;
+  document.getElementById('stat-week').textContent = thisWeek.length;
+  document.getElementById('stat-stories').textContent = stories.length;
+  document.getElementById('stats-row').style.display = 'grid';
+}
+
+function startEdit(id) {
+  document.getElementById(`card-${id}`).classList.add('editing');
+  document.getElementById(`caption-display-${id}`).style.display = 'none';
+  document.getElementById(`caption-edit-${id}`).style.display = 'block';
+  document.getElementById(`btn-edit-${id}`).style.display = 'none';
+  document.getElementById(`btn-save-${id}`).style.display = 'flex';
+  document.getElementById(`btn-cancel-${id}`).style.display = 'flex';
+  document.getElementById(`caption-edit-${id}`).focus();
+}
+
+function cancelEdit(id) {
+  document.getElementById(`card-${id}`).classList.remove('editing');
+  document.getElementById(`caption-display-${id}`).style.display = 'block';
+  document.getElementById(`caption-edit-${id}`).style.display = 'none';
+  document.getElementById(`btn-edit-${id}`).style.display = 'flex';
+  document.getElementById(`btn-save-${id}`).style.display = 'none';
+  document.getElementById(`btn-cancel-${id}`).style.display = 'none';
+}
+
+async function saveCaption(id) {
+  const newCaption = document.getElementById(`caption-edit-${id}`).value.trim();
+  if (!newCaption) { toast('La caption ne peut pas être vide', 'err'); return; }
+  const btn = document.getElementById(`btn-save-${id}`);
+  btn.textContent = '⏳'; btn.disabled = true;
+  try {
+    const r = await fetch(`/api/portal/posts/${id}/caption`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ caption: newCaption })
+    });
+    if (!r.ok) throw new Error();
+    const idx = posts.findIndex(p => p.id === id);
+    if (idx >= 0) { posts[idx].caption = newCaption; posts[idx].modified_by_client = true; }
+    document.getElementById(`caption-display-${id}`).textContent = newCaption;
+    cancelEdit(id);
+    toast('Caption mise à jour ✓', 'ok');
+  } catch {
+    toast('Erreur lors de la sauvegarde', 'err');
+    btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+  }
+}
+
+function toggleAI() {
+  aiEnabled = !aiEnabled;
+  document.getElementById('ai-toggle').classList.toggle('active', aiEnabled);
+  document.getElementById('manual-caption-section').style.display = aiEnabled ? 'none' : 'block';
+}
+
+function handleSpecialFile(input) {
+  if (!input.files[0]) return;
+  document.getElementById('special-file-name').textContent = `📎 ${input.files[0].name}`;
+  document.getElementById('special-file-name').style.display = 'block';
+  toast('Visuel sélectionné', 'info');
+}
+
+async function submitSpecialPost() {
+  const message = document.getElementById('special-message').value.trim();
+  if (!message) { toast('Décrivez votre besoin avant d\'envoyer', 'err'); return; }
+  const dateVal = document.getElementById('special-date').value;
+  const timeVal = document.getElementById('special-time').value || '18:00';
+  const manualCaption = document.getElementById('manual-caption').value.trim();
+  const scheduled_at = dateVal ? new Date(`${dateVal}T${timeVal}`).toISOString() : null;
+  const btn = document.getElementById('btn-submit-special');
+  btn.textContent = '⏳ Envoi en cours…'; btn.disabled = true;
+  try {
+    const r = await fetch(`/api/portal/${clientId}/special-post`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ message, scheduled_at, let_ai_decide: aiEnabled, caption: aiEnabled ? null : manualCaption })
+    });
+    if (!r.ok) throw new Error('Erreur serveur');
+    toast('Demande envoyée ! L\'IA prépare votre post 🚀', 'ok');
+    document.getElementById('special-message').value = '';
+    document.getElementById('manual-caption').value = '';
+    document.getElementById('special-file-name').style.display = 'none';
+    setTimeout(() => loadPosts(), 2000);
+  } catch {
+    toast('Erreur lors de l\'envoi', 'err');
+  } finally {
+    btn.textContent = '🚀 Envoyer la demande'; btn.disabled = false;
+  }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, type = 'info') {
+  const icons = { ok:'✅', err:'❌', info:'💡' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3800);
+}
+
+init();
+</script>
+</body>
+</html>
