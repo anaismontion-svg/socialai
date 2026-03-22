@@ -12,6 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/media',   require('./routes/media'));
 app.use('/api/queue',   require('./routes/queue'));
+app.use('/api/portal',  require('./routes/client-portal'));
 app.use('/',            require('./routes/meta'));
 
 // ── Fallback SPA ──────────────────────────────────────────────────────────────
