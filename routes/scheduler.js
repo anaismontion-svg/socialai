@@ -1,6 +1,9 @@
 const { createClient } = require('@supabase/supabase-js');
 const { generateCaption, getTopPosts } = require('./publisher');
 
+// 🔧 FIX TEMPORAIRE — instagram-sync désactivé le temps de corriger le module ES
+// const { syncInstagramHistory, selectRecyclablePost, generateRecycledCaption, updatePostStats } = require('./instagram-sync');
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 const BEST_HOURS = {

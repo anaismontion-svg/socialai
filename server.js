@@ -31,47 +31,49 @@ setInterval(runScheduler, 24 * 60 * 60 * 1000);
 runScheduler();
 
 // ── Synchronisation Instagram + stats ────────────────────────────────────────
-const { syncInstagramHistory, updatePostStats } = require('./routes/instagram-sync');
-
-async function syncAllClients() {
+(async () => {
   try {
+    const { syncInstagramHistory, updatePostStats } = require('./routes/instagram-sync');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-    const { data: accounts } = await supabase
-      .from('social_accounts')
-      .select('client_id')
-      .eq('platform', 'instagram');
-    if(!accounts || accounts.length === 0) return;
-    console.log(`🔄 Sync historique pour ${accounts.length} compte(s)...`);
-    for(const acc of accounts) {
-      await syncInstagramHistory(acc.client_id);
+
+    async function syncAllClients() {
+      try {
+        const { data: accounts } = await supabase
+          .from('social_accounts')
+          .select('client_id')
+          .eq('platform', 'instagram');
+        if(!accounts || accounts.length === 0) return;
+        console.log(`🔄 Sync historique pour ${accounts.length} compte(s)...`);
+        for(const acc of accounts) {
+          await syncInstagramHistory(acc.client_id);
+        }
+      } catch(err) {
+        console.error('❌ Erreur sync:', err.message);
+      }
     }
-  } catch(err) {
-    console.error('❌ Erreur sync clients:', err.message);
-  }
-}
 
-async function updateAllStats() {
-  try {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-    const { data: accounts } = await supabase
-      .from('social_accounts')
-      .select('client_id')
-      .eq('platform', 'instagram');
-    if(!accounts || accounts.length === 0) return;
-    console.log(`📊 Mise à jour stats pour ${accounts.length} compte(s)...`);
-    for(const acc of accounts) {
-      await updatePostStats(acc.client_id);
+    async function updateAllStats() {
+      try {
+        const { data: accounts } = await supabase
+          .from('social_accounts')
+          .select('client_id')
+          .eq('platform', 'instagram');
+        if(!accounts || accounts.length === 0) return;
+        for(const acc of accounts) {
+          await updatePostStats(acc.client_id);
+        }
+      } catch(err) {
+        console.error('❌ Erreur stats:', err.message);
+      }
     }
+
+    await syncAllClients();
+    setInterval(updateAllStats, 24 * 60 * 60 * 1000);
+
   } catch(err) {
-    console.error('❌ Erreur update stats:', err.message);
+    console.error('❌ Erreur chargement instagram-sync:', err.message);
   }
-}
-
-// Sync historique au démarrage
-syncAllClients();
-
-// Mise à jour des stats toutes les 24h
-setInterval(updateAllStats, 24 * 60 * 60 * 1000);
+})();
 
 module.exports = app;
 
