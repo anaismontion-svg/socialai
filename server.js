@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(cors());
@@ -19,29 +20,62 @@ app.use((req, res) => {
 
 // ── Moteur de publication ─────────────────────────────────────────────────────
 const { processQueue, checkLowContent } = require('./routes/publisher');
-
-// Publier toutes les minutes
 setInterval(processQueue, 60 * 1000);
-
-// Vérifier le contenu faible toutes les 6 heures
 setInterval(checkLowContent, 6 * 60 * 60 * 1000);
-
-// Lancer au démarrage
 processQueue();
 checkLowContent();
 
 // ── Planificateur automatique ─────────────────────────────────────────────────
 const { runScheduler } = require('./routes/scheduler');
-
-// Planifier tous les jours à minuit
 setInterval(runScheduler, 24 * 60 * 60 * 1000);
-
-// Lancer au démarrage
 runScheduler();
+
+// ── Synchronisation Instagram + stats ────────────────────────────────────────
+const { syncInstagramHistory, updatePostStats } = require('./routes/instagram-sync');
+
+async function syncAllClients() {
+  try {
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { data: accounts } = await supabase
+      .from('social_accounts')
+      .select('client_id')
+      .eq('platform', 'instagram');
+    if(!accounts || accounts.length === 0) return;
+    console.log(`🔄 Sync historique pour ${accounts.length} compte(s)...`);
+    for(const acc of accounts) {
+      await syncInstagramHistory(acc.client_id);
+    }
+  } catch(err) {
+    console.error('❌ Erreur sync clients:', err.message);
+  }
+}
+
+async function updateAllStats() {
+  try {
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const { data: accounts } = await supabase
+      .from('social_accounts')
+      .select('client_id')
+      .eq('platform', 'instagram');
+    if(!accounts || accounts.length === 0) return;
+    console.log(`📊 Mise à jour stats pour ${accounts.length} compte(s)...`);
+    for(const acc of accounts) {
+      await updatePostStats(acc.client_id);
+    }
+  } catch(err) {
+    console.error('❌ Erreur update stats:', err.message);
+  }
+}
+
+// Sync historique au démarrage
+syncAllClients();
+
+// Mise à jour des stats toutes les 24h
+setInterval(updateAllStats, 24 * 60 * 60 * 1000);
 
 module.exports = app;
 
-if (require.main === module) {
+if(require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ SocialAI démarré sur http://localhost:${PORT}`);
