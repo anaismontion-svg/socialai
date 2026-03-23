@@ -6,14 +6,15 @@
 <title>SocialAI — Community Manager Autonome</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
   --surface:#22222e;--surface2:#2a2a38;--border:#2e2e3e;--border2:#3a3a4e;
   --text:#f0f0f8;--text2:#9090aa;--text3:#5a5a72;
-  --accent:#ff3b6b;--accent2:#c02250;--purple:#8b5cf6;--orange:#f97316;
-  --teal:#14b8a6;--green:#22c55e;--yellow:#eab308;
+  --accent:#ff3b6b;--accent2:#c02250;--purple:#8b5cf6;
+  --orange:#f97316;--teal:#14b8a6;--green:#22c55e;--yellow:#eab308;
   --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;
   --shadow:0 4px 24px rgba(0,0,0,0.4);--glow:0 0 40px rgba(255,59,107,0.15);
 }
@@ -43,6 +44,7 @@ img{max-width:100%;display:block}
 .client-info{flex:1;text-align:left}
 .client-name{font-size:12px;font-weight:500}
 .client-plan{font-size:10px;color:var(--text3)}
+.chevron{color:var(--text3);font-size:10px}
 .nav{padding:8px;flex:1;overflow-y:auto}
 .nav-section{margin-bottom:20px}
 .nav-section-label{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:4px 8px 6px}
@@ -51,6 +53,7 @@ img{max-width:100%;display:block}
 .nav-item.active{background:var(--bg4);color:var(--text);font-weight:500}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0}
 .nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.8}
+.nav-item.active .nav-icon{opacity:1}
 .nav-badge{margin-left:auto;background:var(--accent);color:white;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
 .sidebar-bottom{padding:12px;border-top:1px solid var(--border)}
 .user-card{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r-md);background:var(--bg3)}
@@ -60,11 +63,18 @@ img{max-width:100%;display:block}
 .topbar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;flex:1}
 .topbar-actions{display:flex;gap:8px;align-items:center}
 .btn{padding:7px 14px;font-size:13px;font-weight:500;border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text2);transition:all 0.15s}
-.btn:hover{background:var(--surface);color:var(--text);border-color:var(--border2)}
+.btn:hover{background:var(--surface);color:var(--text)}
 .btn-accent{background:var(--accent);color:white;border-color:var(--accent)}
 .btn-accent:hover{background:var(--accent2);border-color:var(--accent2);color:white}
 .btn-ghost{border-color:transparent}
 .btn-ghost:hover{border-color:var(--border)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-yellow{background:rgba(234,179,8,0.15);color:var(--yellow);border-color:rgba(234,179,8,0.3)}
+.btn-yellow:hover{background:rgba(234,179,8,0.25)}
+.btn-green{background:rgba(34,197,94,0.15);color:var(--green);border-color:rgba(34,197,94,0.3)}
+.btn-green:hover{background:rgba(34,197,94,0.25)}
+.btn-purple{background:rgba(139,92,246,0.15);color:var(--purple);border-color:rgba(139,92,246,0.3)}
+.btn-purple:hover{background:rgba(139,92,246,0.25)}
 .panel{display:none}
 .panel.active{display:block}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px}
@@ -73,15 +83,19 @@ img{max-width:100%;display:block}
 .card-action{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer}
 .stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:-30px;right:-30px;width:80px;height:80px;border-radius:50%;background:var(--glow-color,rgba(255,59,107,0.06))}
 .stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
 .stat-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px;letter-spacing:-1px}
 .stat-delta{font-size:11px;color:var(--text3)}
+.stat-delta.up{color:var(--green)}
 .stat-icon{font-size:18px;margin-bottom:8px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-xl);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease}
 @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-lg{max-width:760px}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
 .modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:none;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center}
@@ -94,21 +108,31 @@ img{max-width:100%;display:block}
 textarea.form-input{resize:vertical;min-height:80px}
 .form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;color:var(--text);font-size:13px;appearance:none}
 .client-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-.client-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.client-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all 0.2s;position:relative;overflow:hidden}
+.client-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
 .client-card.active-client{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--glow)}
+.client-card.paused-client{opacity:0.65;border-color:var(--yellow)!important}
 .client-card-avatar{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:white;margin-bottom:12px}
 .client-card-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:2px}
 .client-card-handle{font-size:12px;color:var(--text3);margin-bottom:12px}
-.client-card-stats{display:flex;gap:16px}
-.client-stat{text-align:center}
-.client-stat-val{font-size:14px;font-weight:600;font-family:'Syne',sans-serif}
-.client-stat-lbl{font-size:10px;color:var(--text3)}
 .client-card-status{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
 .status-active{background:rgba(34,197,94,0.15);color:var(--green)}
 .status-paused{background:rgba(234,179,8,0.15);color:var(--yellow)}
-.add-client-card{border:1px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;color:var(--text3);transition:all 0.2s}
+.add-client-card{border:1px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;color:var(--text3);transition:all 0.2s;cursor:pointer}
 .add-client-card:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,59,107,0.04)}
+.plan-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:0.3px}
+.plan-starter{background:rgba(20,184,166,0.15);color:var(--teal);border:1px solid rgba(20,184,166,0.3)}
+.plan-pro{background:rgba(139,92,246,0.15);color:var(--purple);border:1px solid rgba(139,92,246,0.3)}
+.client-actions{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.plan-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.plan-option{border:2px solid var(--border);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all 0.2s;position:relative}
+.plan-option.selected-starter{border-color:var(--teal);background:rgba(20,184,166,0.06)}
+.plan-option.selected-pro{border-color:var(--purple);background:rgba(139,92,246,0.06)}
+.plan-option-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
+.plan-option-features{font-size:11px;color:var(--text3);line-height:1.7}
+.plan-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:white}
+.plan-option.selected-starter .plan-check{display:flex;background:var(--teal)}
+.plan-option.selected-pro .plan-check{display:flex;background:var(--purple)}
 .upload-zone{border:2px dashed var(--border2);border-radius:var(--r-lg);padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg3)}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(255,59,107,0.04)}
 .upload-icon{font-size:36px;margin-bottom:12px}
@@ -127,9 +151,23 @@ textarea.form-input{resize:vertical;min-height:80px}
 .type-photo{background:rgba(20,184,166,0.8);color:white}
 .type-video{background:rgba(139,92,246,0.8);color:white}
 .media-ai-badge{position:absolute;top:6px;left:6px;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,59,107,0.85);color:white;font-weight:600}
-.queue-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);margin-bottom:10px;transition:all 0.15s}
-.queue-item:hover{border-color:var(--border2)}
-.queue-thumb{width:56px;height:56px;border-radius:var(--r-sm);flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:22px}
+/* POST GRID */
+.post-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:16px}
+.post-item{border-radius:var(--r-md);overflow:hidden;position:relative;background:var(--bg3);border:1px solid var(--border);aspect-ratio:1;cursor:pointer;transition:all 0.2s}
+.post-item:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+.post-item-img{width:100%;height:100%;object-fit:cover}
+.post-item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.post-item-score{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:rgba(0,0,0,0.7);color:white}
+.post-item-score.top{background:rgba(255,59,107,0.85)}
+.post-item-stats{display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.9)}
+.post-item-caption{font-size:10px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.post-item-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px;background:var(--bg4);gap:6px}
+.post-item-placeholder span{font-size:10px;color:var(--text3)}
+/* QUEUE ITEM */
+.queue-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);margin-bottom:10px;transition:all 0.15s;cursor:pointer}
+.queue-item:hover{border-color:var(--accent)}
+.queue-thumb{width:56px;height:56px;border-radius:var(--r-sm);flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
+.queue-thumb img{width:100%;height:100%;object-fit:cover}
 .queue-body{flex:1;min-width:0}
 .queue-title{font-size:13px;font-weight:500;margin-bottom:2px}
 .queue-meta{font-size:11px;color:var(--text3);margin-bottom:6px}
@@ -138,10 +176,17 @@ textarea.form-input{resize:vertical;min-height:80px}
 .queue-time{font-size:11px;color:var(--text3);white-space:nowrap}
 .queue-status{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
 .qs-scheduled{background:rgba(20,184,166,0.12);color:var(--teal)}
-.qs-generating{background:rgba(234,179,8,0.12);color:var(--yellow)}
 .qs-published{background:rgba(34,197,94,0.12);color:var(--green)}
-.qs-erreur{background:rgba(255,59,107,0.12);color:var(--accent)}
 .qs-draft{background:var(--surface);color:var(--text3)}
+/* BEFORE/AFTER COMPARISON */
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.comparison-card{border-radius:var(--r-md);padding:16px;text-align:center}
+.comparison-before{background:rgba(90,90,114,0.1);border:1px solid var(--border)}
+.comparison-after{background:rgba(255,59,107,0.06);border:1px solid rgba(255,59,107,0.2)}
+.comparison-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;color:var(--text3)}
+.comparison-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;margin-bottom:4px}
+.comparison-sub{font-size:12px;color:var(--text3)}
+/* AUTO */
 .auto-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg3);margin-bottom:8px}
 .auto-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .dot-on{background:var(--green);box-shadow:0 0 8px var(--green)}
@@ -160,13 +205,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 .log-time{color:var(--text3);flex-shrink:0;font-size:11px;padding-top:1px}
 .log-text{color:var(--text2);flex:1;line-height:1.5}
 .log-text strong{color:var(--text);font-weight:500}
-.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,59,107,0.2);border-top-color:var(--accent);animation:spin 0.7s linear infinite;display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-bar{height:2px;background:var(--surface);border-radius:1px;overflow:hidden}
-.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:1px;transition:width 0.3s ease}
-.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r-sm);padding:3px;margin-bottom:16px}
-.tab{flex:1;text-align:center;padding:6px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text3);transition:all 0.15s;font-weight:500}
-.tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
 .section-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;letter-spacing:-0.5px}
 .section-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
 .divider{height:1px;background:var(--border);margin:20px 0}
@@ -176,14 +214,23 @@ textarea.form-input{resize:vertical;min-height:80px}
 .badge-orange{background:rgba(249,115,22,0.15);color:var(--orange)}
 .badge-green{background:rgba(34,197,94,0.15);color:var(--green)}
 .badge-red{background:rgba(255,59,107,0.15);color:var(--accent)}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.badge-yellow{background:rgba(234,179,8,0.15);color:var(--yellow)}
+.tabs{display:flex;gap:2px;background:var(--bg3);border-radius:var(--r-sm);padding:3px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:6px;border-radius:6px;font-size:12px;cursor:pointer;color:var(--text3);transition:all 0.15s;font-weight:500}
+.tab.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
 .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .progress-label{font-size:12px;color:var(--text2);width:100px;flex-shrink:0}
 .progress-bg{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
 .progress-fill{height:100%;border-radius:3px;transition:width 1s ease}
 .progress-val{font-size:11px;color:var(--text3);width:32px;text-align:right;flex-shrink:0}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px}
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,59,107,0.2);border-top-color:var(--accent);animation:spin 0.7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-bar{height:2px;background:var(--surface);border-radius:1px;overflow:hidden}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:1px;transition:width 0.3s ease}
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);min-width:260px;animation:slideInRight 0.3s ease}
 @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
@@ -192,11 +239,26 @@ textarea.form-input{resize:vertical;min-height:80px}
 .toast.success{border-left:3px solid var(--green)}
 .toast.info{border-left:3px solid var(--purple)}
 .toast.warn{border-left:3px solid var(--yellow)}
+/* POST DETAIL MODAL */
+.post-detail-img{width:100%;max-height:280px;object-fit:cover;border-radius:var(--r-md);margin-bottom:16px;display:block}
+.post-detail-placeholder{width:100%;height:200px;background:var(--bg3);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px}
+.ai-suggestion-box{background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));border:1px solid rgba(139,92,246,0.2);border-radius:var(--r-md);padding:16px;margin-top:12px}
+.ai-suggestion-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ai-explanation-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--text2)}
+.ai-explanation-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px}
+.score-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.score-label{font-size:12px;color:var(--text2);width:110px;flex-shrink:0}
+.score-bg{flex:1;height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0}
+/* CAL */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav{display:flex;gap:4px}
 .cal-nav-btn{width:28px;height:28px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:12px;display:flex;align-items:center;justify-content:center}
+.cal-nav-btn:hover{background:var(--surface2);color:var(--text)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
 .cal-day-head{font-size:10px;color:var(--text3);text-align:center;padding:4px;letter-spacing:0.5px;text-transform:uppercase}
-.cal-day{aspect-ratio:1;border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:4px 2px;cursor:pointer;transition:background 0.15s}
+.cal-day{aspect-ratio:1;border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:4px 2px;cursor:pointer;transition:background 0.15s;position:relative}
 .cal-day:hover{background:var(--surface)}
 .cal-day.today{background:rgba(255,59,107,0.1)}
 .cal-day .day-num{font-size:11px;margin-bottom:2px;font-weight:500}
@@ -206,18 +268,22 @@ textarea.form-input{resize:vertical;min-height:80px}
 .cdot{width:4px;height:4px;border-radius:50%}
 .cdot-post{background:var(--accent)}
 .cdot-story{background:var(--purple)}
-.trend-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
-.trend-item:last-child{border-bottom:none}
-.trend-rank{font-size:11px;color:var(--text3);width:18px;flex-shrink:0;font-weight:500}
-.trend-name{font-size:13px;font-weight:500;flex:1}
-.trend-bar-bg{width:100px;height:4px;background:var(--surface);border-radius:2px;flex-shrink:0}
-.trend-bar-fill{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--purple))}
-.trend-pct{font-size:11px;color:var(--green);width:36px;text-align:right;flex-shrink:0;font-weight:500}
 </style>
 </head>
 <body>
 
-<!-- MODAL ADD CLIENT -->
+<!-- ── MODAL POST DETAIL ── -->
+<div class="overlay" id="modal-post-detail">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title" id="post-detail-title">Publication</div>
+      <button class="modal-close" onclick="closeModal('modal-post-detail')">✕</button>
+    </div>
+    <div id="post-detail-content"></div>
+  </div>
+</div>
+
+<!-- ── MODAL ADD CLIENT ── -->
 <div class="overlay" id="modal-add-client">
   <div class="modal">
     <div class="modal-header">
@@ -226,50 +292,79 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-group">
       <label class="form-label">Nom de l'entreprise *</label>
-      <input class="form-input" id="new-client-name" type="text" placeholder="Ex: Déco Paris">
+      <input class="form-input" id="new-client-name" type="text" placeholder="Ex: Love Queen Dolls">
     </div>
     <div class="form-group">
-      <label class="form-label">Secteur d'activité</label>
+      <label class="form-label">Email du client</label>
+      <input class="form-input" id="new-client-email" type="email" placeholder="client@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Secteur</label>
       <select class="form-select form-input" id="new-client-sector">
-        <option>Décoration intérieure</option>
-        <option>Restauration</option>
-        <option>Mode & Beauté</option>
-        <option>Fitness & Bien-être</option>
-        <option>Immobilier</option>
-        <option>Artisanat</option>
-        <option>Autre</option>
+        <option>Élevage / Animaux</option><option>Décoration intérieure</option>
+        <option>Restauration</option><option>Mode & Beauté</option>
+        <option>Fitness & Bien-être</option><option>Immobilier</option><option>Autre</option>
       </select>
     </div>
     <div class="grid-2" style="gap:12px;margin-bottom:16px">
-      <div>
-        <label class="form-label">Handle Instagram</label>
-        <input class="form-input" id="new-client-ig" type="text" placeholder="@votrecompte">
-      </div>
-      <div>
-        <label class="form-label">Handle Facebook</label>
-        <input class="form-input" id="new-client-fb" type="text" placeholder="@votrecompte">
-      </div>
+      <div><label class="form-label">Instagram</label><input class="form-input" id="new-client-ig" type="text" placeholder="@compte"></div>
+      <div><label class="form-label">Facebook</label><input class="form-input" id="new-client-fb" type="text" placeholder="@compte"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Ton de communication</label>
-      <textarea class="form-input" id="new-client-desc" placeholder="Ex: Marque haut de gamme, ton chaleureux..."></textarea>
+      <label class="form-label">Description / Ton</label>
+      <textarea class="form-input" id="new-client-desc" placeholder="Ton chaleureux, passionné..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Plan</label>
-      <select class="form-select form-input" id="new-client-plan">
-        <option value="starter">Starter</option>
-        <option value="pro" selected>Pro</option>
-        <option value="enterprise">Enterprise</option>
-      </select>
+      <label class="form-label">Forfait</label>
+      <div class="plan-selector">
+        <div class="plan-option selected-starter" id="plan-starter" onclick="selectPlan('starter')">
+          <div class="plan-check">✓</div>
+          <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
+          <div class="plan-option-features">3 posts/sem · 1 story/jour<br>1 post spécial/sem · Pas de DM</div>
+        </div>
+        <div class="plan-option" id="plan-pro" onclick="selectPlan('pro')">
+          <div class="plan-check">✓</div>
+          <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
+          <div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires · Illimité</div>
+        </div>
+      </div>
+      <input type="hidden" id="new-client-plan" value="starter">
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn" onclick="closeModal('modal-add-client')">Annuler</button>
-      <button class="btn btn-accent" onclick="addClient()">Créer le compte →</button>
+      <button class="btn btn-accent" onclick="addClient()">Créer →</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL SWITCH CLIENT -->
+<!-- ── MODAL CHANGE PLAN ── -->
+<div class="overlay" id="modal-change-plan">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Changer le forfait</div>
+      <button class="modal-close" onclick="closeModal('modal-change-plan')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Client : <strong id="change-plan-client-name" style="color:var(--text)"></strong></div>
+    <div class="plan-selector">
+      <div class="plan-option" id="modal-plan-starter" onclick="selectModalPlan('starter')">
+        <div class="plan-check">✓</div>
+        <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
+        <div class="plan-option-features">3 posts/sem · 1 post spécial/sem<br>Pas de DM ni commentaires</div>
+      </div>
+      <div class="plan-option" id="modal-plan-pro" onclick="selectModalPlan('pro')">
+        <div class="plan-check">✓</div>
+        <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
+        <div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires illimités</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('modal-change-plan')">Annuler</button>
+      <button class="btn btn-accent" onclick="confirmChangePlan()">Confirmer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL SWITCH CLIENT ── -->
 <div class="overlay" id="modal-switch-client">
   <div class="modal" style="max-width:380px">
     <div class="modal-header">
@@ -283,24 +378,21 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- MODAL UPLOAD -->
+<!-- ── MODAL UPLOAD ── -->
 <div class="overlay" id="modal-upload">
   <div class="modal" style="max-width:600px">
     <div class="modal-header">
       <div class="modal-title">📤 Ajouter des médias</div>
       <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
     </div>
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
-         ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
       <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)">
       <div class="upload-icon">🗂️</div>
       <div class="upload-title">Glissez vos fichiers ici</div>
       <div class="upload-sub">ou cliquez pour sélectionner</div>
       <div class="upload-formats">
-        <span class="format-tag">JPG / PNG</span>
-        <span class="format-tag">MP4 / MOV</span>
-        <span class="format-tag">GIF</span>
-        <span class="format-tag">WebP</span>
+        <span class="format-tag">JPG / PNG</span><span class="format-tag">MP4 / MOV</span>
+        <span class="format-tag">GIF</span><span class="format-tag">WebP</span>
       </div>
     </div>
     <div id="upload-preview" style="margin-top:16px;display:none">
@@ -313,12 +405,12 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn" onclick="closeModal('modal-upload')">Fermer</button>
-      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">🤖 Analyser avec l'IA →</button>
+      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">🤖 Analyser →</button>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ── APP ── -->
 <div class="app">
   <div class="sidebar">
     <div class="logo">
@@ -327,48 +419,45 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="client-selector">
       <button class="client-btn" onclick="openModal('modal-switch-client')">
-        <div class="client-avatar" id="sidebar-client-avatar">?</div>
+        <div class="client-avatar" id="sidebar-client-avatar">LQ</div>
         <div class="client-info">
-          <div class="client-name" id="sidebar-client-name">Chargement…</div>
-          <div class="client-plan" id="sidebar-client-plan">Plan —</div>
+          <div class="client-name" id="sidebar-client-name">Lovequeendolls</div>
+          <div class="client-plan" id="sidebar-client-plan">Plan Starter</div>
         </div>
-        <div style="color:var(--text3);font-size:10px">▾</div>
+        <div class="chevron">▾</div>
       </button>
     </div>
     <nav class="nav">
       <div class="nav-section">
         <div class="nav-section-label">Principal</div>
         <div class="nav-item active" onclick="nav('dashboard')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10z"/></svg>
-          Vue d'ensemble
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10zm6-1l2 2 4-4-1.4-1.4L10 9.2 8.7 7.9 7.3 9.3z"/></svg>Vue d'ensemble
         </div>
         <div class="nav-item" onclick="nav('clients')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
-          Clients
-          <div class="nav-badge" id="nav-client-count">0</div>
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>Clients
+          <div class="nav-badge" id="nav-client-count">1</div>
         </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Contenu</div>
         <div class="nav-item" onclick="nav('media')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
-          Médiathèque
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>Médiathèque
           <div class="nav-badge" id="nav-media-count">0</div>
         </div>
         <div class="nav-item" onclick="nav('queue')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
-          File de publication
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>File de publication
+        </div>
+        <div class="nav-item" onclick="nav('reports')">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Rapports
         </div>
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Analytics</div>
         <div class="nav-item" onclick="nav('calendar')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>
-          Calendrier
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>Calendrier
         </div>
         <div class="nav-item" onclick="nav('automation')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>
-          Automatisation
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>Automatisation
         </div>
       </div>
     </nav>
@@ -384,10 +473,10 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Vue d'ensemble</div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)">
+        <button class="btn btn-ghost" id="auto-indicator" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)">
           <div class="auto-dot dot-on" style="width:6px;height:6px"></div> IA Active
         </button>
-        <button class="btn" onclick="openModal('modal-upload')">📤 Ajouter des médias</button>
+        <button class="btn" onclick="openModal('modal-upload')">📤 Médias</button>
         <button class="btn btn-accent" onclick="openModal('modal-add-client')">+ Nouveau client</button>
       </div>
     </div>
@@ -397,52 +486,45 @@ textarea.form-input{resize:vertical;min-height:80px}
       <!-- DASHBOARD -->
       <div class="panel active" id="panel-dashboard">
         <div class="section-title">Bonjour 👋 Voici votre tableau de bord</div>
-        <div class="section-sub" id="dashboard-sub">Chargement…</div>
+        <div class="section-sub" id="dashboard-date">Chargement...</div>
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-label">Clients actifs</div>
-            <div class="stat-value" id="stat-clients">0</div>
-            <div class="stat-delta">Comptes gérés</div>
+          <div class="stat-card" style="--glow-color:rgba(255,59,107,0.08)">
+            <div class="stat-icon">👥</div><div class="stat-label">Clients actifs</div>
+            <div class="stat-value" id="stat-clients">0</div><div class="stat-delta">Comptes gérés</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">🖼️</div>
-            <div class="stat-label">Médias total</div>
-            <div class="stat-value" id="stat-media">0</div>
-            <div class="stat-delta">Dans la médiathèque</div>
+          <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)">
+            <div class="stat-icon">📸</div><div class="stat-label">Publications</div>
+            <div class="stat-value" id="stat-posts">0</div><div class="stat-delta">Historique + planifiés</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">🤖</div>
-            <div class="stat-label">Posts planifiés</div>
-            <div class="stat-value" id="stat-queue">0</div>
-            <div class="stat-delta">En file d'attente</div>
+          <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)">
+            <div class="stat-icon">❤️</div><div class="stat-label">Likes total</div>
+            <div class="stat-value" id="stat-likes">0</div><div class="stat-delta">Toutes publications</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-label">Posts publiés</div>
-            <div class="stat-value" id="stat-published">0</div>
-            <div class="stat-delta">Au total</div>
+          <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)">
+            <div class="stat-icon">📊</div><div class="stat-label">Engagement moy.</div>
+            <div class="stat-value" id="stat-engagement">0</div><div class="stat-delta">Likes+comments/post</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📈 Évolution engagement</div></div>
+            <canvas id="chart-dashboard" height="160"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">⭐ Top publications</div><button class="card-action" onclick="nav('reports')">Voir tout →</button></div>
+            <div id="dashboard-top-posts"></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header">
-            <div class="card-title">👥 Clients actifs</div>
-            <button class="card-action" onclick="nav('clients')">Gérer →</button>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="dashboard-clients">
-            <div class="empty-state" style="grid-column:span 3;padding:20px">
-              <div class="empty-icon">👥</div>
-              <div class="empty-title">Aucun client</div>
-              <div style="font-size:12px">Ajoutez votre premier client</div>
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">👥 Clients actifs</div><button class="card-action" onclick="nav('clients')">Gérer →</button></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="dashboard-clients"></div>
         </div>
       </div>
 
       <!-- CLIENTS -->
       <div class="panel" id="panel-clients">
         <div class="section-title">Gestion des clients</div>
-        <div class="section-sub">Créez un compte par entreprise, l'IA s'occupe du reste.</div>
+        <div class="section-sub">Gérez les forfaits et le service IA pour chaque client.</div>
         <div class="client-grid" id="clients-grid"></div>
       </div>
 
@@ -451,24 +533,17 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
           <div>
             <div class="section-title">Médiathèque</div>
-            <div class="section-sub" id="media-client-name">Sélectionnez un client</div>
+            <div class="section-sub" id="media-client-name">Médias du client actif</div>
           </div>
-          <button class="btn btn-accent" onclick="openModal('modal-upload')">📤 Ajouter des médias</button>
+          <button class="btn btn-accent" onclick="openModal('modal-upload')">📤 Ajouter</button>
         </div>
         <div class="tabs">
           <div class="tab active" onclick="filterMedia('all',this)">Tous</div>
           <div class="tab" onclick="filterMedia('photo',this)">Photos</div>
           <div class="tab" onclick="filterMedia('video',this)">Vidéos</div>
           <div class="tab" onclick="filterMedia('analysed',this)">Analysés ✓</div>
-          <div class="tab" onclick="filterMedia('pending',this)">En attente</div>
         </div>
-        <div class="media-grid" id="media-grid">
-          <div class="empty-state" style="grid-column:span 6;padding:40px">
-            <div class="empty-icon">🖼️</div>
-            <div class="empty-title">Aucun média</div>
-            <div style="font-size:12px">Uploadez vos premières photos ou vidéos</div>
-          </div>
-        </div>
+        <div class="media-grid" id="media-grid"></div>
       </div>
 
       <!-- QUEUE -->
@@ -476,11 +551,57 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
           <div>
             <div class="section-title">File de publication</div>
-            <div class="section-sub">Tous les contenus planifiés par l'IA.</div>
+            <div class="section-sub">Cliquez sur un post pour le modifier ou demander une suggestion IA.</div>
           </div>
-          <button class="btn btn-accent" onclick="openModal('modal-upload')">+ Ajouter un média</button>
+          <button class="btn btn-accent" onclick="openModal('modal-upload')">+ Médias</button>
         </div>
         <div id="queue-list"></div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="panel" id="panel-reports">
+        <div class="section-title">📊 Rapports de publications</div>
+        <div class="section-sub" id="reports-client-label">Publications historiques + planifiées · Cliquez sur un post pour le détail</div>
+
+        <!-- Stats rapides -->
+        <div class="stats-grid" id="reports-stats-grid" style="margin-bottom:20px"></div>
+
+        <!-- Avant/Après IA -->
+        <div class="comparison-grid" id="reports-comparison" style="display:none">
+          <div class="comparison-card comparison-before">
+            <div class="comparison-label">📅 Avant l'IA</div>
+            <div class="comparison-value" id="cmp-before-val">—</div>
+            <div class="comparison-sub" id="cmp-before-sub">eng. moyen / post</div>
+          </div>
+          <div class="comparison-card comparison-after">
+            <div class="comparison-label">🤖 Avec l'IA</div>
+            <div class="comparison-value" id="cmp-after-val" style="color:var(--accent)">—</div>
+            <div class="comparison-sub" id="cmp-after-sub">eng. moyen / post</div>
+          </div>
+        </div>
+
+        <!-- Graphique évolution -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div class="card-title">📈 Évolution mensuelle</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" id="chart-btn-likes" onclick="switchChart('likes')" style="font-size:11px">Likes</button>
+              <button class="btn btn-sm" id="chart-btn-comments" onclick="switchChart('comments')" style="font-size:11px">Commentaires</button>
+              <button class="btn btn-sm" id="chart-btn-reach" onclick="switchChart('reach')" style="font-size:11px">Reach</button>
+            </div>
+          </div>
+          <canvas id="chart-reports" height="120"></canvas>
+        </div>
+
+        <!-- Tabs publications -->
+        <div class="tabs">
+          <div class="tab active" onclick="switchReportTab('all',this)">Toutes</div>
+          <div class="tab" onclick="switchReportTab('history',this)">Historique</div>
+          <div class="tab" onclick="switchReportTab('planned',this)">Planifiées</div>
+          <div class="tab" onclick="switchReportTab('top',this)">⭐ Top posts</div>
+        </div>
+
+        <div class="post-grid" id="reports-posts-grid"></div>
       </div>
 
       <!-- CALENDAR -->
@@ -490,20 +611,14 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="card">
           <div class="cal-header">
             <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600" id="cal-month-label">Mars 2026</div>
-            <div style="display:flex;gap:4px">
+            <div class="cal-nav">
               <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
               <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
             </div>
           </div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><div class="cdot cdot-post"></div> Post</div>
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)"><div class="cdot cdot-story"></div> Story</div>
-          </div>
           <div class="cal-grid">
-            <div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div>
-            <div class="cal-day-head">Mer</div><div class="cal-day-head">Jeu</div>
-            <div class="cal-day-head">Ven</div><div class="cal-day-head">Sam</div>
-            <div class="cal-day-head">Dim</div>
+            <div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div><div class="cal-day-head">Mer</div>
+            <div class="cal-day-head">Jeu</div><div class="cal-day-head">Ven</div><div class="cal-day-head">Sam</div><div class="cal-day-head">Dim</div>
           </div>
           <div class="cal-grid" id="cal-grid" style="margin-top:4px"></div>
         </div>
@@ -512,20 +627,28 @@ textarea.form-input{resize:vertical;min-height:80px}
       <!-- AUTOMATION -->
       <div class="panel" id="panel-automation">
         <div class="section-title">⚡ Centre d'automatisation</div>
-        <div class="section-sub">Statut des modules IA en temps réel.</div>
+        <div class="section-sub">Modules IA actifs pour votre agent community manager.</div>
         <div class="grid-2">
           <div class="card">
             <div class="card-header"><div class="card-title">🤖 Modules IA actifs</div></div>
-            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Analyse automatique des médias</div><div class="auto-desc">Dès qu'un média est uploadé</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Génération de captions</div><div class="auto-desc">Caption + hashtags automatiques</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            <div class="auto-status"><div class="auto-dot dot-running"></div><div><div class="auto-label">Planification intelligente</div><div class="auto-desc">L'IA choisit la meilleure heure</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Publication automatique</div><div class="auto-desc">Via Meta Graph API</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse aux DMs</div><div class="auto-desc">Community management IA</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Relances automatiques J+1</div><div class="auto-desc">Si pas de réponse dans les 24h</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Analyse automatique des médias</div><div class="auto-desc">Dès qu'un média est uploadé</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Génération de captions</div><div class="auto-desc">Caption + hashtags automatiques</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-running"></div><div><div class="auto-label">Planification intelligente</div><div class="auto-desc">Meilleure heure selon l'audience</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Publication automatique</div><div class="auto-desc">Via Meta Graph API</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Sync historique Instagram</div><div class="auto-desc">Analyse des anciens posts</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse commentaires</div><div class="auto-desc">Courte, émotionnelle, variée</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse DM (PRO)</div><div class="auto-desc">Conversation naturelle avec mémoire</div></div><div class="toggle on"></div></div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">📊 Publications récentes</div></div>
-            <div id="auto-queue-preview"></div>
+            <div class="card-header"><div class="card-title">📋 Forfaits</div></div>
+            <div style="margin-bottom:8px;padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:4px">⚡ Starter</div>
+              <div style="font-size:11px;color:var(--text3)">3 posts/sem · 1 story/jour · Analyse historique · 1 post spécial/sem</div>
+            </div>
+            <div style="padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🚀 Pro</div>
+              <div style="font-size:11px;color:var(--text3)">7 posts/sem · Recyclage · DM + commentaires · Posts spéciaux illimités</div>
+            </div>
           </div>
         </div>
       </div>
@@ -537,430 +660,828 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-let clients = [];
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let clients     = [];
 let activeClient = null;
-let mediaItems = [];
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
+let mediaItems  = [];
+let reportsData = null;
+let reportsChart = null;
+let dashChart    = null;
+let currentChartMetric = 'likes';
+let currentReportTab   = 'all';
+let calendarDate = new Date();
+let selectedPlan = 'starter';
+let changePlanClientId = null;
+let changePlanSelected = 'starter';
 
-const COLORS = [
-  'linear-gradient(135deg,#E1306C,#833AB4)',
-  'linear-gradient(135deg,#f97316,#eab308)',
-  'linear-gradient(135deg,#14b8a6,#8b5cf6)',
-  'linear-gradient(135deg,#3b82f6,#06b6d4)',
-  'linear-gradient(135deg,#10b981,#059669)',
-];
+const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
-function clientColor(i) { return COLORS[i % COLORS.length]; }
-function clientInitials(name) { return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2); }
-
-const titles = {
-  dashboard:'Vue d\'ensemble', clients:'Gestion des clients',
-  media:'Médiathèque', queue:'File de publication',
-  calendar:'Calendrier éditorial', automation:'Centre d\'automatisation'
-};
-
-function nav(page) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('panel-' + page).classList.add('active');
-  document.getElementById('topbar-title').textContent = titles[page] || page;
-  const order = ['dashboard','clients','media','queue','calendar','automation'];
-  const allNavItems = document.querySelectorAll('.nav-item');
-  const idx = order.indexOf(page);
-  if(idx >= 0 && allNavItems[idx]) allNavItems[idx].classList.add('active');
-  closeModal('modal-switch-client');
-  if(page === 'clients') renderClients();
-  if(page === 'media') loadMedia();
-  if(page === 'queue') loadQueue();
-  if(page === 'calendar') buildCalendar();
-  if(page === 'automation') loadAutoQueue();
-  if(page === 'dashboard') loadDashboard();
+// ── INIT ───────────────────────────────────────────────────────────────────────
+async function init() {
+  const now = new Date();
+  document.getElementById('dashboard-date').textContent =
+    now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) + ' — IA en cours d\'exécution';
+  await loadClients();
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.overlay').forEach(o => {
-  o.addEventListener('click', e => { if(e.target === o) o.classList.remove('open'); });
-});
-
+// ── CLIENTS ────────────────────────────────────────────────────────────────────
 async function loadClients() {
   try {
-    const res = await fetch('/api/clients');
-    const data = await res.json();
-    clients = data.map((c, i) => ({
-      ...c,
-      initials: clientInitials(c.name),
-      color: clientColor(i),
-      active: i === 0
-    }));
-    if(clients.length > 0) {
+    const r = await fetch('/api/clients');
+    clients = await r.json();
+    if (clients.length > 0 && !activeClient) {
       activeClient = clients[0];
       updateSidebarClient();
     }
     document.getElementById('nav-client-count').textContent = clients.length;
+    document.getElementById('stat-clients').textContent = clients.filter(c=>c.status==='active').length;
+    renderDashboardClients();
     renderSwitcherList();
-    loadDashboard();
-  } catch(e) { console.error('Erreur clients:', e); }
+  } catch(e) { console.error(e); }
+}
+
+function getClientColor(idx) {
+  const colors = [
+    'linear-gradient(135deg,#E1306C,#833AB4)',
+    'linear-gradient(135deg,#f97316,#eab308)',
+    'linear-gradient(135deg,#14b8a6,#8b5cf6)',
+    'linear-gradient(135deg,#3b82f6,#06b6d4)',
+    'linear-gradient(135deg,#10b981,#059669)',
+  ];
+  return colors[idx % colors.length];
 }
 
 function updateSidebarClient() {
-  if(!activeClient) return;
-  document.getElementById('sidebar-client-avatar').textContent = activeClient.initials;
-  document.getElementById('sidebar-client-avatar').style.background = activeClient.color;
-  document.getElementById('sidebar-client-name').textContent = activeClient.name;
-  document.getElementById('sidebar-client-plan').textContent = 'Plan ' + (activeClient.plan || 'Starter');
+  if (!activeClient) return;
+  const initials = activeClient.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sidebar-client-avatar').textContent = initials;
+  document.getElementById('sidebar-client-name').textContent   = activeClient.name;
+  document.getElementById('sidebar-client-plan').textContent   = 'Plan ' + (activeClient.plan||'starter').charAt(0).toUpperCase() + (activeClient.plan||'starter').slice(1);
 }
 
 function renderClients() {
   const grid = document.getElementById('clients-grid');
-  grid.innerHTML = clients.map(c => `
-    <div class="client-card${c.active ? ' active-client' : ''}" onclick="selectClient('${c.id}')">
-      <div class="client-card-status status-${c.status || 'active'}">${c.status === 'active' ? '● Actif' : '⏸ Pause'}</div>
-      <div class="client-card-avatar" style="background:${c.color}">${c.initials}</div>
+  grid.innerHTML = clients.map((c,idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color    = getClientColor(idx);
+    const isPaused = c.status === 'paused';
+    const plan     = (c.plan||'starter').toLowerCase();
+    return `
+    <div class="client-card${c.id===activeClient?.id?' active-client':''}${isPaused?' paused-client':''}" onclick="selectClient('${c.id}')">
+      <div class="client-card-status status-${c.status}">${isPaused?'⏸ Pause':'● Actif'}</div>
+      <div class="client-card-avatar" style="background:${color}">${initials}</div>
       <div class="client-card-name">${c.name}</div>
-      <div class="client-card-handle">${c.instagram || ''} · ${c.sector || ''}</div>
-      <div class="client-card-stats">
-        <div class="client-stat"><div class="client-stat-val">0</div><div class="client-stat-lbl">Abonnés</div></div>
-        <div class="client-stat"><div class="client-stat-val">0%</div><div class="client-stat-lbl">Engagement</div></div>
-        <div class="client-stat"><div class="client-stat-val">0</div><div class="client-stat-lbl">Posts</div></div>
+      <div class="client-card-handle">${c.instagram||''} · ${c.sector||'Autre'}</div>
+      ${isPaused?'<div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--yellow);margin-top:6px">⏸ Service IA suspendu</div>':''}
+      <div class="client-actions">
+        <span class="plan-badge ${plan==='pro'?'plan-pro':'plan-starter'}">${plan==='pro'?'🚀 Pro':'⚡ Starter'}</span>
+        <button class="btn btn-sm" onclick="event.stopPropagation();openChangePlan('${c.id}','${c.name}','${plan}')">🔄 Forfait</button>
+        ${isPaused
+          ? `<button class="btn btn-green btn-sm" onclick="event.stopPropagation();togglePause('${c.id}','active')">▶ Réactiver</button>`
+          : `<button class="btn btn-yellow btn-sm" onclick="event.stopPropagation();togglePause('${c.id}','paused')">⏸ Pause</button>`}
+        ${c.email?`<button class="btn btn-sm" onclick="event.stopPropagation();resetClientPassword('${c.id}')">🔑 Reset mdp</button>`:''}
+        <button class="btn btn-sm btn-purple" onclick="event.stopPropagation();selectClient('${c.id}');nav('reports')">📊 Rapports</button>
       </div>
-      <div style="margin-top:12px"><span class="badge badge-purple">Plan ${c.plan || 'Starter'}</span></div>
-    </div>
-  `).join('') + `
+    </div>`;
+  }).join('') + `
     <div class="client-card add-client-card" onclick="openModal('modal-add-client')">
       <div style="font-size:24px">＋</div>
       <div style="font-size:13px;font-weight:500">Ajouter un client</div>
       <div style="font-size:11px;color:var(--text3)">Nouveau compte entreprise</div>
-    </div>
-  `;
+    </div>`;
+}
+
+function renderDashboardClients() {
+  const el = document.getElementById('dashboard-clients');
+  if (!el || clients.length === 0) {
+    if (el) el.innerHTML = '<div style="color:var(--text3);font-size:13px;grid-column:1/-1;text-align:center;padding:20px">Aucun client — créez votre premier client</div>';
+    return;
+  }
+  el.innerHTML = clients.map((c,idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color    = getClientColor(idx);
+    const plan     = (c.plan||'starter').toLowerCase();
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);cursor:pointer" onclick="selectClient('${c.id}');nav('reports')">
+      <div style="width:36px;height:36px;border-radius:10px;background:${color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${c.name}</div>
+        <div style="font-size:11px;color:var(--text3)">${plan==='pro'?'🚀 Pro':'⚡ Starter'}</div>
+      </div>
+      <div class="badge badge-${c.status==='active'?'green':'yellow'}">${c.status==='active'?'Actif':'Pause'}</div>
+    </div>`;
+  }).join('');
 }
 
 function selectClient(id) {
-  clients.forEach(c => c.active = c.id == id);
-  activeClient = clients.find(c => c.id == id);
+  activeClient = clients.find(c => c.id===id || c.id===parseInt(id));
+  if (!activeClient) return;
   updateSidebarClient();
   renderClients();
   renderSwitcherList();
-  mediaItems = [];
-  document.getElementById('nav-media-count').textContent = '0';
-  document.getElementById('media-client-name').textContent = 'Tous les médias de ' + activeClient.name;
-  loadMedia();
+  renderDashboardClients();
   closeModal('modal-switch-client');
+}
+
+function renderSwitcherList() {
+  const el = document.getElementById('client-switch-list');
+  el.innerHTML = clients.map((c,idx) => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const color    = getClientColor(idx);
+    const isActive = activeClient && c.id === activeClient.id;
+    return `
+    <div onclick="selectClient('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;border:1px solid ${isActive?'var(--accent)':'transparent'};background:${isActive?'rgba(255,59,107,0.06)':'transparent'}">
+      <div style="width:32px;height:32px;border-radius:9px;background:${color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">${initials}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.instagram||''} · ${(c.plan||'starter').charAt(0).toUpperCase()+(c.plan||'starter').slice(1)}</div></div>
+      ${isActive?'<div style="color:var(--accent);font-size:12px">✓</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ── FORFAIT + PAUSE ────────────────────────────────────────────────────────────
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('new-client-plan').value = plan;
+  document.getElementById('plan-starter').className = 'plan-option'+(plan==='starter'?' selected-starter':'');
+  document.getElementById('plan-pro').className     = 'plan-option'+(plan==='pro'?' selected-pro':'');
+}
+
+function openChangePlan(clientId, clientName, currentPlan) {
+  changePlanClientId = clientId;
+  changePlanSelected = currentPlan;
+  document.getElementById('change-plan-client-name').textContent = clientName;
+  selectModalPlan(currentPlan);
+  openModal('modal-change-plan');
+}
+
+function selectModalPlan(plan) {
+  changePlanSelected = plan;
+  document.getElementById('modal-plan-starter').className = 'plan-option'+(plan==='starter'?' selected-starter':'');
+  document.getElementById('modal-plan-pro').className     = 'plan-option'+(plan==='pro'?' selected-pro':'');
+}
+
+async function confirmChangePlan() {
+  if (!changePlanClientId) return;
+  try {
+    const r = await fetch(`/api/clients/${changePlanClientId}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ plan: changePlanSelected })
+    });
+    if (!r.ok) throw new Error();
+    await loadClients();
+    closeModal('modal-change-plan');
+    renderClients();
+    toast(`Forfait changé en ${changePlanSelected==='pro'?'🚀 Pro':'⚡ Starter'} !`, 'success');
+  } catch { toast('Erreur lors du changement de forfait','warn'); }
+}
+
+async function togglePause(clientId, newStatus) {
+  try {
+    const r = await fetch(`/api/clients/${clientId}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!r.ok) throw new Error();
+    await loadClients();
+    renderClients();
+    toast(newStatus==='paused'?'Service mis en pause ⏸':'Service réactivé ▶', 'success');
+  } catch { toast('Erreur','warn'); }
+}
+
+async function resetClientPassword(clientId) {
+  const adminKey = prompt('Clé admin :');
+  if (!adminKey) return;
+  try {
+    const r = await fetch('/api/auth/reset-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ clientId, adminKey })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    toast('Mot de passe provisoire envoyé par email ✓', 'success');
+  } catch(e) { toast('Erreur: '+e.message,'warn'); }
 }
 
 async function addClient() {
   const name = document.getElementById('new-client-name').value.trim();
-  if(!name) { toast('Veuillez saisir un nom de client', 'warn'); return; }
+  if (!name) { toast('Veuillez saisir un nom','warn'); return; }
+  const email = document.getElementById('new-client-email').value.trim();
   try {
-    const res = await fetch('/api/clients', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const r = await fetch('/api/clients', {
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        name,
+        name, email: email||null,
         sector: document.getElementById('new-client-sector').value,
         instagram: document.getElementById('new-client-ig').value,
-        facebook: document.getElementById('new-client-fb').value,
-        tone: document.getElementById('new-client-desc').value,
-        plan: document.getElementById('new-client-plan').value
+        facebook:  document.getElementById('new-client-fb').value,
+        description: document.getElementById('new-client-desc').value,
+        plan: selectedPlan, solo_entrepreneur: true
       })
     });
-    const newClient = await res.json();
-    clients.push({ ...newClient, initials: clientInitials(name), color: clientColor(clients.length), active: false });
-    document.getElementById('nav-client-count').textContent = clients.length;
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    await loadClients();
     closeModal('modal-add-client');
-    document.getElementById('new-client-name').value = '';
-    document.getElementById('new-client-ig').value = '';
-    document.getElementById('new-client-fb').value = '';
-    document.getElementById('new-client-desc').value = '';
     renderClients();
-    renderSwitcherList();
-    toast('Client "' + name + '" créé !', 'success');
-  } catch(e) { toast('Erreur création client', 'warn'); }
+    toast(`Client "${name}" créé${email?' — email envoyé':''}!`, 'success');
+  } catch(e) { toast('Erreur: '+e.message,'warn'); }
 }
 
-function renderSwitcherList() {
-  document.getElementById('client-switch-list').innerHTML = clients.map(c => `
-    <div onclick="selectClient('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);cursor:pointer;margin-bottom:4px;border:1px solid ${c.active ? 'var(--accent)' : 'transparent'};background:${c.active ? 'rgba(255,59,107,0.06)' : 'transparent'}">
-      <div style="width:32px;height:32px;border-radius:9px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">${c.initials}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:500">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.instagram || ''} · Plan ${c.plan || 'Starter'}</div></div>
-      ${c.active ? '<div style="color:var(--accent);font-size:12px">✓</div>' : ''}
-    </div>
-  `).join('');
-}
+// ── RAPPORTS ───────────────────────────────────────────────────────────────────
+async function loadReports() {
+  if (!activeClient) return;
+  document.getElementById('reports-client-label').textContent = `Publications de ${activeClient.name} · Cliquez pour le détail`;
+  document.getElementById('reports-posts-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
 
-async function loadDashboard() {
-  const now = new Date();
-  document.getElementById('dashboard-sub').textContent =
-    now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
-    ' — ' + clients.filter(c => c.status !== 'paused').length + ' clients actifs';
-  document.getElementById('stat-clients').textContent = clients.length;
   try {
-    const res = await fetch('/api/queue');
-    const queue = await res.json();
-    document.getElementById('stat-queue').textContent = queue.filter(q => q.statut === 'planifie').length;
-    document.getElementById('stat-published').textContent = queue.filter(q => q.statut === 'publie').length;
-  } catch(e) {}
-  const el = document.getElementById('dashboard-clients');
-  if(clients.length === 0) {
-    el.innerHTML = '<div class="empty-state" style="grid-column:span 3;padding:20px"><div class="empty-icon">👥</div><div class="empty-title">Aucun client</div><div style="font-size:12px">Ajoutez votre premier client</div></div>';
+    const r = await fetch(`/api/reports/${activeClient.id}/stats`);
+    reportsData = await r.json();
+    const { stats, posts, queue } = reportsData;
+
+    // Stats rapides
+    document.getElementById('reports-stats-grid').innerHTML = `
+      <div class="stat-card" style="--glow-color:rgba(255,59,107,0.08)">
+        <div class="stat-icon">📸</div><div class="stat-label">Publications total</div>
+        <div class="stat-value">${stats.totalPosts}</div><div class="stat-delta">Historique importé</div>
+      </div>
+      <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)">
+        <div class="stat-icon">❤️</div><div class="stat-label">Likes total</div>
+        <div class="stat-value">${stats.totalLikes.toLocaleString('fr-FR')}</div><div class="stat-delta">Toutes publications</div>
+      </div>
+      <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)">
+        <div class="stat-icon">💬</div><div class="stat-label">Commentaires</div>
+        <div class="stat-value">${stats.totalComments.toLocaleString('fr-FR')}</div><div class="stat-delta">Toutes publications</div>
+      </div>
+      <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)">
+        <div class="stat-icon">📅</div><div class="stat-label">Posts planifiés</div>
+        <div class="stat-value">${stats.plannedPosts}</div><div class="stat-delta">En attente de publication</div>
+      </div>`;
+
+    // Avant/Après IA
+    if (stats.beforeIA.count > 0 || stats.afterIA.count > 0) {
+      document.getElementById('reports-comparison').style.display = 'grid';
+      document.getElementById('cmp-before-val').textContent = stats.beforeIA.avgEngagement;
+      document.getElementById('cmp-before-sub').textContent = `eng. moy · ${stats.beforeIA.count} posts avant IA`;
+      document.getElementById('cmp-after-val').textContent  = stats.afterIA.avgEngagement;
+      document.getElementById('cmp-after-sub').textContent  = `eng. moy · ${stats.afterIA.count} posts avec IA`;
+    }
+
+    // Dashboard stats
+    document.getElementById('stat-posts').textContent      = stats.totalPosts;
+    document.getElementById('stat-likes').textContent      = stats.totalLikes.toLocaleString('fr-FR');
+    document.getElementById('stat-engagement').textContent = stats.avgEngagement;
+
+    // Graphiques
+    buildReportsChart(stats.evolution, 'likes');
+    buildDashboardChart(stats.evolution);
+
+    // Top posts dashboard
+    renderDashboardTopPosts(stats.topPosts);
+
+    // Posts grid
+    renderReportPosts('all', posts, queue);
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('reports-posts-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';
+  }
+}
+
+function buildReportsChart(evolution, metric) {
+  currentChartMetric = metric;
+  const ctx = document.getElementById('chart-reports').getContext('2d');
+  if (reportsChart) reportsChart.destroy();
+
+  const labels = evolution.map(e => {
+    const [y,m] = e.month.split('-');
+    return MONTHS_FR[parseInt(m)-1].slice(0,3)+' '+y.slice(2);
+  });
+  const data = evolution.map(e => e[metric] || 0);
+  const colors = { likes:'#ff3b6b', comments:'#8b5cf6', reach:'#14b8a6' };
+
+  reportsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: metric.charAt(0).toUpperCase()+metric.slice(1),
+        data,
+        borderColor: colors[metric],
+        backgroundColor: colors[metric]+'22',
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: colors[metric],
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend:{ display:false } },
+      scales: {
+        x: { grid:{ color:'#2e2e3e' }, ticks:{ color:'#5a5a72', font:{size:10} } },
+        y: { grid:{ color:'#2e2e3e' }, ticks:{ color:'#5a5a72', font:{size:10} } }
+      }
+    }
+  });
+
+  // Highlight active button
+  ['likes','comments','reach'].forEach(m => {
+    const btn = document.getElementById(`chart-btn-${m}`);
+    if (btn) btn.style.background = m===metric ? 'var(--surface2)' : '';
+    if (btn) btn.style.color      = m===metric ? 'var(--text)' : '';
+  });
+}
+
+function buildDashboardChart(evolution) {
+  const ctx = document.getElementById('chart-dashboard').getContext('2d');
+  if (dashChart) dashChart.destroy();
+  const labels = evolution.slice(-6).map(e => {
+    const [y,m] = e.month.split('-');
+    return MONTHS_FR[parseInt(m)-1].slice(0,3);
+  });
+  dashChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Likes',
+        data: evolution.slice(-6).map(e=>e.likes||0),
+        backgroundColor: '#ff3b6b44',
+        borderColor: '#ff3b6b',
+        borderWidth: 1,
+        borderRadius: 4
+      },{
+        label: 'Commentaires',
+        data: evolution.slice(-6).map(e=>e.comments||0),
+        backgroundColor: '#8b5cf644',
+        borderColor: '#8b5cf6',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend:{ labels:{ color:'#9090aa', font:{size:11} } } },
+      scales: {
+        x: { grid:{ color:'#2e2e3e' }, ticks:{ color:'#5a5a72', font:{size:10} } },
+        y: { grid:{ color:'#2e2e3e' }, ticks:{ color:'#5a5a72', font:{size:10} } }
+      }
+    }
+  });
+}
+
+function switchChart(metric) { if (reportsData) buildReportsChart(reportsData.stats.evolution, metric); }
+
+function renderDashboardTopPosts(topPosts) {
+  const el = document.getElementById('dashboard-top-posts');
+  if (!topPosts || topPosts.length === 0) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Aucun post analysé</div>';
     return;
   }
-  el.innerHTML = clients.map(c => `
-    <div onclick="selectClient('${c.id}');nav('media')" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r-md);background:var(--bg3);border:1px solid var(--border);cursor:pointer">
-      <div style="width:36px;height:36px;border-radius:10px;background:${c.color};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0">${c.initials}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:500">${c.name}</div>
-        <div style="font-size:11px;color:var(--text3)">${c.sector || 'Non défini'}</div>
+  el.innerHTML = topPosts.slice(0,3).map(p => `
+    <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openPostDetail('${p.id}','media')">
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--bg4);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">
+        ${p.url ? `<img src="${p.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">` : '🖼️'}
       </div>
-      <div class="badge badge-${c.status === 'active' ? 'green' : 'orange'}">${c.status === 'active' ? 'Actif' : 'Pause'}</div>
-    </div>
-  `).join('');
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.caption||'—'}</div>
+        <div style="font-size:11px;color:var(--text3)">❤️ ${p.likes||0} · 💬 ${p.comments||0}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:${(p.performance_score||0)>=60?'var(--accent)':'var(--text3)'}">${p.performance_score||0}</div>
+    </div>`).join('');
 }
 
-async function loadMedia() {
-  if(!activeClient) return;
-  document.getElementById('media-client-name').textContent = 'Médias de ' + activeClient.name + ' — dossier isolé ✓';
+function switchReportTab(tab, el) {
+  currentReportTab = tab;
+  document.querySelectorAll('#panel-reports .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if (reportsData) renderReportPosts(tab, reportsData.posts, reportsData.queue);
+}
+
+function renderReportPosts(tab, posts, queue) {
+  const grid = document.getElementById('reports-posts-grid');
+  let items = [];
+
+  if (tab === 'history' || tab === 'all' || tab === 'top') {
+    const filtered = tab === 'top'
+      ? [...posts].sort((a,b)=>(b.performance_score||0)-(a.performance_score||0)).slice(0,12)
+      : posts;
+    items = filtered.map(p => ({ ...p, _source: 'media' }));
+  }
+  if (tab === 'planned' || tab === 'all') {
+    const qFiltered = (queue||[]).filter(q => q.statut === 'planifie');
+    items = [...items, ...qFiltered.map(q => ({ ...q, _source: 'queue' }))];
+  }
+  if (tab === 'all') {
+    items.sort((a,b) => {
+      const da = a.original_post_date || a.scheduled_at || '';
+      const db = b.original_post_date || b.scheduled_at || '';
+      return db.localeCompare(da);
+    });
+  }
+
+  if (items.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📭</div><div class="empty-title">Aucune publication</div><div class="empty-sub">Les données apparaîtront ici après synchronisation.</div></div>';
+    return;
+  }
+
+  grid.innerHTML = items.map(p => {
+    const score     = p.performance_score || 0;
+    const isTop     = score >= 60;
+    const isPlanned = p._source === 'queue';
+    const date      = p.original_post_date || p.scheduled_at;
+    const dateStr   = date ? new Date(date).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    return `
+    <div class="post-item" onclick="openPostDetail('${p.id}','${p._source}')">
+      ${p.url
+        ? `<img class="post-item-img" src="${p.url}" onerror="this.style.display='none'">`
+        : `<div class="post-item-placeholder">${isPlanned?'📅':'🖼️'}<span>${isPlanned?'Planifié':'Sans image'}</span></div>`}
+      ${score > 0 ? `<div class="post-item-score${isTop?' top':''}">${score}</div>` : ''}
+      ${isPlanned ? '<div style="position:absolute;top:8px;left:8px;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(20,184,166,0.8);color:white;font-weight:600">PLANIFIÉ</div>' : ''}
+      <div class="post-item-overlay">
+        <div class="post-item-stats">
+          <span>❤️ ${p.likes||0}</span>
+          <span>💬 ${p.comments||0}</span>
+          ${p.reach ? `<span>👁 ${p.reach}</span>` : ''}
+        </div>
+        <div class="post-item-caption">${dateStr} · ${p.caption||'Sans caption'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL DÉTAIL POST ──────────────────────────────────────────────────────────
+async function openPostDetail(postId, type) {
+  openModal('modal-post-detail');
+  document.getElementById('post-detail-title').textContent = 'Chargement…';
+  document.getElementById('post-detail-content').innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
+
   try {
-    const res = await fetch('/api/media/' + activeClient.id);
-    mediaItems = await res.json();
+    const r = await fetch(`/api/reports/post/${postId}?type=${type}`);
+    const post = await r.json();
+
+    const isQueue    = type === 'queue';
+    const date       = post.original_post_date || post.scheduled_at;
+    const dateStr    = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
+    const score      = post.performance_score || 0;
+    const isTop      = post.is_top_content;
+    const client     = activeClient || {};
+
+    document.getElementById('post-detail-title').textContent = isQueue ? '📅 Post planifié' : '📸 Publication Instagram';
+
+    document.getElementById('post-detail-content').innerHTML = `
+      ${post.url
+        ? `<img class="post-detail-img" src="${post.url}" onerror="this.style.display='none'">`
+        : `<div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>`}
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <span style="font-size:12px;color:var(--text3)">${dateStr}</span>
+        ${isTop ? '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,59,107,0.12);color:var(--accent);font-weight:600">⭐ Top Content</span>' : ''}
+        ${isQueue ? '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,0.12);color:var(--teal);font-weight:600">📅 Planifié</span>' : ''}
+        ${post.recycled ? '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,0.12);color:var(--teal);font-weight:600">♻️ Recyclé</span>' : ''}
+      </div>
+
+      ${score > 0 ? `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div>
+        <div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div></div>
+        <div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px">
+          <span>❤️ ${post.likes||0} likes</span>
+          <span>💬 ${post.comments||0} commentaires</span>
+          ${post.reach ? `<span>👁 ${post.reach} reach</span>` : ''}
+        </div>
+      </div>` : ''}
+
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
+        ${isQueue ? `<textarea class="form-input" id="detail-caption-edit" style="margin-top:8px;display:none;min-height:100px">${escHtml(post.caption||'')}</textarea>` : ''}
+      </div>
+
+      ${post.analyse_data ? `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Analyse IA</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${post.analyse_data.type_contenu ? `<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(139,92,246,0.12);color:var(--purple);border:1px solid rgba(139,92,246,0.2)">${post.analyse_data.type_contenu}</span>` : ''}
+          ${post.analyse_data.format_recommande ? `<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text2)">${post.analyse_data.format_recommande}</span>` : ''}
+          ${(post.analyse_data.hashtags||[]).slice(0,5).map(h=>`<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text3)">${h}</span>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div id="ai-suggestion-result"></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        ${isQueue ? `
+          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit('${post.id}')">✏️ Modifier la caption</button>
+          <button class="btn btn-sm" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button>
+          <button class="btn btn-sm btn-ghost" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
+        ` : ''}
+        <button class="btn btn-sm btn-purple" onclick="openAISuggest('${post.id}','${escHtml(post.caption||'')}','${isQueue?'queue':'media'}')">✨ Suggestion IA</button>
+        ${isQueue ? `<button class="btn btn-sm" style="color:var(--accent);border-color:rgba(255,59,107,0.3)" onclick="deletePost('${post.id}')">🗑 Supprimer</button>` : ''}
+      </div>
+    `;
+
+  } catch(e) {
+    document.getElementById('post-detail-content').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';
+  }
+}
+
+function toggleCaptionEdit(postId) {
+  const display = document.getElementById('detail-caption-display');
+  const edit    = document.getElementById('detail-caption-edit');
+  const btnEdit   = document.getElementById('btn-edit-caption');
+  const btnSave   = document.getElementById('btn-save-caption');
+  const btnCancel = document.getElementById('btn-cancel-caption');
+  display.style.display = 'none';
+  edit.style.display    = 'block';
+  btnEdit.style.display   = 'none';
+  btnSave.style.display   = 'flex';
+  btnCancel.style.display = 'flex';
+  edit.focus();
+}
+
+function cancelCaptionEdit() {
+  document.getElementById('detail-caption-display').style.display = 'block';
+  document.getElementById('detail-caption-edit').style.display    = 'none';
+  document.getElementById('btn-edit-caption').style.display   = 'flex';
+  document.getElementById('btn-save-caption').style.display   = 'none';
+  document.getElementById('btn-cancel-caption').style.display = 'none';
+}
+
+async function savePostCaption(postId) {
+  const caption = document.getElementById('detail-caption-edit').value.trim();
+  if (!caption) { toast('Caption vide','warn'); return; }
+  try {
+    const r = await fetch(`/api/reports/post/${postId}/caption`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ caption })
+    });
+    if (!r.ok) throw new Error();
+    document.getElementById('detail-caption-display').textContent = caption;
+    cancelCaptionEdit();
+    toast('Caption mise à jour ✓','success');
+    if (reportsData) loadReports();
+  } catch { toast('Erreur sauvegarde','warn'); }
+}
+
+async function deletePost(postId) {
+  if (!confirm('Supprimer ce post de la file ?')) return;
+  try {
+    const r = await fetch(`/api/reports/post/${postId}`, { method:'DELETE' });
+    if (!r.ok) throw new Error();
+    closeModal('modal-post-detail');
+    toast('Post supprimé ✓','success');
+    loadReports();
+  } catch { toast('Erreur suppression','warn'); }
+}
+
+async function openAISuggest(postId, currentCaption, type) {
+  const resultEl = document.getElementById('ai-suggestion-result');
+  resultEl.innerHTML = '<div style="text-align:center;padding:16px"><span class="spinner"></span> L\'IA analyse votre publication…</div>';
+
+  const directive = prompt('Directive pour l\'IA (optionnel) :\nEx: "Rends la plus émotionnelle", "Ajoute plus de hashtags", "Optimise pour plus d\'engagement"');
+
+  try {
+    const r = await fetch(`/api/reports/post/${postId}/ai-suggest`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        directive:        directive || '',
+        currentCaption,
+        clientName:       activeClient?.name,
+        sector:           activeClient?.sector,
+        tone:             activeClient?.tone,
+        performanceScore: reportsData?.posts?.find(p=>p.id===postId)?.performance_score
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+
+    resultEl.innerHTML = `
+      <div class="ai-suggestion-box">
+        <div class="ai-suggestion-title">✨ Suggestion de l'IA</div>
+        ${data.points_forts?.length ? `
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--green);margin-bottom:4px;font-weight:600">✅ Points forts</div>
+            ${data.points_forts.map(p=>`<div class="ai-explanation-item"><div class="ai-explanation-dot" style="background:var(--green)"></div>${p}</div>`).join('')}
+          </div>` : ''}
+        ${data.ameliorations?.length ? `
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--orange);margin-bottom:4px;font-weight:600">💡 Améliorations suggérées</div>
+            ${data.ameliorations.map(a=>`<div class="ai-explanation-item"><div class="ai-explanation-dot" style="background:var(--orange)"></div>${a}</div>`).join('')}
+          </div>` : ''}
+        <div style="font-size:11px;color:var(--purple);margin-bottom:6px;font-weight:600">📝 Nouvelle caption proposée</div>
+        <div style="background:var(--bg3);border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;margin-bottom:10px" id="ai-new-caption">${escHtml(data.suggestion||'')}</div>
+        ${data.explications?.length ? `
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500">Explications</div>
+            ${data.explications.map(e=>`<div class="ai-explanation-item"><div class="ai-explanation-dot"></div>${e}</div>`).join('')}
+          </div>` : ''}
+        ${type==='queue' ? `<button class="btn btn-sm btn-accent" onclick="applyAISuggestion('${postId}')">✅ Appliquer cette caption</button>` : ''}
+      </div>`;
+  } catch(e) {
+    resultEl.innerHTML = `<div style="color:var(--accent);font-size:13px;padding:12px">Erreur: ${e.message}</div>`;
+  }
+}
+
+async function applyAISuggestion(postId) {
+  const newCaption = document.getElementById('ai-new-caption')?.textContent;
+  if (!newCaption) return;
+  try {
+    const r = await fetch(`/api/reports/post/${postId}/caption`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ caption: newCaption })
+    });
+    if (!r.ok) throw new Error();
+    document.getElementById('detail-caption-display').textContent = newCaption;
+    toast('Caption de l\'IA appliquée ✓','success');
+    loadReports();
+  } catch { toast('Erreur application caption','warn'); }
+}
+
+// ── MÉDIAS ─────────────────────────────────────────────────────────────────────
+async function loadMedia() {
+  if (!activeClient) return;
+  try {
+    const r = await fetch(`/api/media/${activeClient.id}`);
+    mediaItems = await r.json();
     document.getElementById('nav-media-count').textContent = mediaItems.length;
-    document.getElementById('stat-media').textContent = mediaItems.length;
     renderMedia('all');
-  } catch(e) { console.error('Erreur médias:', e); }
+    document.getElementById('media-client-name').textContent = `Médias de ${activeClient.name}`;
+  } catch(e) { console.error(e); }
 }
 
 function renderMedia(filter) {
   const grid = document.getElementById('media-grid');
   let items = [...mediaItems];
-  if(filter === 'photo') items = items.filter(m => m.type === 'photo');
-  if(filter === 'video') items = items.filter(m => m.type === 'video');
-  if(filter === 'analysed') items = items.filter(m => m.statut === 'analyse');
-  if(filter === 'pending') items = items.filter(m => m.statut !== 'analyse');
-  if(items.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:span 6;padding:40px"><div class="empty-icon">🖼️</div><div class="empty-title">Aucun média</div><div style="font-size:12px">Uploadez vos premières photos ou vidéos</div></div>';
+  if (filter==='photo')    items = items.filter(m=>m.type==='photo');
+  if (filter==='video')    items = items.filter(m=>m.type==='video');
+  if (filter==='analysed') items = items.filter(m=>m.analyse_data);
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📷</div><div class="empty-title">Aucun média</div><div class="empty-sub">Uploadez des photos ou vidéos.</div></div>';
     return;
   }
   grid.innerHTML = items.map(m => `
-    <div class="media-item" onclick="openMediaDetail('${m.id}')">
-      ${m.url
-        ? '<img src="' + m.url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
-        : ''
-      }
-      <div class="media-thumb" style="${m.url ? 'display:none' : ''}">${m.type === 'video' ? '🎬' : '🖼️'}</div>
+    <div class="media-item" onclick="openPostDetail('${m.id}','media')">
+      <div class="media-thumb">${m.url?`<img src="${m.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">`:(m.type==='video'?'🎬':'🖼️')}</div>
       <div class="media-type-badge type-${m.type}">${m.type}</div>
-      ${m.statut === 'analyse' ? '<div class="media-ai-badge">IA ✓</div>' : ''}
-      <div class="media-overlay"><div class="media-info">${m.filename || 'Sans nom'}</div></div>
-    </div>
-  `).join('');
+      ${m.analyse_data?'<div class="media-ai-badge">IA ✓</div>':''}
+      <div class="media-overlay"><div class="media-info">${m.filename||'média'}</div></div>
+    </div>`).join('');
 }
 
 function filterMedia(filter, el) {
-  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   renderMedia(filter);
 }
 
-function openMediaDetail(id) {
-  const m = mediaItems.find(x => x.id == id);
-  if(!m) return;
-  const existing = document.getElementById('modal-media-detail');
-  if(existing) existing.remove();
-  const modal = document.createElement('div');
-  modal.className = 'overlay open';
-  modal.id = 'modal-media-detail';
-  modal.innerHTML = `
-    <div class="modal" style="max-width:600px">
-      <div class="modal-header">
-        <div class="modal-title">${m.filename || 'Média'}</div>
-        <button class="modal-close" onclick="document.getElementById('modal-media-detail').remove()">✕</button>
-      </div>
-      <div style="display:flex;gap:16px">
-        <div style="width:180px;height:180px;border-radius:var(--r-md);overflow:hidden;flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center">
-          ${m.url ? '<img src="' + m.url + '" style="width:100%;height:100%;object-fit:cover">' : '<div style="font-size:48px">' + (m.type === 'video' ? '🎬' : '🖼️') + '</div>'}
-        </div>
-        <div style="flex:1">
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-            <span class="badge badge-${m.type === 'video' ? 'purple' : 'teal'}">${m.type}</span>
-            ${m.statut === 'analyse' ? '<span class="badge badge-green">IA ✓ Analysé</span>' : '<span class="badge badge-orange">En attente</span>'}
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Client</div>
-          <div style="font-size:13px;font-weight:500;margin-bottom:12px">${activeClient ? activeClient.name : ''}</div>
-          ${m.qualite ? '<div class="progress-row"><div class="progress-label">Qualité</div><div class="progress-bg"><div class="progress-fill" style="width:' + m.qualite + '%;background:var(--green)"></div></div><div class="progress-val">' + m.qualite + '%</div></div>' : ''}
-          ${m.potentiel_viral ? '<div class="progress-row"><div class="progress-label">Viral</div><div class="progress-bg"><div class="progress-fill" style="width:' + m.potentiel_viral + '%;background:var(--orange)"></div></div><div class="progress-val">' + m.potentiel_viral + '%</div></div>' : ''}
-        </div>
-      </div>
-      ${m.caption ? '<div style="margin-top:16px"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption générée</div><div style="font-size:13px;color:var(--text2);background:var(--bg3);border-radius:var(--r-sm);padding:12px;line-height:1.6;border:1px solid var(--border)">' + m.caption + '</div></div>' : ''}
-      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-        <button class="btn" onclick="deleteMedia('${m.id}')">🗑️ Supprimer</button>
-        <button class="btn btn-accent" onclick="document.getElementById('modal-media-detail').remove()">Fermer</button>
-      </div>
-    </div>
-  `;
-  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
-  document.body.appendChild(modal);
+// ── QUEUE ──────────────────────────────────────────────────────────────────────
+async function loadQueue() {
+  if (!activeClient) return;
+  try {
+    const r = await fetch(`/api/queue/${activeClient.id}`).catch(()=>null);
+    if (!r || !r.ok) { renderQueueStatic(); return; }
+    const queue = await r.json();
+    renderQueueFromData(queue);
+  } catch { renderQueueStatic(); }
 }
 
-async function deleteMedia(id) {
-  if(!confirm('Supprimer ce média ?')) return;
-  await fetch('/api/media/' + id, { method: 'DELETE' });
-  mediaItems = mediaItems.filter(m => m.id != id);
-  renderMedia('all');
-  document.getElementById('modal-media-detail')?.remove();
-  document.getElementById('nav-media-count').textContent = mediaItems.length;
-  toast('Média supprimé', 'info');
+function renderQueueFromData(queue) {
+  const el = document.getElementById('queue-list');
+  if (!queue || queue.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div><div class="empty-sub">L\'IA planifiera automatiquement les prochains posts.</div></div>';
+    return;
+  }
+  const statusClass = { planifie:'qs-scheduled', publie:'qs-published', draft:'qs-draft' };
+  const statusLabel = { planifie:'Planifié', publie:'Publié ✓', draft:'Brouillon' };
+  el.innerHTML = queue.map(q => {
+    const date = q.scheduled_at ? new Date(q.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    return `
+    <div class="queue-item" onclick="openPostDetail('${q.id}','queue')">
+      <div class="queue-thumb">${q.media_url?`<img src="${q.media_url}" onerror="this.parentElement.textContent='🖼️'">`:'🖼️'}</div>
+      <div class="queue-body">
+        <div class="queue-title">${q.type==='recycled'?'♻️ Post recyclé':q.type==='special'?'⭐ Post spécial':'📸 Post'} · ${q.platform||'instagram'}</div>
+        <div class="queue-meta">${activeClient?.name||''}</div>
+        <div class="queue-caption">${q.caption||'Caption en cours…'}</div>
+      </div>
+      <div class="queue-right">
+        <div class="queue-time">${date}</div>
+        <div class="queue-status ${statusClass[q.statut]||'qs-draft'}">${statusLabel[q.statut]||q.statut}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
+function renderQueueStatic() {
+  document.getElementById('queue-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div><div class="empty-sub">L\'IA planifiera automatiquement les prochains posts.</div></div>';
+}
+
+// ── UPLOAD ─────────────────────────────────────────────────────────────────────
 let uploadedFiles = [];
-
-function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('dragover'); }
-function dragLeave() { document.getElementById('upload-zone').classList.remove('dragover'); }
-function dropFiles(e) { e.preventDefault(); dragLeave(); handleFiles(e.dataTransfer.files); }
+function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover')}
+function dragLeave(){document.getElementById('upload-zone').classList.remove('dragover')}
+function dropFiles(e){e.preventDefault();dragLeave();handleFiles(e.dataTransfer.files)}
 
 function handleFiles(files) {
   uploadedFiles = Array.from(files);
-  if(!uploadedFiles.length) return;
+  if (!uploadedFiles.length) return;
   document.getElementById('upload-preview').style.display = 'block';
-  document.getElementById('upload-count').textContent = uploadedFiles.length + ' fichier' + (uploadedFiles.length > 1 ? 's' : '') + ' sélectionné' + (uploadedFiles.length > 1 ? 's' : '');
-  document.getElementById('upload-list').innerHTML = uploadedFiles.slice(0,6).map(f =>
-    '<div style="width:60px;height:60px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px">' + (f.type.startsWith('video') ? '🎬' : '🖼️') + '</div>'
-  ).join('') + (uploadedFiles.length > 6 ? '<div style="width:60px;height:60px;border-radius:8px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text3)">+' + (uploadedFiles.length - 6) + '</div>' : '');
+  document.getElementById('upload-count').textContent = `${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
+  document.getElementById('upload-list').innerHTML = uploadedFiles.slice(0,6).map(f=>`<div style="width:60px;height:60px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px">${f.type.startsWith('video')?'🎬':'🖼️'}</div>`).join('');
   document.getElementById('btn-analyze').style.display = 'flex';
 }
 
 async function startAnalysis() {
-  if(!activeClient) { toast('Sélectionnez un client d\'abord', 'warn'); return; }
-  const fill = document.getElementById('upload-fill');
+  if (!activeClient) { toast('Sélectionnez un client','warn'); return; }
+  const btn    = document.getElementById('btn-analyze');
+  const fill   = document.getElementById('upload-fill');
   const status = document.getElementById('upload-status');
-  const btn = document.getElementById('btn-analyze');
-  btn.disabled = true;
-  btn.textContent = 'Analyse en cours…';
-  for(let i = 0; i < uploadedFiles.length; i++) {
-    const file = uploadedFiles[i];
-    fill.style.width = Math.round((i + 1) / uploadedFiles.length * 100) + '%';
-    status.textContent = 'Analyse de ' + file.name + '… (' + (i+1) + '/' + uploadedFiles.length + ')';
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('client_id', activeClient.id);
-    try { await fetch('/api/media/upload', { method: 'POST', body: formData }); }
-    catch(e) { console.error('Erreur upload:', e); }
+  btn.disabled = true; btn.textContent = 'Analyse en cours…';
+  let completed = 0;
+  for (const file of uploadedFiles) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('client_id', activeClient.id);
+    try {
+      await fetch('/api/media/upload', { method:'POST', body:fd });
+      completed++;
+      fill.style.width  = Math.round(completed/uploadedFiles.length*100)+'%';
+      status.textContent = `${completed}/${uploadedFiles.length} traités…`;
+    } catch(e) { console.error(e); }
   }
-  fill.style.width = '100%';
-  status.textContent = 'Terminé !';
-  btn.textContent = '✅ Terminé';
+  status.textContent = '✅ Terminé !';
   await loadMedia();
-  setTimeout(() => {
+  setTimeout(()=>{
     closeModal('modal-upload');
-    btn.disabled = false;
-    btn.textContent = '🤖 Analyser avec l\'IA →';
-    fill.style.width = '0%';
-    status.textContent = 'Prêt à analyser';
+    btn.disabled = false; btn.textContent = '🤖 Analyser →';
+    fill.style.width = '0%'; status.textContent = 'Prêt à analyser';
     document.getElementById('upload-preview').style.display = 'none';
     uploadedFiles = [];
-    toast('Médias analysés et ajoutés dans le dossier de ' + activeClient.name + ' !', 'success');
-  }, 1200);
+    toast(`${completed} média(s) analysés !`,'success');
+  },1000);
 }
 
-async function loadQueue() {
-  try {
-    const res = await fetch('/api/queue');
-    const data = await res.json();
-    const filtered = activeClient ? data.filter(q => q.client_id == activeClient.id) : data;
-    const list = document.getElementById('queue-list');
-    if(filtered.length === 0) {
-      list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Aucune publication planifiée</div><div style="font-size:12px">L\'IA planifiera automatiquement vos prochains posts</div></div>';
-      return;
-    }
-    const statusClass = { planifie:'qs-scheduled', publie:'qs-published', erreur:'qs-erreur', en_cours:'qs-generating' };
-    const statusLabel = { planifie:'Planifié', publie:'Publié ✓', erreur:'Erreur', en_cours:'En cours…' };
-    list.innerHTML = filtered.map(q => `
-      <div class="queue-item">
-        <div class="queue-thumb">${q.type === 'story' ? '📸' : '🖼️'}</div>
-        <div class="queue-body">
-          <div class="queue-title">${q.type === 'story' ? 'Story' : 'Post'} — ${q.platform || 'Instagram'}</div>
-          <div class="queue-meta">${new Date(q.scheduled_at).toLocaleString('fr-FR')}</div>
-          <div class="queue-caption">${q.caption || 'Caption à générer…'}</div>
-        </div>
-        <div class="queue-right">
-          <div class="queue-status ${statusClass[q.statut] || 'qs-draft'}">${statusLabel[q.statut] || q.statut}</div>
-          ${q.error_message ? '<div style="font-size:10px;color:var(--accent)">' + q.error_message + '</div>' : ''}
-        </div>
-      </div>
-    `).join('');
-  } catch(e) { console.error('Erreur queue:', e); }
-}
+// ── CALENDRIER ─────────────────────────────────────────────────────────────────
+function changeMonth(dir) { calendarDate.setMonth(calendarDate.getMonth()+dir); buildCalendar(); }
 
-async function loadAutoQueue() {
-  try {
-    const res = await fetch('/api/queue');
-    const data = await res.json();
-    const recent = data.slice(0, 6);
-    const el = document.getElementById('auto-queue-preview');
-    if(recent.length === 0) {
-      el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">Aucune publication en cours</div>';
-      return;
-    }
-    el.innerHTML = recent.map(q => `
-      <div class="log-item">
-        <div class="log-dot" style="background:${q.statut === 'publie' ? 'var(--green)' : q.statut === 'erreur' ? 'var(--accent)' : 'var(--yellow)'}"></div>
-        <div class="log-text"><strong>${q.platform || 'Instagram'}</strong> — ${q.type} · ${new Date(q.scheduled_at).toLocaleString('fr-FR')}</div>
-        <div style="font-size:10px;color:var(--text3)">${q.statut}</div>
-      </div>
-    `).join('');
-  } catch(e) {}
-}
-
-async function buildCalendar() {
-  const grid = document.getElementById('cal-grid');
+function buildCalendar() {
+  const grid  = document.getElementById('cal-grid');
+  const year  = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  document.getElementById('cal-month-label').textContent = `${MONTHS_FR[month]} ${year}`;
   grid.innerHTML = '';
-  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-  document.getElementById('cal-month-label').textContent = months[calMonth] + ' ' + calYear;
-  let queueDots = {};
-  try {
-    const res = await fetch('/api/queue');
-    const data = await res.json();
-    const filtered = activeClient ? data.filter(q => q.client_id == activeClient.id) : data;
-    filtered.forEach(q => {
-      const d = new Date(q.scheduled_at);
-      if(d.getMonth() === calMonth && d.getFullYear() === calYear) {
-        const day = d.getDate();
-        if(!queueDots[day]) queueDots[day] = [];
-        queueDots[day].push(q.type === 'story' ? 'story' : 'post');
-      }
-    });
-  } catch(e) {}
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const offset = firstDay === 0 ? 6 : firstDay - 1;
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const today = new Date();
-  for(let i = 0; i < offset; i++) grid.innerHTML += '<div class="cal-day other-month"></div>';
-  for(let d = 1; d <= daysInMonth; d++) {
-    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const dots = (queueDots[d] || []).map(t => '<div class="cdot cdot-' + t + '"></div>').join('');
-    grid.innerHTML += '<div class="cal-day' + (isToday ? ' today' : '') + '"><div class="day-num">' + d + '</div><div class="cal-dots">' + dots + '</div></div>';
+  const firstDay      = (new Date(year,month,1).getDay()+6)%7;
+  const daysInMonth   = new Date(year,month+1,0).getDate();
+  const daysInPrev    = new Date(year,month,0).getDate();
+  const today         = new Date();
+  for (let i=0;i<firstDay;i++) grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${daysInPrev-firstDay+1+i}</div></div>`;
+  for (let d=1;d<=daysInMonth;d++) {
+    const isToday = d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear();
+    grid.innerHTML += `<div class="cal-day${isToday?' today':''}"><div class="day-num">${d}</div></div>`;
   }
-  const total = offset + daysInMonth;
-  const rem = total % 7 === 0 ? 0 : 7 - (total % 7);
-  for(let i = 1; i <= rem; i++) grid.innerHTML += '<div class="cal-day other-month"></div>';
+  const rem = (firstDay+daysInMonth)%7===0?0:7-(firstDay+daysInMonth)%7;
+  for (let i=1;i<=rem;i++) grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
 }
 
-function changeMonth(dir) {
-  calMonth += dir;
-  if(calMonth < 0) { calMonth = 11; calYear--; }
-  if(calMonth > 11) { calMonth = 0; calYear++; }
-  buildCalendar();
+// ── NAVIGATION ─────────────────────────────────────────────────────────────────
+const titles = { dashboard:'Vue d\'ensemble', clients:'Gestion des clients', media:'Médiathèque', queue:'File de publication', reports:'Rapports de publications', calendar:'Calendrier éditorial', automation:'Centre d\'automatisation' };
+const navMap  = { dashboard:0, clients:1, media:2, queue:3, reports:4, calendar:5, automation:6 };
+
+function nav(page) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+page).classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[page]||page;
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navMap[page] !== undefined) navItems[navMap[page]]?.classList.add('active');
+  if (page==='clients')  renderClients();
+  if (page==='media')    loadMedia();
+  if (page==='queue')    loadQueue();
+  if (page==='reports')  loadReports();
+  if (page==='calendar') buildCalendar();
+  if (page==='dashboard') { loadReports(); }
+  closeModal('modal-switch-client');
 }
 
-function toast(msg, type = 'info') {
-  const icons = { success:'✅', info:'💡', warn:'⚠️' };
-  const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.innerHTML = '<div class="toast-icon">' + (icons[type] || 'ℹ️') + '</div><div class="toast-text">' + msg + '</div>';
+// ── MODALS ─────────────────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})});
+
+// ── UTILS ──────────────────────────────────────────────────────────────────────
+function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function toast(msg,type='info'){
+  const icons={success:'✅',info:'💡',warn:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-text">${msg}</div>`;
   document.getElementById('toast-container').appendChild(el);
-  setTimeout(() => el.remove(), 3500);
+  setTimeout(()=>el.remove(),3500);
 }
 
-loadClients();
+// ── START ──────────────────────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
