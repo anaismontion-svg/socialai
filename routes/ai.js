@@ -55,8 +55,8 @@ function getContactTiming(senderId) {
 // ─────────────────────────────────────────────
 function extractFirstNameFromUsername(username) {
   if (!username) return null;
-  const cleaned   = username.replace(/[0-9._\-]/g, ' ').trim();
-  const words     = cleaned.split(' ').filter(w => w.length >= 3 && w.length <= 15);
+  const cleaned = username.replace(/[0-9._\-]/g, ' ').trim();
+  const words   = cleaned.split(' ').filter(w => w.length >= 3 && w.length <= 15);
   if (words.length === 0) return null;
   return words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
 }
@@ -156,7 +156,7 @@ besoin_humain=true pour : partenariat, opportunite_commerciale, question_personn
 // ─────────────────────────────────────────────
 // 💬 RÉPONSE AUX COMMENTAIRES INSTAGRAM
 // Courte, émotionnelle, positive, humaine
-// Jamais robotique, jamais générique
+// Délai de 3 secondes pour paraître naturel
 // ─────────────────────────────────────────────
 async function generateCommentReply(commentText, accountName = '', accountDescription = '') {
   const response = await anthropic.messages.create({
@@ -194,6 +194,9 @@ Exemples de bonnes réponses :
 Retourne UNIQUEMENT la réponse, rien d'autre.`,
     messages: [{ role:'user', content:`Commentaire reçu : "${commentText}"` }]
   });
+
+  // ── Délai 3 secondes pour paraître naturel ────────────────────────────────
+  await delay(3000);
 
   return response.content[0].text.trim();
 }
@@ -235,22 +238,25 @@ async function generateReply(
   // Si on attend les coordonnées
   if (memory.status === 'waiting_coordinates') {
     memory.status = 'coordinates_received';
-    const historyText = memory.history.map(m => `${m.role==='user'?'Client':'IA'}: ${m.content}`).join('\n');
+    const historyText = memory.history
+      .map(m => `${m.role === 'user' ? 'Client' : 'IA'}: ${m.content}`)
+      .join('\n');
     await sendEmailSummary(
-      { senderId, firstName:memory.firstName, originalMessage:memory.originalMessage, accountName, conversationHistory:historyText },
+      { senderId, firstName: memory.firstName, originalMessage: memory.originalMessage, accountName, conversationHistory: historyText },
       memory.reason, messageText, clientEmail
     );
     const v    = memory.vouvoiement !== false;
     const solo = isSoloEntrepreneur;
     const rep  = solo
-      ? `Merci beaucoup pour ces informations ! 😊\n\nJe ${v?'vous':'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`
-      : `Merci beaucoup pour ces informations ! 😊\n\nNotre équipe ${v?'vous':'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`;
-    memory.history.push({ role:'user', content:messageText });
-    memory.history.push({ role:'assistant', content:rep });
+      ? `Merci beaucoup pour ces informations ! 😊\n\nJe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`
+      : `Merci beaucoup pour ces informations ! 😊\n\nNotre équipe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`;
+    memory.history.push({ role: 'user', content: messageText });
+    memory.history.push({ role: 'assistant', content: rep });
     await delay(2000);
     return rep;
   }
 
+  // Si coordonnées déjà reçues → silence
   if (memory.status === 'coordinates_received') {
     console.log('🔕 Coordonnées déjà reçues — message ignoré');
     return null;
@@ -284,7 +290,7 @@ RÈGLES SUR LA MÉMOIRE :
 RÈGLES SUR LES COORDONNÉES :
 - Ne demande JAMAIS le téléphone dès le premier message
 - D'abord échanger, comprendre le projet
-- Quand c'est le bon moment : "Pourriez-${v?'vous':'tu'} m'envoyer ${v?'votre':'ton'} numéro de téléphone ? Ce sera plus simple de vive voix !"
+- Quand c'est le bon moment : "Pourriez-${v ? 'vous' : 'tu'} m'envoyer ${v ? 'votre' : 'ton'} numéro de téléphone ? Ce sera plus simple de vive voix !"
 
 RÈGLES DE COMMUNICATION :
 - ${v ? 'Vouvoie cette personne' : 'Tutoie cette personne'}
@@ -295,19 +301,19 @@ RÈGLES DE COMMUNICATION :
 FORMAT : Ne commence JAMAIS par une salutation (déjà ajoutée automatiquement).`;
 
   const recentHistory = memory.history.slice(-10);
-  recentHistory.push({ role:'user', content:messageText });
+  recentHistory.push({ role: 'user', content: messageText });
 
   const response = await anthropic.messages.create({
-    model:      'claude-sonnet-4-20250514',
-    max_tokens: 350,
+    model:       'claude-sonnet-4-20250514',
+    max_tokens:  350,
     temperature: 1,
-    system:     systemPrompt,
-    messages:   recentHistory
+    system:      systemPrompt,
+    messages:    recentHistory
   });
 
   const body = response.content[0].text;
-  memory.history.push({ role:'user', content:messageText });
-  memory.history.push({ role:'assistant', content:body });
+  memory.history.push({ role: 'user', content: messageText });
+  memory.history.push({ role: 'assistant', content: body });
 
   await delay(body.length > 200 ? 3000 : Math.random() > 0.5 ? 2000 : 1000);
   return greeting + body;
@@ -344,12 +350,12 @@ async function generateHumanNeededReply(
     : `Pourrais-tu m'envoyer ton numéro de téléphone ? Ce sera plus simple d'échanger directement de vive voix ! 😊`;
 
   const suite = isSoloEntrepreneur
-    ? `Je reviendrai vers ${v?'vous':'toi'} au plus vite.`
-    : `Notre équipe reviendra vers ${v?'vous':'toi'} au plus vite.`;
+    ? `Je reviendrai vers ${v ? 'vous' : 'toi'} au plus vite.`
+    : `Notre équipe reviendra vers ${v ? 'vous' : 'toi'} au plus vite.`;
 
-  const reponse = `${greeting}Merci pour ${v?'votre':'ton'} message ! ✨\n\n${phoneRequest}\n\n${suite}`;
-  memory.history.push({ role:'user', content:originalMessage });
-  memory.history.push({ role:'assistant', content:reponse });
+  const reponse = `${greeting}Merci pour ${v ? 'votre' : 'ton'} message ! ✨\n\n${phoneRequest}\n\n${suite}`;
+  memory.history.push({ role: 'user', content: originalMessage });
+  memory.history.push({ role: 'assistant', content: reponse });
   return reponse;
 }
 
@@ -365,14 +371,17 @@ async function scheduleFollowUp(supabase, senderId, accountId, accessToken) {
       access_token: accessToken,
       scheduled_at: scheduledAt,
       sent:         false
-    }, { onConflict:'sender_id' });
+    }, { onConflict: 'sender_id' });
     console.log(`⏰ Relance programmée pour ${senderId}`);
   } catch (err) { console.error('❌ Erreur relance:', err.message); }
 }
 
 async function cancelFollowUp(supabase, senderId) {
   try {
-    await supabase.from('follow_ups').update({ sent:true }).eq('sender_id', senderId).eq('sent', false);
+    await supabase.from('follow_ups')
+      .update({ sent: true })
+      .eq('sender_id', senderId)
+      .eq('sent', false);
     console.log(`✅ Relance annulée pour ${senderId}`);
   } catch (err) { console.error('❌ Erreur annulation relance:', err.message); }
 }
@@ -380,12 +389,17 @@ async function cancelFollowUp(supabase, senderId) {
 async function processFollowUps(supabase) {
   try {
     const { data: followUps } = await supabase
-      .from('follow_ups').select('*').eq('sent', false)
+      .from('follow_ups').select('*')
+      .eq('sent', false)
       .lte('scheduled_at', new Date().toISOString());
     if (!followUps?.length) return;
     for (const f of followUps) {
-      await replyToDM(f.sender_id, `Bonjour,\n\nJe ne sais pas si mon dernier message s'était bien envoyé, avez-vous bien reçu ma réponse ?\n\nMerci à vous ! 😊`, f.access_token);
-      await supabase.from('follow_ups').update({ sent:true }).eq('id', f.id);
+      await replyToDM(
+        f.sender_id,
+        `Bonjour,\n\nJe ne sais pas si mon dernier message s'était bien envoyé, avez-vous bien reçu ma réponse ?\n\nMerci à vous ! 😊`,
+        f.access_token
+      );
+      await supabase.from('follow_ups').update({ sent: true }).eq('id', f.id);
       console.log(`📬 Relance envoyée à ${f.sender_id}`);
     }
   } catch (err) { console.error('❌ Erreur relances:', err.message); }
@@ -413,8 +427,8 @@ async function replyToDM(recipientId, reply, accessToken) {
   try {
     const response = await axios.post(
       `https://graph.instagram.com/v19.0/me/messages`,
-      { recipient:{ id:recipientId }, message:{ text:reply } },
-      { params: { access_token:accessToken } }
+      { recipient: { id: recipientId }, message: { text: reply } },
+      { params: { access_token: accessToken } }
     );
     console.log(`✅ DM envoyé à ${recipientId}`);
     return response.data;
