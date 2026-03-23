@@ -5,6 +5,7 @@ const { createClient } = require('@supabase/supabase-js');
 const {
   classifyMessage,
   generateReply,
+  generateCommentReply,
   generateHumanNeededReply,
   scheduleFollowUp,
   cancelFollowUp,
@@ -15,9 +16,9 @@ const {
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-const APP_SECRET    = process.env.META_APP_SECRET;
-const REDIRECT_URI  = process.env.META_REDIRECT_URI;
-const VERIFY_TOKEN  = process.env.META_VERIFY_TOKEN;
+const APP_SECRET   = process.env.META_APP_SECRET;
+const REDIRECT_URI = process.env.META_REDIRECT_URI;
+const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
 // ── Job de relance — vérifie toutes les heures ────────────────────────────────
 setInterval(async () => {
@@ -37,40 +38,40 @@ router.get('/auth/meta/callback', async (req, res) => {
     const { data: tokenData } = await axios.post(
       `https://api.instagram.com/oauth/access_token`,
       new URLSearchParams({
-        client_id: '911028448504932',
+        client_id:     '911028448504932',
         client_secret: APP_SECRET,
-        grant_type: 'authorization_code',
-        redirect_uri: REDIRECT_URI,
+        grant_type:    'authorization_code',
+        redirect_uri:  REDIRECT_URI,
         code
       })
     );
 
     const { data: longToken } = await axios.get(
       `https://graph.instagram.com/access_token`,
-      { params: { grant_type: 'ig_exchange_token', client_secret: APP_SECRET, access_token: tokenData.access_token } }
+      { params: { grant_type:'ig_exchange_token', client_secret:APP_SECRET, access_token:tokenData.access_token } }
     );
 
     const { data: igData } = await axios.get(
       `https://graph.instagram.com/v19.0/me`,
-      { params: { fields: 'id,name,username', access_token: longToken.access_token } }
+      { params: { fields:'id,name,username', access_token:longToken.access_token } }
     );
 
-    const { data: upsertData, error: upsertError } = await supabase
+    const { error: upsertError } = await supabase
       .from('social_accounts')
       .upsert({
-        client_id: client_id || null,
-        platform: 'instagram',
-        account_id: igData.id,
-        account_name: igData.username || igData.name,
-        access_token: longToken.access_token,
+        client_id:        client_id || null,
+        platform:         'instagram',
+        account_id:       igData.id,
+        account_name:     igData.username || igData.name,
+        access_token:     longToken.access_token,
         token_expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
-      }, { onConflict: 'account_id' });
+      }, { onConflict:'account_id' });
 
     console.log('Upsert error:', upsertError);
-    res.json({ success: true, account: igData.username, dbError: upsertError });
+    res.json({ success:true, account:igData.username, dbError:upsertError });
   } catch (err) {
     console.error(err.response?.data || err.message);
-    res.status(500).json({ error: 'Erreur OAuth Meta', details: err.response?.data });
+    res.status(500).json({ error:'Erreur OAuth Meta', details:err.response?.data });
   }
 });
 
@@ -87,7 +88,7 @@ router.get('/webhook/meta', (req, res) => {
 });
 
 // ── Webhook réception messages ────────────────────────────────────────────────
-router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook/meta', express.raw({ type:'application/json' }), async (req, res) => {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
   res.sendStatus(200);
 
@@ -105,36 +106,50 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
 
     if (!account) { console.warn('⚠️ Compte introuvable pour', entry.id); continue; }
 
-    // Récupérer les infos du client (solo ou équipe, email de contact)
+    // Récupérer les infos du client
     let isSoloEntrepreneur = true;
-    let clientEmail = null;
+    let clientEmail        = null;
+    let clientPlan         = 'starter';
 
     if (account.client_id) {
       const { data: client } = await supabase
         .from('clients')
-        .select('solo_entrepreneur, email')
+        .select('solo_entrepreneur, email, plan, status')
         .eq('id', account.client_id)
         .single();
 
       if (client) {
-        // Si la colonne solo_entrepreneur n'existe pas encore, on reste à true par défaut
         isSoloEntrepreneur = client.solo_entrepreneur !== false;
-        clientEmail = client.email || null;
+        clientEmail        = client.email || null;
+        clientPlan         = (client.plan || 'starter').toLowerCase();
+
+        // Si le client est en pause → ignorer tous les messages/commentaires
+        if (client.status === 'paused') {
+          console.log(`⏸ Client en pause — messages/commentaires ignorés`);
+          continue;
+        }
       }
     }
 
     // ── DMs ──────────────────────────────────────────────────────────────────
+    // Réponse aux DMs : PRO uniquement
     if (entry.messaging) {
       for (const event of entry.messaging) {
         if (!event.message) continue;
 
-        const senderId   = event.sender?.id;
-        const messageText = event.message?.text;
+        const senderId       = event.sender?.id;
+        const messageText    = event.message?.text;
         const senderUsername = event.sender?.username || '';
 
         if (!messageText || senderId === entry.id) continue;
 
         console.log('📩 DM reçu de', senderId, ':', messageText);
+
+        // STARTER → pas de réponse aux DMs
+        if (clientPlan === 'starter') {
+          console.log('⚡ Forfait Starter — DMs non gérés');
+          continue;
+        }
 
         try {
           await cancelFollowUp(supabase, senderId);
@@ -153,9 +168,7 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
               senderUsername,
               isSoloEntrepreneur
             );
-            if (transitionReply) {
-              await replyToDM(senderId, transitionReply, account.access_token);
-            }
+            if (transitionReply) await replyToDM(senderId, transitionReply, account.access_token);
             continue;
           }
 
@@ -183,9 +196,10 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
     }
 
     // ── Commentaires ──────────────────────────────────────────────────────────
+    // Réponse aux commentaires : STARTER + PRO
     if (entry.changes) {
       for (const change of entry.changes) {
-        console.log('📣 Événement:', change.field, change.value);
+        console.log('📣 Événement:', change.field);
 
         if (change.field !== 'comments') continue;
 
@@ -197,26 +211,23 @@ router.post('/webhook/meta', express.raw({ type: 'application/json' }), async (r
 
         try {
           const classification = await classifyMessage(commentText);
-          console.log('🔍 Classification:', classification);
+          console.log('🔍 Classification commentaire:', classification);
 
-          if (classification.besoin_humain) {
-            console.log('🙋 Commentaire sensible (', classification.categorie, ') — laissé sans réponse');
+          // Commentaire sensible → laisser sans réponse
+          if (classification.besoin_humain || classification.categorie === 'plainte_grave') {
+            console.log('🙋 Commentaire sensible — laissé sans réponse');
             continue;
           }
 
-          const reply = await generateReply(
+          // ── Générer une réponse courte et émotionnelle ────────────────────
+          const reply = await generateCommentReply(
             commentText,
             account.account_name,
-            change.value?.from?.id || '',
-            account.access_token,
-            account.description,
-            change.value?.from?.username || '',
-            isSoloEntrepreneur,
-            clientEmail
+            account.description
           );
 
           if (reply) {
-            console.log('🤖 Réponse commentaire:', reply);
+            console.log(`💬 Réponse commentaire : "${reply}"`);
             await replyToComment(commentId, reply, account.access_token);
           }
 
