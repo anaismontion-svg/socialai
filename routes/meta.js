@@ -20,6 +20,21 @@ const APP_SECRET   = process.env.META_APP_SECRET;
 const REDIRECT_URI = process.env.META_REDIRECT_URI;
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
+// ─────────────────────────────────────────────
+// 🔁 DÉDUPLICATION
+// Cache des IDs déjà traités pour éviter
+// les doublons dus aux webhooks répétés
+// ─────────────────────────────────────────────
+const processedComments = new Set(); // commentaires déjà traités
+const processedMessages = new Set(); // DMs déjà traités
+
+// Nettoyer le cache toutes les 2h pour éviter la saturation mémoire
+setInterval(() => {
+  processedComments.clear();
+  processedMessages.clear();
+  console.log('🧹 Cache déduplication nettoyé');
+}, 2 * 60 * 60 * 1000);
+
 // ── Job de relance — vérifie toutes les heures ────────────────────────────────
 setInterval(async () => {
   console.log('⏰ Vérification des relances...');
@@ -106,7 +121,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
 
     if (!account) { console.warn('⚠️ Compte introuvable pour', entry.id); continue; }
 
-    // Récupérer les infos du client
     let isSoloEntrepreneur = true;
     let clientEmail        = null;
     let clientPlan         = 'starter';
@@ -123,25 +137,31 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
         clientEmail        = client.email || null;
         clientPlan         = (client.plan || 'starter').toLowerCase();
 
-        // Si le client est en pause → ignorer tous les messages/commentaires
         if (client.status === 'paused') {
-          console.log(`⏸ Client en pause — messages/commentaires ignorés`);
+          console.log(`⏸ Client en pause — ignoré`);
           continue;
         }
       }
     }
 
     // ── DMs ──────────────────────────────────────────────────────────────────
-    // Réponse aux DMs : PRO uniquement
     if (entry.messaging) {
       for (const event of entry.messaging) {
         if (!event.message) continue;
 
+        const messageId      = event.message?.mid;
         const senderId       = event.sender?.id;
         const messageText    = event.message?.text;
         const senderUsername = event.sender?.username || '';
 
         if (!messageText || senderId === entry.id) continue;
+
+        // ── DÉDUPLICATION DM ─────────────────────────────────────────────────
+        if (messageId && processedMessages.has(messageId)) {
+          console.log(`⏭️ DM déjà traité (${messageId}) — ignoré`);
+          continue;
+        }
+        if (messageId) processedMessages.add(messageId);
 
         console.log('📩 DM reçu de', senderId, ':', messageText);
 
@@ -196,16 +216,20 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
     }
 
     // ── Commentaires ──────────────────────────────────────────────────────────
-    // Réponse aux commentaires : STARTER + PRO
     if (entry.changes) {
       for (const change of entry.changes) {
-        console.log('📣 Événement:', change.field);
-
         if (change.field !== 'comments') continue;
 
         const commentId   = change.value?.id;
         const commentText = change.value?.text;
         if (!commentId || !commentText) continue;
+
+        // ── DÉDUPLICATION COMMENTAIRE ────────────────────────────────────────
+        if (processedComments.has(commentId)) {
+          console.log(`⏭️ Commentaire déjà traité (${commentId}) — ignoré`);
+          continue;
+        }
+        processedComments.add(commentId);
 
         console.log('💬 Commentaire reçu:', commentText);
 
@@ -219,7 +243,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
             continue;
           }
 
-          // ── Générer une réponse courte et émotionnelle ────────────────────
           const reply = await generateCommentReply(
             commentText,
             account.account_name,
