@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mon Espace — SocialAI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -21,8 +21,6 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--ink);color:va
 button{cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* ── HEADER ── */
 .header{background:var(--ink2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .header-brand{display:flex;align-items:center;gap:10px}
 .brand-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -37,67 +35,42 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .plan-chip-pro{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
 .btn-logout{font-size:11px;color:var(--chalk3);background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;transition:all 0.15s}
 .btn-logout:hover{color:var(--rose);border-color:var(--rose)}
-
-/* ── LAYOUT ── */
-.wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px}
-
-/* ── BANNERS ── */
+.wrap{max-width:900px;margin:0 auto;padding:32px 24px 80px}
 .banner{border-radius:var(--r2);padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.6}
 .banner-pause{background:rgba(255,179,64,0.08);border:1px solid rgba(255,179,64,0.25);color:var(--amber)}
-.banner-pro{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.2);color:var(--purple)}
 .banner-icon{font-size:20px;flex-shrink:0;margin-top:1px}
-
-/* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
 .stat-pill{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px}
 .stat-pill-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-1px;margin-bottom:2px}
 .stat-pill-lbl{font-size:11px;color:var(--chalk3);text-transform:uppercase;letter-spacing:0.8px}
 .stat-pill-sub{font-size:11px;color:var(--chalk3);margin-top:2px}
-
-/* ── SECTION ── */
 .s-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .s-title{font-size:15px;font-weight:600}
 .s-count{font-size:11px;color:var(--chalk3);background:var(--ink3);border:1px solid var(--border);padding:3px 10px;border-radius:20px}
-
-/* ── POST CARDS ── */
-.post-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:10px;transition:border-color 0.2s}
-.post-card:hover{border-color:var(--border2)}
-.post-card.editing{border-color:var(--rose);box-shadow:0 0 0 1px rgba(255,77,109,0.2)}
-.post-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
-.post-thumb{width:52px;height:52px;border-radius:var(--r);flex-shrink:0;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
-.post-thumb img{width:100%;height:100%;object-fit:cover}
-.post-meta{flex:1}
-.post-date{font-size:11px;color:var(--chalk3);margin-bottom:4px;font-family:'DM Mono',monospace}
-.post-badges{display:flex;gap:6px;flex-wrap:wrap}
-.post-type{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px}
-.type-post{background:rgba(77,166,255,0.15);color:var(--sky)}
-.type-recycled{background:rgba(0,212,170,0.15);color:var(--mint)}
-.type-special{background:rgba(255,179,64,0.15);color:var(--amber)}
-.post-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.status-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;text-transform:uppercase}
-.sb-planned{background:rgba(0,212,170,0.12);color:var(--mint)}
-.modified-tag{font-size:10px;color:var(--amber)}
-.post-caption{font-size:13px;color:var(--chalk2);line-height:1.7;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
-.post-caption-edit{width:100%;background:var(--ink3);border:1px solid var(--rose);border-radius:var(--r);padding:12px;color:var(--chalk);font-size:13px;line-height:1.7;resize:vertical;min-height:100px;margin-bottom:12px;transition:all 0.15s;font-family:'Bricolage Grotesque',sans-serif}
-.post-caption-edit:focus{box-shadow:0 0 0 2px rgba(255,77,109,0.1)}
-.post-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
-/* ── BOUTONS ── */
-.btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--chalk2);transition:all 0.15s}
-.btn:hover{background:var(--surface);color:var(--chalk)}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
-.btn-rose{background:var(--rose);color:white;border-color:var(--rose)}
-.btn-rose:hover{background:var(--rose2);border-color:var(--rose2);color:white}
-.btn-ghost{border-color:transparent;color:var(--chalk3)}
-.btn-ghost:hover{color:var(--rose);background:transparent}
-.btn-sm{padding:5px 10px;font-size:11px}
-
-/* ── DIVIDER ── */
-.divider{height:1px;background:var(--border);margin:28px 0}
-
-/* ── SPECIAL POST ── */
+/* POST GRID CLIENT */
+.post-grid-client{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px}
+.post-item-client{border-radius:var(--r2);overflow:hidden;position:relative;background:var(--ink3);border:1px solid var(--border);aspect-ratio:1;cursor:pointer;transition:all 0.2s}
+.post-item-client:hover{border-color:var(--rose);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.post-item-client img{width:100%;height:100%;object-fit:cover}
+.post-item-client-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.post-item-client-badge{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600}
+.badge-planned{background:rgba(0,212,170,0.8);color:white}
+.badge-top{background:rgba(255,77,109,0.85);color:white}
+.post-item-client-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:32px;background:var(--ink3);gap:6px}
+.post-item-client-placeholder span{font-size:10px;color:var(--chalk3)}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r3);padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;animation:slideUp 0.25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+.modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:none;color:var(--chalk2);font-size:14px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--border2);color:var(--chalk)}
+.post-detail-img{width:100%;max-height:260px;object-fit:cover;border-radius:var(--r);margin-bottom:16px}
+.post-detail-placeholder{width:100%;height:180px;background:var(--ink3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px}
+/* SPECIAL SECTION */
 .special-section{background:linear-gradient(135deg,rgba(255,77,109,0.06),rgba(255,179,64,0.04));border:1px solid rgba(255,77,109,0.2);border-radius:var(--r2);padding:24px}
-.special-section.locked{background:rgba(255,179,64,0.04);border-color:rgba(255,179,64,0.2)}
 .special-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .special-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .special-title{font-size:16px;font-weight:700}
@@ -111,8 +84,7 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .locked-icon{font-size:36px;margin-bottom:10px}
 .locked-title{font-size:15px;font-weight:600;margin-bottom:6px}
 .locked-sub{font-size:13px;color:var(--chalk3)}
-
-/* ── FORMULAIRE ── */
+/* FORM */
 .form-group{margin-bottom:14px}
 .form-label{font-size:11px;color:var(--chalk3);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
 .form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s;font-family:'Bricolage Grotesque',sans-serif}
@@ -120,7 +92,6 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .form-input::placeholder{color:var(--chalk3)}
 textarea.form-input{resize:vertical;min-height:80px}
 .ai-toggle{display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:14px;cursor:pointer;transition:all 0.15s}
-.ai-toggle:hover{border-color:var(--border2)}
 .ai-toggle.active{border-color:var(--mint);background:rgba(0,212,170,0.04)}
 .toggle-knob{width:38px;height:22px;background:var(--surface);border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0}
 .ai-toggle.active .toggle-knob{background:var(--mint)}
@@ -133,44 +104,66 @@ textarea.form-input{resize:vertical;min-height:80px}
 .date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .ai-preview{background:var(--ink3);border:1px solid rgba(0,212,170,0.2);border-radius:var(--r);padding:12px;margin-bottom:14px;display:none}
 .ai-preview-label{font-size:10px;color:var(--mint);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
-.ai-preview-text{font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap}
-
-/* ── EMPTY ── */
-.empty{text-align:center;padding:48px 20px;color:var(--chalk3)}
-.empty-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
-.empty-title{font-size:16px;font-weight:600;color:var(--chalk2);margin-bottom:6px}
+/* BTNS */
+.btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--chalk2);transition:all 0.15s}
+.btn:hover{background:var(--surface);color:var(--chalk)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-rose{background:var(--rose);color:white;border-color:var(--rose)}
+.btn-rose:hover{background:var(--rose2);border-color:var(--rose2);color:white}
+.btn-ghost{border-color:transparent;color:var(--chalk3)}
+.btn-ghost:hover{color:var(--rose);background:transparent}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-purple{background:rgba(167,139,250,0.15);color:var(--purple);border-color:rgba(167,139,250,0.3)}
+.btn-purple:hover{background:rgba(167,139,250,0.25)}
+/* AI SUGGEST */
+.ai-suggestion-box{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:16px;margin-top:12px}
+.ai-suggestion-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:10px}
+.ai-explain-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--chalk2)}
+.ai-explain-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px}
+/* SCORE */
+.score-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.score-label{font-size:12px;color:var(--chalk2);width:100px;flex-shrink:0}
+.score-bg{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0}
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:24px 0}
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--chalk3)}
+.empty-icon{font-size:36px;margin-bottom:10px;opacity:0.5}
+.empty-title{font-size:15px;font-weight:600;color:var(--chalk2);margin-bottom:4px}
 .empty-sub{font-size:13px}
-
-/* ── TOAST ── */
+/* TOAST */
 .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;max-width:340px;animation:tin 0.3s ease}
+.toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;animation:tin 0.3s ease}
 @keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .toast.ok{border-left:3px solid var(--mint)}
 .toast.err{border-left:3px solid var(--rose)}
 .toast.info{border-left:3px solid var(--sky)}
 .toast.warn{border-left:3px solid var(--amber)}
-
-/* ── SPINNER ── */
 .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,77,109,0.2);border-top-color:var(--rose);animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-screen{display:flex;align-items:center;justify-content:center;min-height:50vh;flex-direction:column;gap:12px;color:var(--chalk3)}
-
-@media(max-width:600px){
-  .stats-row{grid-template-columns:1fr 1fr}
-  .date-row{grid-template-columns:1fr}
-  .wrap{padding:20px 16px 64px}
-}
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:40vh;flex-direction:column;gap:12px;color:var(--chalk3)}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.date-row{grid-template-columns:1fr}.wrap{padding:20px 16px 64px}.post-grid-client{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
 </style>
 </head>
 <body>
 
+<!-- MODAL DÉTAIL POST -->
+<div class="overlay" id="modal-post-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="post-detail-title">Publication</div>
+      <button class="modal-close" onclick="closeModal('modal-post-detail')">✕</button>
+    </div>
+    <div id="post-detail-content"></div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-brand">
     <div class="brand-dot">✦</div>
-    <div>
-      <div class="brand-name">SocialAI</div>
-      <div class="brand-tag">Espace client</div>
-    </div>
+    <div><div class="brand-name">SocialAI</div><div class="brand-tag">Espace client</div></div>
   </div>
   <div class="header-right">
     <div class="header-client">
@@ -184,24 +177,19 @@ textarea.form-input{resize:vertical;min-height:80px}
 
 <div class="wrap">
 
-  <!-- Bannière pause -->
   <div class="banner banner-pause" id="banner-pause" style="display:none">
     <div class="banner-icon">⏸</div>
-    <div>
-      <strong>Service suspendu</strong><br>
-      Votre service SocialAI est actuellement en pause. Contactez votre community manager pour le réactiver.
-    </div>
+    <div><strong>Service suspendu</strong><br>Contactez votre community manager pour le réactiver.</div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row" id="stats-row" style="display:none">
     <div class="stat-pill">
       <div class="stat-pill-val" id="stat-total">—</div>
       <div class="stat-pill-lbl">Posts planifiés</div>
     </div>
     <div class="stat-pill">
-      <div class="stat-pill-val" id="stat-week">—</div>
-      <div class="stat-pill-lbl">Cette semaine</div>
+      <div class="stat-pill-val" id="stat-history">—</div>
+      <div class="stat-pill-lbl">Publications passées</div>
     </div>
     <div class="stat-pill">
       <div class="stat-pill-val" id="stat-special">—</div>
@@ -211,16 +199,28 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 
   <!-- Posts planifiés -->
-  <div class="s-header">
-    <div class="s-title">📅 Posts planifiés</div>
-    <div class="s-count" id="posts-count">0 post</div>
+  <div class="s-header" style="margin-bottom:8px">
+    <div class="s-title">📅 Publications planifiées</div>
+    <div class="s-count" id="posts-count">0</div>
   </div>
+  <p style="font-size:12px;color:var(--chalk3);margin-bottom:12px">Cliquez sur une publication pour la consulter, la modifier ou demander une suggestion IA.</p>
 
-  <div id="posts-container">
+  <div id="planned-grid">
     <div class="loading-screen">
       <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
-      <div>Chargement de vos posts…</div>
+      <div>Chargement…</div>
     </div>
+  </div>
+
+  <!-- Publications passées -->
+  <div id="history-section" style="display:none">
+    <div class="divider"></div>
+    <div class="s-header" style="margin-bottom:8px">
+      <div class="s-title">📸 Publications passées</div>
+      <div class="s-count" id="history-count">0</div>
+    </div>
+    <p style="font-size:12px;color:var(--chalk3);margin-bottom:12px">Vos publications Instagram importées avec leur analyse IA.</p>
+    <div class="post-grid-client" id="history-grid"></div>
   </div>
 
   <div class="divider"></div>
@@ -231,78 +231,57 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="special-icon">🚀</div>
       <div><div class="special-title">Demander un post spécial</div></div>
     </div>
-    <div class="special-sub">Événement, nouveauté, annonce importante… Décrivez votre besoin et l'IA s'occupe du reste.</div>
+    <div class="special-sub">Événement, nouveauté, annonce importante… L'IA s'occupe du reste.</div>
 
-    <!-- Quota (Starter) -->
     <div id="quota-section" style="display:none">
       <div class="quota-bar-wrap">
         <div class="quota-label">
-          <span>Posts spéciaux utilisés cette semaine</span>
+          <span>Posts spéciaux cette semaine</span>
           <span id="quota-text">0 / 1</span>
         </div>
         <div class="quota-bar"><div class="quota-fill" id="quota-fill" style="width:0%"></div></div>
       </div>
     </div>
 
-    <!-- Formulaire (affiché ou masqué selon quota) -->
     <div id="special-form">
       <div class="form-group">
         <label class="form-label">Votre message / contexte *</label>
-        <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle collection printemps ! Je veux annoncer ça avec une belle caption..."></textarea>
+        <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle portée de chatons Ragdoll ! Je veux annoncer ça..."></textarea>
       </div>
-
       <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
         <div class="toggle-knob"></div>
-        <div>
-          <div class="toggle-label">Laisser l'IA écrire la caption</div>
-          <div class="toggle-desc">L'IA va rédiger une caption optimisée à partir de votre message</div>
-        </div>
+        <div><div class="toggle-label">Laisser l'IA écrire la caption</div><div class="toggle-desc">L'IA rédige une caption optimisée</div></div>
       </div>
-
       <div id="manual-caption-section" style="display:none">
         <div class="form-group">
-          <label class="form-label">Votre caption (rédigée par vous)</label>
-          <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption ici..."></textarea>
+          <label class="form-label">Votre caption</label>
+          <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption…"></textarea>
         </div>
       </div>
-
-      <!-- Prévisualisation caption IA -->
       <div class="ai-preview" id="ai-preview">
         <div class="ai-preview-label">✨ Caption générée par l'IA</div>
-        <div class="ai-preview-text" id="ai-preview-text"></div>
+        <div style="font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap" id="ai-preview-text"></div>
       </div>
-
       <div class="upload-zone" onclick="document.getElementById('special-file').click()">
         <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
         <div style="font-size:24px;margin-bottom:6px">📸</div>
-        <div style="font-size:12px;color:var(--chalk3)">Cliquez pour ajouter un visuel (optionnel)</div>
+        <div style="font-size:12px;color:var(--chalk3)">Ajouter un visuel (optionnel)</div>
         <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:6px;display:none"></div>
       </div>
-
       <div class="date-row">
-        <div>
-          <label class="form-label">Date souhaitée</label>
-          <input type="date" class="form-input" id="special-date">
-        </div>
-        <div>
-          <label class="form-label">Heure souhaitée</label>
-          <input type="time" class="form-input" id="special-time" value="18:00">
-        </div>
+        <div><label class="form-label">Date</label><input type="date" class="form-input" id="special-date"></div>
+        <div><label class="form-label">Heure</label><input type="time" class="form-input" id="special-time" value="18:00"></div>
       </div>
-
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">
-          🚀 Envoyer la demande
-        </button>
+        <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">🚀 Envoyer la demande</button>
         <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
       </div>
     </div>
 
-    <!-- Quota épuisé (Starter) -->
     <div class="locked-overlay" id="special-locked" style="display:none">
       <div class="locked-icon">⏳</div>
       <div class="locked-title">Quota hebdomadaire atteint</div>
-      <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Votre quota se renouvelle chaque lundi.<br><br>Passez au forfait <strong style="color:var(--purple)">Pro</strong> pour des posts spéciaux illimités !</div>
+      <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Renouvellement chaque lundi.<br><br>Passez au <strong style="color:var(--purple)">forfait Pro</strong> pour des posts illimités !</div>
     </div>
   </div>
 
@@ -311,367 +290,375 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// ── AUTH ──────────────────────────────────────────────────────────────────────
 const token    = localStorage.getItem('portal_token');
 const clientId = localStorage.getItem('portal_client_id');
 
 async function checkAuth() {
   if (!token || !clientId) { window.location.href = '/login.html'; return false; }
   try {
-    const r = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+    const r = await fetch('/api/auth/me', { headers: { Authorization:`Bearer ${token}` } });
     if (!r.ok) { window.location.href = '/login.html'; return false; }
-    const data = await r.json();
-    if (data.mustChangePassword) { window.location.href = '/login.html'; return false; }
+    const d = await r.json();
+    if (d.mustChangePassword) { window.location.href = '/login.html'; return false; }
     return true;
   } catch { window.location.href = '/login.html'; return false; }
 }
 
 function logout() {
-  fetch('/api/auth/logout', { method:'POST', headers:{ Authorization:`Bearer ${token}` } });
+  fetch('/api/auth/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}});
   localStorage.clear();
   window.location.href = '/login.html';
 }
 
-function authHeaders() {
-  return { 'Content-Type':'application/json', Authorization:`Bearer ${token}` };
-}
+function authHeaders() { return {'Content-Type':'application/json',Authorization:`Bearer ${token}`}; }
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let posts        = [];
-let clientPlan   = 'starter';
-let planLimits   = { postsVisibles:1, postsSpeciauxMax:1 };
-let specialQuota = { used:0, max:1, remaining:1, unlimited:false };
-let aiEnabled    = true;
+let posts=[], historyPosts=[], clientPlan='starter', planLimits={}, specialQuota={}, aiEnabled=true;
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   const ok = await checkAuth();
   if (!ok) return;
-
-  const name = localStorage.getItem('portal_client_name') || 'Mon espace';
+  const name = localStorage.getItem('portal_client_name')||'Mon espace';
   document.getElementById('header-client-name').textContent = name;
   document.title = `${name} — SocialAI`;
-
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('special-date').min = today;
+  document.getElementById('special-date').min   = today;
   document.getElementById('special-date').value = today;
-
-  await Promise.all([loadPosts(), loadSpecialQuota()]);
+  await Promise.all([loadPosts(), loadHistory(), loadSpecialQuota()]);
 }
 
-// ── CHARGER LES POSTS ─────────────────────────────────────────────────────────
 async function loadPosts() {
   try {
-    const r = await fetch(`/api/portal/${clientId}/posts`, {
-      headers: { Authorization:`Bearer ${token}` }
-    });
-
-    // Service en pause
-    if (r.status === 403) {
-      const data = await r.json();
-      if (data.error === 'service_paused') {
-        document.getElementById('banner-pause').style.display = 'flex';
-        document.getElementById('posts-container').innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">⏸</div>
-            <div class="empty-title">Service suspendu</div>
-            <div class="empty-sub">Contactez votre community manager.</div>
-          </div>`;
-        document.getElementById('special-section').style.display = 'none';
+    const r = await fetch(`/api/portal/${clientId}/posts`, { headers:{Authorization:`Bearer ${token}`} });
+    if (r.status===403) {
+      const d = await r.json();
+      if (d.error==='service_paused') {
+        document.getElementById('banner-pause').style.display='flex';
+        document.getElementById('planned-grid').innerHTML='';
+        document.getElementById('special-section').style.display='none';
         return;
       }
     }
-
-    if (!r.ok) throw new Error('Erreur chargement');
+    if (!r.ok) throw new Error();
     const data = await r.json();
-
-    posts      = data.posts || [];
-    clientPlan = data.plan || 'starter';
-    planLimits = data.planLimits || { postsVisibles:1, postsSpeciauxMax:1 };
-
-    // Mettre à jour le chip forfait dans le header
+    posts      = data.posts||[];
+    clientPlan = data.plan||'starter';
+    planLimits = data.planLimits||{};
     const chip = document.getElementById('header-plan-chip');
-    chip.textContent = clientPlan === 'pro' ? '🚀 Pro' : '⚡ Starter';
-    chip.className = `plan-chip plan-chip-${clientPlan}`;
+    chip.textContent = clientPlan==='pro'?'🚀 Pro':'⚡ Starter';
+    chip.className   = `plan-chip plan-chip-${clientPlan}`;
     chip.style.display = 'inline-flex';
-
-    renderPosts();
+    renderPlannedGrid();
     updateStats();
-
-  } catch (e) {
-    document.getElementById('posts-container').innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">⚠️</div>
-        <div class="empty-title">Erreur de chargement</div>
-        <div class="empty-sub">${e.message}</div>
-      </div>`;
+  } catch(e) {
+    document.getElementById('planned-grid').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur</div></div>';
   }
 }
 
-// ── CHARGER LE QUOTA POST SPÉCIAL ─────────────────────────────────────────────
+async function loadHistory() {
+  try {
+    const r = await fetch(`/api/reports/${clientId}/stats`);
+    if (!r.ok) return;
+    const data = await r.json();
+    historyPosts = (data.posts||[]).filter(p=>p.source==='instagram_history');
+    renderHistoryGrid();
+    document.getElementById('stat-history').textContent = historyPosts.length;
+    if (historyPosts.length>0) document.getElementById('history-section').style.display='block';
+  } catch(e) { console.error(e); }
+}
+
 async function loadSpecialQuota() {
   try {
-    const r = await fetch(`/api/portal/${clientId}/special-count`, {
-      headers: { Authorization:`Bearer ${token}` }
-    });
+    const r = await fetch(`/api/portal/${clientId}/special-count`, {headers:{Authorization:`Bearer ${token}`}});
     if (!r.ok) return;
     specialQuota = await r.json();
     updateSpecialSection();
   } catch(e) { console.error(e); }
 }
 
-function updateSpecialSection() {
-  const quotaSection  = document.getElementById('quota-section');
-  const specialForm   = document.getElementById('special-form');
-  const specialLocked = document.getElementById('special-locked');
-  const quotaText     = document.getElementById('quota-text');
-  const quotaFill     = document.getElementById('quota-fill');
-  const statSpecial   = document.getElementById('stat-special');
-  const statSpecialSub = document.getElementById('stat-special-sub');
+function renderPlannedGrid() {
+  const grid = document.getElementById('planned-grid');
+  const count = document.getElementById('posts-count');
+  count.textContent = posts.length;
 
-  if (specialQuota.unlimited) {
-    // PRO — illimité, pas de quota affiché
-    quotaSection.style.display  = 'none';
-    specialForm.style.display   = 'block';
-    specialLocked.style.display = 'none';
-    statSpecial.textContent     = '∞';
-    statSpecialSub.textContent  = 'Illimité (Pro)';
-  } else {
-    // STARTER — quota affiché
-    quotaSection.style.display = 'block';
-    quotaText.textContent = `${specialQuota.used} / ${specialQuota.max}`;
-    const pct = Math.min(100, (specialQuota.used / specialQuota.max) * 100);
-    quotaFill.style.width = pct + '%';
-    quotaFill.className = 'quota-fill' + (specialQuota.remaining === 0 ? ' full' : '');
-    statSpecial.textContent = specialQuota.remaining;
-    statSpecialSub.textContent = 'restant cette semaine';
-
-    if (specialQuota.remaining === 0) {
-      specialForm.style.display   = 'none';
-      specialLocked.style.display = 'block';
-    } else {
-      specialForm.style.display   = 'block';
-      specialLocked.style.display = 'none';
-    }
-  }
-}
-
-// ── AFFICHER LES POSTS ────────────────────────────────────────────────────────
-function renderPosts() {
-  const container = document.getElementById('posts-container');
-  const count     = document.getElementById('posts-count');
-  count.textContent = `${posts.length} post${posts.length > 1 ? 's' : ''}`;
-
-  if (posts.length === 0) {
-    container.innerHTML = `
-      <div class="empty">
-        <div class="empty-icon">📭</div>
-        <div class="empty-title">Aucun post planifié</div>
-        <div class="empty-sub">L'IA prépare vos prochaines publications automatiquement.</div>
+  if (clientPlan==='starter' && posts.length>0) {
+    grid.innerHTML = `
+      <div style="background:rgba(0,212,170,0.05);border:1px solid rgba(0,212,170,0.15);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--chalk3);margin-bottom:12px">
+        ⚡ Forfait Starter : vous pouvez voir et modifier votre prochain post planifié. Passez au <strong style="color:var(--purple)">forfait Pro</strong> pour tout voir.
       </div>`;
+  } else { grid.innerHTML=''; }
+
+  if (posts.length===0) {
+    grid.innerHTML+='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun post planifié</div><div class="empty-sub">L\'IA prépare vos prochaines publications.</div></div>';
     return;
   }
 
-  // Message Starter si 1 seul post visible
-  let starterNote = '';
-  if (clientPlan === 'starter') {
-    starterNote = `<div class="banner banner-pro" style="margin-bottom:12px;font-size:12px">
-      <div class="banner-icon" style="font-size:16px">⚡</div>
-      <div>Forfait Starter : vous pouvez consulter et modifier votre prochain post.<br>
-      Passez au <strong>forfait Pro</strong> pour voir et modifier tous vos posts planifiés.</div>
-    </div>`;
-  }
-
-  const typeMap  = { post:'Post', recycled:'♻️ Recyclé', special:'⭐ Spécial' };
-  const classMap = { post:'type-post', recycled:'type-recycled', special:'type-special' };
-
-  container.innerHTML = starterNote + posts.map(post => {
-    const date    = new Date(post.scheduled_at);
-    const dateStr = date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-    const timeStr = date.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+  const gridEl = document.createElement('div');
+  gridEl.className = 'post-grid-client';
+  gridEl.innerHTML = posts.map(p => {
+    const date = p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
     return `
-    <div class="post-card" id="card-${post.id}">
-      <div class="post-card-top">
-        <div class="post-thumb">
-          ${post.media_url
-            ? `<img src="${post.media_url}" alt="" onerror="this.parentElement.textContent='🖼️'">`
-            : '🖼️'}
-        </div>
-        <div class="post-meta">
-          <div class="post-date">${dateStr} à ${timeStr}</div>
-          <div class="post-badges">
-            <div class="post-type ${classMap[post.type]||'type-post'}">${typeMap[post.type]||post.type}</div>
-            ${post.special_request ? '<div class="post-type type-special">Spécial</div>' : ''}
-          </div>
-        </div>
-        <div class="post-right">
-          <div class="status-badge sb-planned">Planifié</div>
-          ${post.modified_by_client ? '<div class="modified-tag">✏️ Modifié</div>' : ''}
-        </div>
+    <div class="post-item-client" onclick="openPostDetail('${p.id}','queue')">
+      ${p.media_url
+        ? `<img src="${p.media_url}" onerror="this.style.display='none'">`
+        : `<div class="post-item-client-placeholder">${p.type==='recycled'?'♻️':p.special_request?'⭐':'📅'}<span>${date}</span></div>`}
+      <div class="post-item-client-badge badge-planned">Planifié</div>
+      <div class="post-item-client-overlay">
+        <div style="font-size:10px;color:rgba(255,255,255,0.9)">${date}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.caption||'—'}</div>
       </div>
-      <div class="post-caption" id="caption-display-${post.id}">${escHtml(post.caption || 'Caption en cours de génération…')}</div>
-      <textarea class="post-caption-edit" id="caption-edit-${post.id}" style="display:none">${escHtml(post.caption || '')}</textarea>
-      <div class="post-actions">
-        <button class="btn btn-sm" id="btn-edit-${post.id}" onclick="startEdit('${post.id}')">✏️ Modifier la caption</button>
-        <button class="btn btn-rose btn-sm" id="btn-save-${post.id}" style="display:none" onclick="saveCaption('${post.id}')">💾 Enregistrer</button>
-        <button class="btn btn-ghost btn-sm" id="btn-cancel-${post.id}" style="display:none" onclick="cancelEdit('${post.id}')">Annuler</button>
+    </div>`;
+  }).join('');
+  grid.appendChild(gridEl);
+}
+
+function renderHistoryGrid() {
+  const grid = document.getElementById('history-grid');
+  const count = document.getElementById('history-count');
+  count.textContent = historyPosts.length;
+  if (historyPosts.length===0) { grid.innerHTML=''; return; }
+  grid.innerHTML = historyPosts.slice(0,12).map(p => {
+    const score  = p.performance_score||0;
+    const isTop  = score>=60;
+    const date   = p.original_post_date ? new Date(p.original_post_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+    return `
+    <div class="post-item-client" onclick="openPostDetail('${p.id}','media')">
+      ${p.url
+        ? `<img src="${p.url}" onerror="this.style.display='none'">`
+        : `<div class="post-item-client-placeholder">🖼️<span>${date}</span></div>`}
+      ${isTop?'<div class="post-item-client-badge badge-top">⭐ TOP</div>':''}
+      <div class="post-item-client-overlay">
+        <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.9)"><span>❤️${p.likes||0}</span><span>💬${p.comments||0}</span></div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.6)">${date}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── STATS ─────────────────────────────────────────────────────────────────────
 function updateStats() {
-  const now      = new Date();
-  const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const thisWeek = posts.filter(p => new Date(p.scheduled_at) <= nextWeek);
+  const now=new Date(), nextWeek=new Date(now.getTime()+7*24*60*60*1000);
   document.getElementById('stat-total').textContent = posts.length;
-  document.getElementById('stat-week').textContent  = thisWeek.length;
-  document.getElementById('stats-row').style.display = 'grid';
+  document.getElementById('stats-row').style.display='grid';
 }
 
-// ── ÉDITION CAPTION ───────────────────────────────────────────────────────────
-function startEdit(id) {
-  document.getElementById(`card-${id}`).classList.add('editing');
-  document.getElementById(`caption-display-${id}`).style.display = 'none';
-  document.getElementById(`caption-edit-${id}`).style.display    = 'block';
-  document.getElementById(`btn-edit-${id}`).style.display        = 'none';
-  document.getElementById(`btn-save-${id}`).style.display        = 'flex';
-  document.getElementById(`btn-cancel-${id}`).style.display      = 'flex';
-  document.getElementById(`caption-edit-${id}`).focus();
-}
-
-function cancelEdit(id) {
-  document.getElementById(`card-${id}`).classList.remove('editing');
-  document.getElementById(`caption-display-${id}`).style.display = 'block';
-  document.getElementById(`caption-edit-${id}`).style.display    = 'none';
-  document.getElementById(`btn-edit-${id}`).style.display        = 'flex';
-  document.getElementById(`btn-save-${id}`).style.display        = 'none';
-  document.getElementById(`btn-cancel-${id}`).style.display      = 'none';
-}
-
-async function saveCaption(id) {
-  const newCaption = document.getElementById(`caption-edit-${id}`).value.trim();
-  if (!newCaption) { toast('La caption ne peut pas être vide', 'err'); return; }
-  const btn = document.getElementById(`btn-save-${id}`);
-  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
-  try {
-    const r = await fetch(`/api/portal/posts/${id}/caption`, {
-      method:'PATCH', headers:authHeaders(),
-      body: JSON.stringify({ caption: newCaption })
-    });
-    if (!r.ok) throw new Error();
-    const idx = posts.findIndex(p => p.id === id);
-    if (idx >= 0) { posts[idx].caption = newCaption; posts[idx].modified_by_client = true; }
-    document.getElementById(`caption-display-${id}`).textContent = newCaption;
-    cancelEdit(id);
-    toast('Caption mise à jour ✓', 'ok');
-  } catch {
-    toast('Erreur lors de la sauvegarde', 'err');
-    btn.textContent = '💾 Enregistrer'; btn.disabled = false;
+function updateSpecialSection() {
+  const quotaSection=document.getElementById('quota-section');
+  const specialForm=document.getElementById('special-form');
+  const specialLocked=document.getElementById('special-locked');
+  const statSpecial=document.getElementById('stat-special');
+  const statSpecialSub=document.getElementById('stat-special-sub');
+  if (specialQuota.unlimited) {
+    quotaSection.style.display='none'; specialForm.style.display='block'; specialLocked.style.display='none';
+    statSpecial.textContent='∞'; statSpecialSub.textContent='Illimité (Pro)';
+  } else {
+    quotaSection.style.display='block';
+    document.getElementById('quota-text').textContent=`${specialQuota.used}/${specialQuota.max}`;
+    const pct=Math.min(100,(specialQuota.used/specialQuota.max)*100);
+    document.getElementById('quota-fill').style.width=pct+'%';
+    document.getElementById('quota-fill').className='quota-fill'+(specialQuota.remaining===0?' full':'');
+    statSpecial.textContent=specialQuota.remaining;
+    statSpecialSub.textContent='restant cette semaine';
+    if (specialQuota.remaining===0) { specialForm.style.display='none'; specialLocked.style.display='block'; }
+    else { specialForm.style.display='block'; specialLocked.style.display='none'; }
   }
 }
 
-// ── AI TOGGLE ─────────────────────────────────────────────────────────────────
-function toggleAI() {
-  aiEnabled = !aiEnabled;
-  document.getElementById('ai-toggle').classList.toggle('active', aiEnabled);
-  document.getElementById('manual-caption-section').style.display = aiEnabled ? 'none' : 'block';
-  document.getElementById('ai-preview').style.display = 'none';
-}
-
-// ── FICHIER SPÉCIAL ───────────────────────────────────────────────────────────
-function handleSpecialFile(input) {
-  if (!input.files[0]) return;
-  document.getElementById('special-file-name').textContent = `📎 ${input.files[0].name}`;
-  document.getElementById('special-file-name').style.display = 'block';
-  toast('Visuel sélectionné', 'info');
-}
-
-// ── SOUMETTRE POST SPÉCIAL ────────────────────────────────────────────────────
-async function submitSpecialPost() {
-  const message = document.getElementById('special-message').value.trim();
-  if (!message) { toast('Décrivez votre besoin avant d\'envoyer', 'err'); return; }
-
-  const dateVal      = document.getElementById('special-date').value;
-  const timeVal      = document.getElementById('special-time').value || '18:00';
-  const manualCaption = document.getElementById('manual-caption').value.trim();
-  const scheduled_at = dateVal ? new Date(`${dateVal}T${timeVal}`).toISOString() : null;
-
-  const btn = document.getElementById('btn-submit-special');
-  btn.innerHTML = '<span class="spinner"></span> Envoi en cours…';
-  btn.disabled  = true;
-
-  // Masquer la prévisualisation précédente
-  document.getElementById('ai-preview').style.display = 'none';
-
+// MODAL DÉTAIL POST
+async function openPostDetail(postId, type) {
+  openModal('modal-post-detail');
+  document.getElementById('post-detail-title').textContent='Chargement…';
+  document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
   try {
-    const r = await fetch(`/api/portal/${clientId}/special-post`, {
-      method:'POST', headers:authHeaders(),
-      body: JSON.stringify({
-        message,
-        scheduled_at,
-        let_ai_decide:  aiEnabled,
-        manual_caption: aiEnabled ? null : manualCaption
-      })
+    const r = await fetch(`/api/reports/post/${postId}?type=${type}`);
+    const post = await r.json();
+    const isQueue = type==='queue';
+    const date = post.original_post_date||post.scheduled_at;
+    const dateStr = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
+    const score = post.performance_score||0;
+    const isTop = post.is_top_content;
+
+    document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
+
+    document.getElementById('post-detail-content').innerHTML=`
+      ${post.url
+        ?`<img class="post-detail-img" src="${post.url}" onerror="this.style.display='none'">`
+        :`<div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>`}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <span style="font-size:12px;color:var(--chalk3)">${dateStr}</span>
+        ${isTop?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,77,109,0.12);color:var(--rose);font-weight:600">⭐ Top Content</span>':''}
+        ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,212,170,0.12);color:var(--mint);font-weight:600">📅 Planifié</span>':''}
+      </div>
+      ${score>0?`
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--chalk3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div>
+        <div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--rose)':'var(--mint)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--rose)':'var(--mint)'}">${score}/100</div></div>
+        <div style="display:flex;gap:16px;font-size:12px;color:var(--chalk2);margin-top:8px">
+          <span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}
+        </div>
+      </div>`:''}
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--chalk3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption</div>
+        <div style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
+        ${isQueue?`<textarea class="form-input" id="detail-caption-edit" style="margin-top:8px;display:none;min-height:100px">${escHtml(post.caption||'')}</textarea>`:''}
+      </div>
+      ${post.analyse_data?`
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--chalk3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Analyse IA</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${post.analyse_data.type_contenu?`<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.2)">${post.analyse_data.type_contenu}</span>`:''}
+          ${(post.analyse_data.hashtags||[]).slice(0,5).map(h=>`<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--chalk3)">${h}</span>`).join('')}
+        </div>
+      </div>`:''}
+      <div id="ai-suggestion-result-client"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+        ${isQueue?`
+          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit('${post.id}')">✏️ Modifier</button>
+          <button class="btn btn-sm btn-rose" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button>
+          <button class="btn btn-ghost btn-sm" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
+        `:''}
+        <button class="btn btn-sm btn-purple" onclick="openAISuggestClient('${post.id}','${escHtml(post.caption||'')}','${type}')">✨ Suggestion IA</button>
+      </div>`;
+  } catch(e) {
+    document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--chalk3)">Erreur de chargement</div>';
+  }
+}
+
+function toggleCaptionEdit(id){
+  document.getElementById('detail-caption-display').style.display='none';
+  document.getElementById('detail-caption-edit').style.display='block';
+  document.getElementById('btn-edit-caption').style.display='none';
+  document.getElementById('btn-save-caption').style.display='flex';
+  document.getElementById('btn-cancel-caption').style.display='flex';
+  document.getElementById('detail-caption-edit').focus();
+}
+
+function cancelCaptionEdit(){
+  document.getElementById('detail-caption-display').style.display='block';
+  document.getElementById('detail-caption-edit').style.display='none';
+  document.getElementById('btn-edit-caption').style.display='flex';
+  document.getElementById('btn-save-caption').style.display='none';
+  document.getElementById('btn-cancel-caption').style.display='none';
+}
+
+async function savePostCaption(postId){
+  const caption=document.getElementById('detail-caption-edit').value.trim();
+  if(!caption){toast('Caption vide','err');return;}
+  try{
+    const r=await fetch(`/api/portal/posts/${postId}/caption`,{method:'PATCH',headers:authHeaders(),body:JSON.stringify({caption})});
+    if(!r.ok)throw new Error();
+    document.getElementById('detail-caption-display').textContent=caption;
+    cancelCaptionEdit();
+    toast('Caption mise à jour ✓','ok');
+    loadPosts();
+  }catch{toast('Erreur sauvegarde','err');}
+}
+
+async function openAISuggestClient(postId, currentCaption, type){
+  const resultEl=document.getElementById('ai-suggestion-result-client');
+  resultEl.innerHTML='<div style="text-align:center;padding:16px"><span class="spinner"></span> L\'IA analyse…</div>';
+  const directive=prompt('Directive (optionnel) :\nEx: "Rends-la plus émotionnelle", "Optimise les hashtags"');
+  try{
+    const r=await fetch(`/api/reports/post/${postId}/ai-suggest`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({directive:directive||'',currentCaption})
     });
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error);
+    resultEl.innerHTML=`
+      <div class="ai-suggestion-box">
+        <div class="ai-suggestion-title">✨ Suggestion de l'IA</div>
+        ${data.ameliorations?.length?`
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--amber);margin-bottom:4px;font-weight:600">💡 Améliorations</div>
+            ${data.ameliorations.map(a=>`<div class="ai-explain-item"><div class="ai-explain-dot" style="background:var(--amber)"></div>${a}</div>`).join('')}
+          </div>`:''}
+        <div style="font-size:11px;color:var(--purple);margin-bottom:6px;font-weight:600">📝 Nouvelle caption</div>
+        <div style="background:var(--ink3);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap;margin-bottom:10px" id="ai-client-new-caption">${escHtml(data.suggestion||'')}</div>
+        ${data.explications?.length?`
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--chalk3);margin-bottom:4px">Explications</div>
+            ${data.explications.map(e=>`<div class="ai-explain-item"><div class="ai-explain-dot"></div>${e}</div>`).join('')}
+          </div>`:''}
+        ${type==='queue'?`<button class="btn btn-sm btn-rose" onclick="applyClientAISuggestion('${postId}')">✅ Appliquer</button>`:''}
+      </div>`;
+  }catch(e){
+    resultEl.innerHTML=`<div style="color:var(--rose);font-size:13px;padding:12px">Erreur: ${e.message}</div>`;
+  }
+}
 
-    const data = await r.json();
+async function applyClientAISuggestion(postId){
+  const newCaption=document.getElementById('ai-client-new-caption')?.textContent;
+  if(!newCaption)return;
+  try{
+    const r=await fetch(`/api/portal/posts/${postId}/caption`,{method:'PATCH',headers:authHeaders(),body:JSON.stringify({caption:newCaption})});
+    if(!r.ok)throw new Error();
+    document.getElementById('detail-caption-display').textContent=newCaption;
+    toast('Caption appliquée ✓','ok');
+    loadPosts();
+  }catch{toast('Erreur','err');}
+}
 
-    if (!r.ok) {
-      // Message d'erreur spécifique selon le type
-      if (data.error === 'limite_atteinte') {
-        toast(data.message, 'warn');
-        await loadSpecialQuota(); // Recharger le quota
-      } else if (data.error === 'service_paused') {
-        toast(data.message, 'warn');
-      } else {
-        toast(data.error || 'Erreur serveur', 'err');
-      }
+// AI TOGGLE
+function toggleAI(){
+  aiEnabled=!aiEnabled;
+  document.getElementById('ai-toggle').classList.toggle('active',aiEnabled);
+  document.getElementById('manual-caption-section').style.display=aiEnabled?'none':'block';
+  document.getElementById('ai-preview').style.display='none';
+}
+
+function handleSpecialFile(input){
+  if(!input.files[0])return;
+  document.getElementById('special-file-name').textContent=`📎 ${input.files[0].name}`;
+  document.getElementById('special-file-name').style.display='block';
+  toast('Visuel sélectionné','info');
+}
+
+async function submitSpecialPost(){
+  const message=document.getElementById('special-message').value.trim();
+  if(!message){toast('Décrivez votre besoin','err');return;}
+  const dateVal=document.getElementById('special-date').value;
+  const timeVal=document.getElementById('special-time').value||'18:00';
+  const manualCaption=document.getElementById('manual-caption').value.trim();
+  const scheduled_at=dateVal?new Date(`${dateVal}T${timeVal}`).toISOString():null;
+  const btn=document.getElementById('btn-submit-special');
+  btn.innerHTML='<span class="spinner"></span> Envoi…'; btn.disabled=true;
+  document.getElementById('ai-preview').style.display='none';
+  try{
+    const r=await fetch(`/api/portal/${clientId}/special-post`,{
+      method:'POST',headers:authHeaders(),
+      body:JSON.stringify({message,scheduled_at,let_ai_decide:aiEnabled,manual_caption:aiEnabled?null:manualCaption})
+    });
+    const data=await r.json();
+    if(!r.ok){
+      if(data.error==='limite_atteinte'){toast(data.message,'warn');await loadSpecialQuota();}
+      else toast(data.error||'Erreur','err');
       return;
     }
-
-    // Afficher la caption générée par l'IA
-    if (aiEnabled && data.caption) {
-      document.getElementById('ai-preview-text').textContent = data.caption;
-      document.getElementById('ai-preview').style.display = 'block';
+    if(aiEnabled&&data.caption){
+      document.getElementById('ai-preview-text').textContent=data.caption;
+      document.getElementById('ai-preview').style.display='block';
     }
-
-    toast('Demande envoyée ! 🚀', 'ok');
-
-    // Reset formulaire
-    document.getElementById('special-message').value = '';
-    document.getElementById('manual-caption').value  = '';
-    document.getElementById('special-file-name').style.display = 'none';
-
-    // Recharger posts et quota
-    await Promise.all([loadPosts(), loadSpecialQuota()]);
-
-  } catch {
-    toast('Erreur lors de l\'envoi', 'err');
-  } finally {
-    btn.textContent = '🚀 Envoyer la demande';
-    btn.disabled    = false;
-  }
+    toast('Demande envoyée ! 🚀','ok');
+    document.getElementById('special-message').value='';
+    document.getElementById('manual-caption').value='';
+    document.getElementById('special-file-name').style.display='none';
+    await Promise.all([loadPosts(),loadSpecialQuota()]);
+  }catch{toast('Erreur lors de l\'envoi','err');}
+  finally{btn.textContent='🚀 Envoyer la demande';btn.disabled=false;}
 }
 
-// ── UTILITAIRES ───────────────────────────────────────────────────────────────
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function toast(msg, type = 'info') {
-  const icons = { ok:'✅', err:'❌', info:'💡', warn:'⚠️' };
-  const el    = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]}</span><span style="flex:1">${msg}</span>`;
+function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})});
+function toast(msg,type='info'){
+  const icons={ok:'✅',err:'❌',info:'💡',warn:'⚠️'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span>${icons[type]}</span><span style="flex:1">${msg}</span>`;
   document.getElementById('toasts').appendChild(el);
-  setTimeout(() => el.remove(), 4500);
+  setTimeout(()=>el.remove(),4500);
 }
 
-// ── START ─────────────────────────────────────────────────────────────────────
 init();
 </script>
 </body>

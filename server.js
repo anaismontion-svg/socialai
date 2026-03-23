@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Pages espace client ───────────────────────────────────────────────────────
-app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/login.html',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/client.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
@@ -18,6 +18,7 @@ app.use('/api/media',   require('./routes/media'));
 app.use('/api/queue',   require('./routes/queue'));
 app.use('/api/auth',    require('./routes/auth-portal').router);
 app.use('/api/portal',  require('./routes/client-portal'));
+app.use('/api/reports', require('./routes/reports'));
 app.use('/',            require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
