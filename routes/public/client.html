@@ -12,17 +12,17 @@
   --ink:#0d0d14;--ink2:#1a1a26;--ink3:#252533;
   --surface:#2e2e40;--border:#3a3a50;--border2:#4a4a64;
   --chalk:#f5f4f0;--chalk2:#c8c6be;--chalk3:#7a7870;
-  --rose:#ff4d6d;--rose2:#cc2244;--mint:#00d4aa;--amber:#ffb340;--sky:#4da6ff;
+  --rose:#ff4d6d;--rose2:#cc2244;--mint:#00d4aa;
+  --amber:#ffb340;--sky:#4da6ff;--purple:#a78bfa;
   --r:10px;--r2:16px;--r3:24px;
 }
 html{scroll-behavior:smooth}
 body{font-family:'Bricolage Grotesque',sans-serif;background:var(--ink);color:var(--chalk);min-height:100vh;font-size:14px;line-height:1.6}
 button{cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
+/* ── HEADER ── */
 .header{background:var(--ink2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .header-brand{display:flex;align-items:center;gap:10px}
 .brand-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -32,68 +32,93 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .header-client{display:flex;align-items:center;gap:8px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:7px 12px}
 .client-dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
 .client-label{font-size:12px;color:var(--chalk2)}
+.plan-chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.3px}
+.plan-chip-starter{background:rgba(0,212,170,0.15);color:var(--mint);border:1px solid rgba(0,212,170,0.3)}
+.plan-chip-pro{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
 .btn-logout{font-size:11px;color:var(--chalk3);background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;transition:all 0.15s}
 .btn-logout:hover{color:var(--rose);border-color:var(--rose)}
 
-.wrap{max-width:860px;margin:0 auto;padding:32px 24px 64px}
+/* ── LAYOUT ── */
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px}
 
-.s-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px}
-.s-sub{font-size:13px;color:var(--chalk3);margin-bottom:24px}
+/* ── BANNERS ── */
+.banner{border-radius:var(--r2);padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.6}
+.banner-pause{background:rgba(255,179,64,0.08);border:1px solid rgba(255,179,64,0.25);color:var(--amber)}
+.banner-pro{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.2);color:var(--purple)}
+.banner-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:32px}
-.stat-pill{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:flex;flex-direction:column;gap:4px}
-.stat-pill-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-1px}
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.stat-pill{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px}
+.stat-pill-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-1px;margin-bottom:2px}
 .stat-pill-lbl{font-size:11px;color:var(--chalk3);text-transform:uppercase;letter-spacing:0.8px}
+.stat-pill-sub{font-size:11px;color:var(--chalk3);margin-top:2px}
 
-.posts-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.posts-title{font-size:15px;font-weight:600}
-.posts-count{font-size:11px;color:var(--chalk3);background:var(--ink3);border:1px solid var(--border);padding:3px 10px;border-radius:20px}
+/* ── SECTION ── */
+.s-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.s-title{font-size:15px;font-weight:600}
+.s-count{font-size:11px;color:var(--chalk3);background:var(--ink3);border:1px solid var(--border);padding:3px 10px;border-radius:20px}
 
-.post-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:10px;transition:border-color 0.2s;position:relative}
+/* ── POST CARDS ── */
+.post-card{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:18px;margin-bottom:10px;transition:border-color 0.2s}
 .post-card:hover{border-color:var(--border2)}
-.post-card.editing{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
+.post-card.editing{border-color:var(--rose);box-shadow:0 0 0 1px rgba(255,77,109,0.2)}
 .post-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
 .post-thumb{width:52px;height:52px;border-radius:var(--r);flex-shrink:0;background:var(--ink3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}
 .post-thumb img{width:100%;height:100%;object-fit:cover}
 .post-meta{flex:1}
 .post-date{font-size:11px;color:var(--chalk3);margin-bottom:4px;font-family:'DM Mono',monospace}
-.post-type{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px}
+.post-badges{display:flex;gap:6px;flex-wrap:wrap}
+.post-type{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px}
 .type-post{background:rgba(77,166,255,0.15);color:var(--sky)}
-.type-story{background:rgba(139,92,246,0.15);color:#a78bfa}
 .type-recycled{background:rgba(0,212,170,0.15);color:var(--mint)}
 .type-special{background:rgba(255,179,64,0.15);color:var(--amber)}
-.post-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.status-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.3px}
+.post-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.status-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;text-transform:uppercase}
 .sb-planned{background:rgba(0,212,170,0.12);color:var(--mint)}
-
+.modified-tag{font-size:10px;color:var(--amber)}
 .post-caption{font-size:13px;color:var(--chalk2);line-height:1.7;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:12px;white-space:pre-wrap;word-break:break-word}
-.post-caption-edit{width:100%;background:var(--ink3);border:1px solid var(--rose);border-radius:var(--r);padding:12px;color:var(--chalk);font-size:13px;line-height:1.7;resize:vertical;min-height:100px;margin-bottom:12px;transition:all 0.15s}
+.post-caption-edit{width:100%;background:var(--ink3);border:1px solid var(--rose);border-radius:var(--r);padding:12px;color:var(--chalk);font-size:13px;line-height:1.7;resize:vertical;min-height:100px;margin-bottom:12px;transition:all 0.15s;font-family:'Bricolage Grotesque',sans-serif}
 .post-caption-edit:focus{box-shadow:0 0 0 2px rgba(255,77,109,0.1)}
-
 .post-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── BOUTONS ── */
 .btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--chalk2);transition:all 0.15s}
 .btn:hover{background:var(--surface);color:var(--chalk)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
 .btn-rose{background:var(--rose);color:white;border-color:var(--rose)}
 .btn-rose:hover{background:var(--rose2);border-color:var(--rose2);color:white}
 .btn-ghost{border-color:transparent;color:var(--chalk3)}
-.btn-ghost:hover{color:var(--rose);border-color:transparent;background:transparent}
+.btn-ghost:hover{color:var(--rose);background:transparent}
 .btn-sm{padding:5px 10px;font-size:11px}
 
+/* ── DIVIDER ── */
 .divider{height:1px;background:var(--border);margin:28px 0}
 
-.special-section{background:linear-gradient(135deg,rgba(255,77,109,0.06),rgba(255,179,64,0.04));border:1px solid rgba(255,77,109,0.2);border-radius:var(--r2);padding:24px;margin-top:32px}
+/* ── SPECIAL POST ── */
+.special-section{background:linear-gradient(135deg,rgba(255,77,109,0.06),rgba(255,179,64,0.04));border:1px solid rgba(255,77,109,0.2);border-radius:var(--r2);padding:24px}
+.special-section.locked{background:rgba(255,179,64,0.04);border-color:rgba(255,179,64,0.2)}
 .special-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .special-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .special-title{font-size:16px;font-weight:700}
 .special-sub{font-size:13px;color:var(--chalk3);margin-bottom:20px}
+.quota-bar-wrap{margin-bottom:16px}
+.quota-label{font-size:12px;color:var(--chalk2);margin-bottom:6px;display:flex;justify-content:space-between}
+.quota-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.quota-fill{height:100%;border-radius:2px;transition:width 0.4s;background:var(--mint)}
+.quota-fill.full{background:var(--rose)}
+.locked-overlay{text-align:center;padding:24px;color:var(--amber)}
+.locked-icon{font-size:36px;margin-bottom:10px}
+.locked-title{font-size:15px;font-weight:600;margin-bottom:6px}
+.locked-sub{font-size:13px;color:var(--chalk3)}
 
+/* ── FORMULAIRE ── */
 .form-group{margin-bottom:14px}
 .form-label{font-size:11px;color:var(--chalk3);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
-.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s}
+.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s;font-family:'Bricolage Grotesque',sans-serif}
 .form-input:focus{border-color:var(--rose);outline:none}
 .form-input::placeholder{color:var(--chalk3)}
 textarea.form-input{resize:vertical;min-height:80px}
-
 .ai-toggle{display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:14px;cursor:pointer;transition:all 0.15s}
 .ai-toggle:hover{border-color:var(--border2)}
 .ai-toggle.active{border-color:var(--mint);background:rgba(0,212,170,0.04)}
@@ -103,32 +128,37 @@ textarea.form-input{resize:vertical;min-height:80px}
 .ai-toggle.active .toggle-knob::after{transform:translateX(16px)}
 .toggle-label{font-size:13px;font-weight:500}
 .toggle-desc{font-size:11px;color:var(--chalk3)}
-
-.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:14px}
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:14px}
 .upload-zone:hover{border-color:var(--rose);background:rgba(255,77,109,0.03)}
-
 .date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ai-preview{background:var(--ink3);border:1px solid rgba(0,212,170,0.2);border-radius:var(--r);padding:12px;margin-bottom:14px;display:none}
+.ai-preview-label{font-size:10px;color:var(--mint);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+.ai-preview-text{font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap}
 
+/* ── EMPTY ── */
 .empty{text-align:center;padding:48px 20px;color:var(--chalk3)}
 .empty-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
 .empty-title{font-size:16px;font-weight:600;color:var(--chalk2);margin-bottom:6px}
 .empty-sub{font-size:13px}
 
+/* ── TOAST ── */
 .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
-.toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;animation:tin 0.3s ease}
+.toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;max-width:340px;animation:tin 0.3s ease}
 @keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .toast.ok{border-left:3px solid var(--mint)}
 .toast.err{border-left:3px solid var(--rose)}
 .toast.info{border-left:3px solid var(--sky)}
+.toast.warn{border-left:3px solid var(--amber)}
 
+/* ── SPINNER ── */
 .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,77,109,0.2);border-top-color:var(--rose);animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-screen{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:12px;color:var(--chalk3)}
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:50vh;flex-direction:column;gap:12px;color:var(--chalk3)}
 
 @media(max-width:600px){
   .stats-row{grid-template-columns:1fr 1fr}
   .date-row{grid-template-columns:1fr}
-  .wrap{padding:20px 16px 48px}
+  .wrap{padding:20px 16px 64px}
 }
 </style>
 </head>
@@ -146,6 +176,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="header-client">
       <div class="client-dot"></div>
       <div class="client-label" id="header-client-name">Chargement…</div>
+      <div class="plan-chip plan-chip-starter" id="header-plan-chip" style="display:none"></div>
     </div>
     <button class="btn-logout" onclick="logout()">Déconnexion</button>
   </div>
@@ -153,7 +184,17 @@ textarea.form-input{resize:vertical;min-height:80px}
 
 <div class="wrap">
 
-  <div id="stats-row" class="stats-row" style="display:none">
+  <!-- Bannière pause -->
+  <div class="banner banner-pause" id="banner-pause" style="display:none">
+    <div class="banner-icon">⏸</div>
+    <div>
+      <strong>Service suspendu</strong><br>
+      Votre service SocialAI est actuellement en pause. Contactez votre community manager pour le réactiver.
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row" style="display:none">
     <div class="stat-pill">
       <div class="stat-pill-val" id="stat-total">—</div>
       <div class="stat-pill-lbl">Posts planifiés</div>
@@ -163,14 +204,16 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="stat-pill-lbl">Cette semaine</div>
     </div>
     <div class="stat-pill">
-      <div class="stat-pill-val" id="stat-stories">—</div>
-      <div class="stat-pill-lbl">Stories prévues</div>
+      <div class="stat-pill-val" id="stat-special">—</div>
+      <div class="stat-pill-lbl">Post spécial</div>
+      <div class="stat-pill-sub" id="stat-special-sub"></div>
     </div>
   </div>
 
-  <div class="posts-header">
-    <div class="posts-title">📅 Posts planifiés</div>
-    <div class="posts-count" id="posts-count">0 post</div>
+  <!-- Posts planifiés -->
+  <div class="s-header">
+    <div class="s-title">📅 Posts planifiés</div>
+    <div class="s-count" id="posts-count">0 post</div>
   </div>
 
   <div id="posts-container">
@@ -182,54 +225,84 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <div class="divider"></div>
 
-  <div class="special-section">
+  <!-- Post spécial -->
+  <div class="special-section" id="special-section">
     <div class="special-header">
       <div class="special-icon">🚀</div>
       <div><div class="special-title">Demander un post spécial</div></div>
     </div>
     <div class="special-sub">Événement, nouveauté, annonce importante… Décrivez votre besoin et l'IA s'occupe du reste.</div>
 
-    <div class="form-group">
-      <label class="form-label">Votre message / contexte *</label>
-      <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle collection printemps ! Je veux annoncer ça avec une belle caption..."></textarea>
-    </div>
-
-    <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
-      <div class="toggle-knob"></div>
-      <div>
-        <div class="toggle-label">Laisser l'IA écrire la caption</div>
-        <div class="toggle-desc">L'IA va rédiger une caption optimisée à partir de votre message</div>
+    <!-- Quota (Starter) -->
+    <div id="quota-section" style="display:none">
+      <div class="quota-bar-wrap">
+        <div class="quota-label">
+          <span>Posts spéciaux utilisés cette semaine</span>
+          <span id="quota-text">0 / 1</span>
+        </div>
+        <div class="quota-bar"><div class="quota-fill" id="quota-fill" style="width:0%"></div></div>
       </div>
     </div>
 
-    <div id="manual-caption-section" style="display:none">
+    <!-- Formulaire (affiché ou masqué selon quota) -->
+    <div id="special-form">
       <div class="form-group">
-        <label class="form-label">Votre caption</label>
-        <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption ici..."></textarea>
+        <label class="form-label">Votre message / contexte *</label>
+        <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle collection printemps ! Je veux annoncer ça avec une belle caption..."></textarea>
+      </div>
+
+      <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
+        <div class="toggle-knob"></div>
+        <div>
+          <div class="toggle-label">Laisser l'IA écrire la caption</div>
+          <div class="toggle-desc">L'IA va rédiger une caption optimisée à partir de votre message</div>
+        </div>
+      </div>
+
+      <div id="manual-caption-section" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Votre caption (rédigée par vous)</label>
+          <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption ici..."></textarea>
+        </div>
+      </div>
+
+      <!-- Prévisualisation caption IA -->
+      <div class="ai-preview" id="ai-preview">
+        <div class="ai-preview-label">✨ Caption générée par l'IA</div>
+        <div class="ai-preview-text" id="ai-preview-text"></div>
+      </div>
+
+      <div class="upload-zone" onclick="document.getElementById('special-file').click()">
+        <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
+        <div style="font-size:24px;margin-bottom:6px">📸</div>
+        <div style="font-size:12px;color:var(--chalk3)">Cliquez pour ajouter un visuel (optionnel)</div>
+        <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:6px;display:none"></div>
+      </div>
+
+      <div class="date-row">
+        <div>
+          <label class="form-label">Date souhaitée</label>
+          <input type="date" class="form-input" id="special-date">
+        </div>
+        <div>
+          <label class="form-label">Heure souhaitée</label>
+          <input type="time" class="form-input" id="special-time" value="18:00">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">
+          🚀 Envoyer la demande
+        </button>
+        <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
       </div>
     </div>
 
-    <div class="upload-zone" onclick="document.getElementById('special-file').click()">
-      <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
-      <div style="font-size:28px;margin-bottom:8px">📸</div>
-      <div style="font-size:12px;color:var(--chalk3)">Cliquez pour ajouter un visuel (optionnel)</div>
-      <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:8px;display:none"></div>
-    </div>
-
-    <div class="date-row">
-      <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">Date souhaitée</label>
-        <input type="date" class="form-input" id="special-date">
-      </div>
-      <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">Heure souhaitée</label>
-        <input type="time" class="form-input" id="special-time" value="18:00">
-      </div>
-    </div>
-
-    <div style="margin-top:16px;display:flex;gap:8px;align-items:center">
-      <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">🚀 Envoyer la demande</button>
-      <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
+    <!-- Quota épuisé (Starter) -->
+    <div class="locked-overlay" id="special-locked" style="display:none">
+      <div class="locked-icon">⏳</div>
+      <div class="locked-title">Quota hebdomadaire atteint</div>
+      <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Votre quota se renouvelle chaque lundi.<br><br>Passez au forfait <strong style="color:var(--purple)">Pro</strong> pour des posts spéciaux illimités !</div>
     </div>
   </div>
 
@@ -238,50 +311,39 @@ textarea.form-input{resize:vertical;min-height:80px}
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-// ── Auth ──────────────────────────────────────────────────────────────────────
-const token = localStorage.getItem('portal_token');
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+const token    = localStorage.getItem('portal_token');
 const clientId = localStorage.getItem('portal_client_id');
 
-// Vérifier l'auth au chargement
 async function checkAuth() {
-  if (!token || !clientId) {
-    window.location.href = '/login.html';
-    return false;
-  }
+  if (!token || !clientId) { window.location.href = '/login.html'; return false; }
   try {
-    const r = await fetch('/api/auth/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!r.ok) {
-      window.location.href = '/login.html';
-      return false;
-    }
+    const r = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) { window.location.href = '/login.html'; return false; }
+    const data = await r.json();
+    if (data.mustChangePassword) { window.location.href = '/login.html'; return false; }
     return true;
-  } catch {
-    window.location.href = '/login.html';
-    return false;
-  }
+  } catch { window.location.href = '/login.html'; return false; }
 }
 
 function logout() {
-  fetch('/api/auth/logout', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  localStorage.removeItem('portal_token');
-  localStorage.removeItem('portal_client_id');
-  localStorage.removeItem('portal_client_name');
+  fetch('/api/auth/logout', { method:'POST', headers:{ Authorization:`Bearer ${token}` } });
+  localStorage.clear();
   window.location.href = '/login.html';
 }
 
 function authHeaders() {
-  return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+  return { 'Content-Type':'application/json', Authorization:`Bearer ${token}` };
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
-let posts = [];
-let aiEnabled = true;
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let posts        = [];
+let clientPlan   = 'starter';
+let planLimits   = { postsVisibles:1, postsSpeciauxMax:1 };
+let specialQuota = { used:0, max:1, remaining:1, unlimited:false };
+let aiEnabled    = true;
 
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
   const ok = await checkAuth();
   if (!ok) return;
@@ -294,18 +356,48 @@ async function init() {
   document.getElementById('special-date').min = today;
   document.getElementById('special-date').value = today;
 
-  await loadPosts();
+  await Promise.all([loadPosts(), loadSpecialQuota()]);
 }
 
+// ── CHARGER LES POSTS ─────────────────────────────────────────────────────────
 async function loadPosts() {
   try {
     const r = await fetch(`/api/portal/${clientId}/posts`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization:`Bearer ${token}` }
     });
+
+    // Service en pause
+    if (r.status === 403) {
+      const data = await r.json();
+      if (data.error === 'service_paused') {
+        document.getElementById('banner-pause').style.display = 'flex';
+        document.getElementById('posts-container').innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">⏸</div>
+            <div class="empty-title">Service suspendu</div>
+            <div class="empty-sub">Contactez votre community manager.</div>
+          </div>`;
+        document.getElementById('special-section').style.display = 'none';
+        return;
+      }
+    }
+
     if (!r.ok) throw new Error('Erreur chargement');
-    posts = await r.json();
+    const data = await r.json();
+
+    posts      = data.posts || [];
+    clientPlan = data.plan || 'starter';
+    planLimits = data.planLimits || { postsVisibles:1, postsSpeciauxMax:1 };
+
+    // Mettre à jour le chip forfait dans le header
+    const chip = document.getElementById('header-plan-chip');
+    chip.textContent = clientPlan === 'pro' ? '🚀 Pro' : '⚡ Starter';
+    chip.className = `plan-chip plan-chip-${clientPlan}`;
+    chip.style.display = 'inline-flex';
+
     renderPosts();
     updateStats();
+
   } catch (e) {
     document.getElementById('posts-container').innerHTML = `
       <div class="empty">
@@ -316,13 +408,61 @@ async function loadPosts() {
   }
 }
 
+// ── CHARGER LE QUOTA POST SPÉCIAL ─────────────────────────────────────────────
+async function loadSpecialQuota() {
+  try {
+    const r = await fetch(`/api/portal/${clientId}/special-count`, {
+      headers: { Authorization:`Bearer ${token}` }
+    });
+    if (!r.ok) return;
+    specialQuota = await r.json();
+    updateSpecialSection();
+  } catch(e) { console.error(e); }
+}
+
+function updateSpecialSection() {
+  const quotaSection  = document.getElementById('quota-section');
+  const specialForm   = document.getElementById('special-form');
+  const specialLocked = document.getElementById('special-locked');
+  const quotaText     = document.getElementById('quota-text');
+  const quotaFill     = document.getElementById('quota-fill');
+  const statSpecial   = document.getElementById('stat-special');
+  const statSpecialSub = document.getElementById('stat-special-sub');
+
+  if (specialQuota.unlimited) {
+    // PRO — illimité, pas de quota affiché
+    quotaSection.style.display  = 'none';
+    specialForm.style.display   = 'block';
+    specialLocked.style.display = 'none';
+    statSpecial.textContent     = '∞';
+    statSpecialSub.textContent  = 'Illimité (Pro)';
+  } else {
+    // STARTER — quota affiché
+    quotaSection.style.display = 'block';
+    quotaText.textContent = `${specialQuota.used} / ${specialQuota.max}`;
+    const pct = Math.min(100, (specialQuota.used / specialQuota.max) * 100);
+    quotaFill.style.width = pct + '%';
+    quotaFill.className = 'quota-fill' + (specialQuota.remaining === 0 ? ' full' : '');
+    statSpecial.textContent = specialQuota.remaining;
+    statSpecialSub.textContent = 'restant cette semaine';
+
+    if (specialQuota.remaining === 0) {
+      specialForm.style.display   = 'none';
+      specialLocked.style.display = 'block';
+    } else {
+      specialForm.style.display   = 'block';
+      specialLocked.style.display = 'none';
+    }
+  }
+}
+
+// ── AFFICHER LES POSTS ────────────────────────────────────────────────────────
 function renderPosts() {
   const container = document.getElementById('posts-container');
-  const count = document.getElementById('posts-count');
-  const filtered = posts.filter(p => p.type !== 'story');
-  count.textContent = `${filtered.length} post${filtered.length > 1 ? 's' : ''}`;
+  const count     = document.getElementById('posts-count');
+  count.textContent = `${posts.length} post${posts.length > 1 ? 's' : ''}`;
 
-  if (filtered.length === 0) {
+  if (posts.length === 0) {
     container.innerHTML = `
       <div class="empty">
         <div class="empty-icon">📭</div>
@@ -332,13 +472,23 @@ function renderPosts() {
     return;
   }
 
-  container.innerHTML = filtered.map(post => {
-    const date = new Date(post.scheduled_at);
+  // Message Starter si 1 seul post visible
+  let starterNote = '';
+  if (clientPlan === 'starter') {
+    starterNote = `<div class="banner banner-pro" style="margin-bottom:12px;font-size:12px">
+      <div class="banner-icon" style="font-size:16px">⚡</div>
+      <div>Forfait Starter : vous pouvez consulter et modifier votre prochain post.<br>
+      Passez au <strong>forfait Pro</strong> pour voir et modifier tous vos posts planifiés.</div>
+    </div>`;
+  }
+
+  const typeMap  = { post:'Post', recycled:'♻️ Recyclé', special:'⭐ Spécial' };
+  const classMap = { post:'type-post', recycled:'type-recycled', special:'type-special' };
+
+  container.innerHTML = starterNote + posts.map(post => {
+    const date    = new Date(post.scheduled_at);
     const dateStr = date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
     const timeStr = date.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-    const typeMap = { post:'Post', story:'Story', recycled:'♻️ Recyclé', special:'⭐ Spécial' };
-    const classMap = { post:'type-post', story:'type-story', recycled:'type-recycled', special:'type-special' };
-
     return `
     <div class="post-card" id="card-${post.id}">
       <div class="post-card-top">
@@ -349,12 +499,14 @@ function renderPosts() {
         </div>
         <div class="post-meta">
           <div class="post-date">${dateStr} à ${timeStr}</div>
-          <div class="post-type ${classMap[post.type] || 'type-post'}">${typeMap[post.type] || post.type}</div>
+          <div class="post-badges">
+            <div class="post-type ${classMap[post.type]||'type-post'}">${typeMap[post.type]||post.type}</div>
+            ${post.special_request ? '<div class="post-type type-special">Spécial</div>' : ''}
+          </div>
         </div>
-        <div class="post-status">
+        <div class="post-right">
           <div class="status-badge sb-planned">Planifié</div>
-          ${post.modified_by_client ? '<div style="font-size:10px;color:var(--amber)">✏️ Modifié par vous</div>' : ''}
-          ${post.special_request ? '<div style="font-size:10px;color:var(--amber)">⭐ Post spécial</div>' : ''}
+          ${post.modified_by_client ? '<div class="modified-tag">✏️ Modifié</div>' : ''}
         </div>
       </div>
       <div class="post-caption" id="caption-display-${post.id}">${escHtml(post.caption || 'Caption en cours de génération…')}</div>
@@ -368,46 +520,44 @@ function renderPosts() {
   }).join('');
 }
 
+// ── STATS ─────────────────────────────────────────────────────────────────────
 function updateStats() {
-  const now = new Date();
+  const now      = new Date();
   const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const postsOnly = posts.filter(p => p.type !== 'story');
-  const thisWeek = postsOnly.filter(p => new Date(p.scheduled_at) <= nextWeek);
-  const stories = posts.filter(p => p.type === 'story');
-  document.getElementById('stat-total').textContent = postsOnly.length;
-  document.getElementById('stat-week').textContent = thisWeek.length;
-  document.getElementById('stat-stories').textContent = stories.length;
+  const thisWeek = posts.filter(p => new Date(p.scheduled_at) <= nextWeek);
+  document.getElementById('stat-total').textContent = posts.length;
+  document.getElementById('stat-week').textContent  = thisWeek.length;
   document.getElementById('stats-row').style.display = 'grid';
 }
 
+// ── ÉDITION CAPTION ───────────────────────────────────────────────────────────
 function startEdit(id) {
   document.getElementById(`card-${id}`).classList.add('editing');
   document.getElementById(`caption-display-${id}`).style.display = 'none';
-  document.getElementById(`caption-edit-${id}`).style.display = 'block';
-  document.getElementById(`btn-edit-${id}`).style.display = 'none';
-  document.getElementById(`btn-save-${id}`).style.display = 'flex';
-  document.getElementById(`btn-cancel-${id}`).style.display = 'flex';
+  document.getElementById(`caption-edit-${id}`).style.display    = 'block';
+  document.getElementById(`btn-edit-${id}`).style.display        = 'none';
+  document.getElementById(`btn-save-${id}`).style.display        = 'flex';
+  document.getElementById(`btn-cancel-${id}`).style.display      = 'flex';
   document.getElementById(`caption-edit-${id}`).focus();
 }
 
 function cancelEdit(id) {
   document.getElementById(`card-${id}`).classList.remove('editing');
   document.getElementById(`caption-display-${id}`).style.display = 'block';
-  document.getElementById(`caption-edit-${id}`).style.display = 'none';
-  document.getElementById(`btn-edit-${id}`).style.display = 'flex';
-  document.getElementById(`btn-save-${id}`).style.display = 'none';
-  document.getElementById(`btn-cancel-${id}`).style.display = 'none';
+  document.getElementById(`caption-edit-${id}`).style.display    = 'none';
+  document.getElementById(`btn-edit-${id}`).style.display        = 'flex';
+  document.getElementById(`btn-save-${id}`).style.display        = 'none';
+  document.getElementById(`btn-cancel-${id}`).style.display      = 'none';
 }
 
 async function saveCaption(id) {
   const newCaption = document.getElementById(`caption-edit-${id}`).value.trim();
   if (!newCaption) { toast('La caption ne peut pas être vide', 'err'); return; }
   const btn = document.getElementById(`btn-save-${id}`);
-  btn.textContent = '⏳'; btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true;
   try {
     const r = await fetch(`/api/portal/posts/${id}/caption`, {
-      method: 'PATCH',
-      headers: authHeaders(),
+      method:'PATCH', headers:authHeaders(),
       body: JSON.stringify({ caption: newCaption })
     });
     if (!r.ok) throw new Error();
@@ -422,12 +572,15 @@ async function saveCaption(id) {
   }
 }
 
+// ── AI TOGGLE ─────────────────────────────────────────────────────────────────
 function toggleAI() {
   aiEnabled = !aiEnabled;
   document.getElementById('ai-toggle').classList.toggle('active', aiEnabled);
   document.getElementById('manual-caption-section').style.display = aiEnabled ? 'none' : 'block';
+  document.getElementById('ai-preview').style.display = 'none';
 }
 
+// ── FICHIER SPÉCIAL ───────────────────────────────────────────────────────────
 function handleSpecialFile(input) {
   if (!input.files[0]) return;
   document.getElementById('special-file-name').textContent = `📎 ${input.files[0].name}`;
@@ -435,47 +588,90 @@ function handleSpecialFile(input) {
   toast('Visuel sélectionné', 'info');
 }
 
+// ── SOUMETTRE POST SPÉCIAL ────────────────────────────────────────────────────
 async function submitSpecialPost() {
   const message = document.getElementById('special-message').value.trim();
   if (!message) { toast('Décrivez votre besoin avant d\'envoyer', 'err'); return; }
-  const dateVal = document.getElementById('special-date').value;
-  const timeVal = document.getElementById('special-time').value || '18:00';
+
+  const dateVal      = document.getElementById('special-date').value;
+  const timeVal      = document.getElementById('special-time').value || '18:00';
   const manualCaption = document.getElementById('manual-caption').value.trim();
   const scheduled_at = dateVal ? new Date(`${dateVal}T${timeVal}`).toISOString() : null;
+
   const btn = document.getElementById('btn-submit-special');
-  btn.textContent = '⏳ Envoi en cours…'; btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Envoi en cours…';
+  btn.disabled  = true;
+
+  // Masquer la prévisualisation précédente
+  document.getElementById('ai-preview').style.display = 'none';
+
   try {
     const r = await fetch(`/api/portal/${clientId}/special-post`, {
-      method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ message, scheduled_at, let_ai_decide: aiEnabled, caption: aiEnabled ? null : manualCaption })
+      method:'POST', headers:authHeaders(),
+      body: JSON.stringify({
+        message,
+        scheduled_at,
+        let_ai_decide:  aiEnabled,
+        manual_caption: aiEnabled ? null : manualCaption
+      })
     });
-    if (!r.ok) throw new Error('Erreur serveur');
-    toast('Demande envoyée ! L\'IA prépare votre post 🚀', 'ok');
+
+    const data = await r.json();
+
+    if (!r.ok) {
+      // Message d'erreur spécifique selon le type
+      if (data.error === 'limite_atteinte') {
+        toast(data.message, 'warn');
+        await loadSpecialQuota(); // Recharger le quota
+      } else if (data.error === 'service_paused') {
+        toast(data.message, 'warn');
+      } else {
+        toast(data.error || 'Erreur serveur', 'err');
+      }
+      return;
+    }
+
+    // Afficher la caption générée par l'IA
+    if (aiEnabled && data.caption) {
+      document.getElementById('ai-preview-text').textContent = data.caption;
+      document.getElementById('ai-preview').style.display = 'block';
+    }
+
+    toast('Demande envoyée ! 🚀', 'ok');
+
+    // Reset formulaire
     document.getElementById('special-message').value = '';
-    document.getElementById('manual-caption').value = '';
+    document.getElementById('manual-caption').value  = '';
     document.getElementById('special-file-name').style.display = 'none';
-    setTimeout(() => loadPosts(), 2000);
+
+    // Recharger posts et quota
+    await Promise.all([loadPosts(), loadSpecialQuota()]);
+
   } catch {
     toast('Erreur lors de l\'envoi', 'err');
   } finally {
-    btn.textContent = '🚀 Envoyer la demande'; btn.disabled = false;
+    btn.textContent = '🚀 Envoyer la demande';
+    btn.disabled    = false;
   }
 }
 
+// ── UTILITAIRES ───────────────────────────────────────────────────────────────
 function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function toast(msg, type = 'info') {
-  const icons = { ok:'✅', err:'❌', info:'💡' };
-  const el = document.createElement('div');
+  const icons = { ok:'✅', err:'❌', info:'💡', warn:'⚠️' };
+  const el    = document.createElement('div');
   el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  el.innerHTML = `<span>${icons[type]}</span><span style="flex:1">${msg}</span>`;
   document.getElementById('toasts').appendChild(el);
-  setTimeout(() => el.remove(), 3800);
+  setTimeout(() => el.remove(), 4500);
 }
 
+// ── START ─────────────────────────────────────────────────────────────────────
 init();
 </script>
 </body>
