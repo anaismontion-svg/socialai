@@ -83,13 +83,17 @@ body::before{
 .footer-note{text-align:center;font-size:11px;color:var(--chalk3);margin-top:20px}
 .spinner{display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:white;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Panneau "choisir mot de passe" */
 #panel-choose-password{display:none}
 .temp-info{
   background:rgba(255,179,64,0.08);border:1px solid rgba(255,179,64,0.25);
   border-radius:var(--r);padding:12px;margin-bottom:20px;font-size:13px;color:var(--amber);
   line-height:1.5;
+}
+/* Branding redirect notice */
+.branding-info{
+  background:rgba(196,174,207,0.1);border:1px solid rgba(196,174,207,0.3);
+  border-radius:var(--r);padding:12px;margin-bottom:20px;font-size:13px;
+  color:#c4aecf;line-height:1.5;text-align:center;
 }
 </style>
 </head>
@@ -107,9 +111,7 @@ body::before{
   <div id="panel-login">
     <div class="title">Connexion</div>
     <div class="subtitle">Accédez à vos publications et gérez votre contenu.</div>
-
     <div class="error-msg" id="login-error"></div>
-
     <div class="form-group">
       <label class="form-label">Adresse email</label>
       <input class="form-input" type="email" id="email" placeholder="votre@email.com" autocomplete="email">
@@ -122,10 +124,8 @@ body::before{
         <button class="toggle-pw" onclick="togglePw('password')" tabindex="-1">👁</button>
       </div>
     </div>
-
     <button class="btn-main" id="btn-login" onclick="login()">Se connecter →</button>
     <button class="link-btn" onclick="showForgot()">Mot de passe oublié ?</button>
-
     <div class="footer-note">Problème ? Contactez votre community manager.</div>
   </div>
 
@@ -141,14 +141,11 @@ body::before{
   <div id="panel-choose-password">
     <div class="title">Choisissez votre mot de passe</div>
     <div class="subtitle">Pour sécuriser votre compte, créez un mot de passe personnel.</div>
-
     <div class="temp-info">
       🔑 Vous êtes connecté(e) avec un mot de passe provisoire. Choisissez-en un nouveau pour sécuriser votre compte.
     </div>
-
     <div class="error-msg" id="choose-error"></div>
     <div class="success-msg" id="choose-success"></div>
-
     <div class="form-group">
       <label class="form-label">Nouveau mot de passe</label>
       <div class="input-wrap">
@@ -167,30 +164,60 @@ body::before{
         <button class="toggle-pw" onclick="togglePw('confirm-password')" tabindex="-1">👁</button>
       </div>
     </div>
-
     <button class="btn-main" id="btn-set-password" onclick="setPassword()">Enregistrer mon mot de passe →</button>
   </div>
+
+  <!-- ── PANNEAU REDIRECTION BRANDING ── -->
+  <div id="panel-branding" style="display:none">
+    <div class="title">Bienvenue ! ✨</div>
+    <div class="subtitle">Avant d'accéder à votre espace, personnalisez votre identité visuelle.</div>
+    <div class="branding-info">
+      🎨 L'IA va vous proposer 4 thèmes visuels adaptés à votre univers.<br>
+      Cela ne prend que 2 minutes !
+    </div>
+    <div class="success-msg" id="branding-success" style="display:block">
+      ✅ Connexion réussie ! Redirection vers la configuration…
+    </div>
+    <button class="btn-main" id="btn-branding" onclick="goToBranding()">
+      Choisir mon identité visuelle →
+    </button>
+  </div>
+
 </div>
 
 <script>
-let authToken = null;
+let authToken    = null;
 let authClientId = null;
+let needsBranding = false;
 
-// ── Affichage des panneaux ─────────────────────────────────────────────────────
+// ── Affichage des panneaux ────────────────────────────────────────────────────
 function showLogin() {
+  ['panel-login','panel-forgot','panel-choose-password','panel-branding']
+    .forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('panel-login').style.display = 'block';
-  document.getElementById('panel-forgot').style.display = 'none';
-  document.getElementById('panel-choose-password').style.display = 'none';
 }
 function showForgot() {
-  document.getElementById('panel-login').style.display = 'none';
+  ['panel-login','panel-forgot','panel-choose-password','panel-branding']
+    .forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('panel-forgot').style.display = 'block';
-  document.getElementById('panel-choose-password').style.display = 'none';
 }
 function showChoosePassword() {
-  document.getElementById('panel-login').style.display = 'none';
-  document.getElementById('panel-forgot').style.display = 'none';
+  ['panel-login','panel-forgot','panel-choose-password','panel-branding']
+    .forEach(id => document.getElementById(id).style.display = 'none');
   document.getElementById('panel-choose-password').style.display = 'block';
+}
+function showBrandingPanel() {
+  ['panel-login','panel-forgot','panel-choose-password','panel-branding']
+    .forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('panel-branding').style.display = 'block';
+  // Redirection automatique après 2s
+  setTimeout(goToBranding, 2000);
+}
+
+// ── Redirection vers branding-setup ──────────────────────────────────────────
+function goToBranding() {
+  const clientId = authClientId || localStorage.getItem('portal_client_id');
+  window.location.href = `/branding-setup.html?client_id=${clientId}`;
 }
 
 // ── Toggle visibilité mot de passe ────────────────────────────────────────────
@@ -204,7 +231,7 @@ function checkStrength(pw) {
   const fill = document.getElementById('strength-fill');
   const text = document.getElementById('strength-text');
   let score = 0;
-  if (pw.length >= 8) score++;
+  if (pw.length >= 8)  score++;
   if (pw.length >= 12) score++;
   if (/[A-Z]/.test(pw)) score++;
   if (/[0-9]/.test(pw)) score++;
@@ -217,18 +244,18 @@ function checkStrength(pw) {
     { pct:'100%', color:'#00d4aa', label:'Très fort' },
   ];
   const lvl = levels[Math.min(score, 4)];
-  fill.style.width = lvl.pct;
+  fill.style.width      = lvl.pct;
   fill.style.background = lvl.color;
-  text.textContent = pw.length > 0 ? lvl.label : '';
-  text.style.color = lvl.color;
+  text.textContent      = pw.length > 0 ? lvl.label : '';
+  text.style.color      = lvl.color;
 }
 
 // ── Connexion ─────────────────────────────────────────────────────────────────
 async function login() {
-  const email = document.getElementById('email').value.trim();
+  const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-  const btn = document.getElementById('btn-login');
-  const err = document.getElementById('login-error');
+  const btn      = document.getElementById('btn-login');
+  const err      = document.getElementById('login-error');
 
   if (!email || !password) {
     err.textContent = 'Veuillez remplir tous les champs.';
@@ -242,107 +269,119 @@ async function login() {
 
   try {
     const r = await fetch('/api/auth/login', {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body:    JSON.stringify({ email, password })
     });
     const data = await r.json();
 
     if (!r.ok) {
-      err.textContent = data.error || 'Email ou mot de passe incorrect.';
+      err.textContent   = data.error || 'Email ou mot de passe incorrect.';
       err.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Se connecter →';
+      btn.disabled      = false;
+      btn.textContent   = 'Se connecter →';
       return;
     }
 
     // Sauvegarder le token
-    authToken = data.token;
+    authToken    = data.token;
     authClientId = data.clientId;
-    localStorage.setItem('portal_token', data.token);
-    localStorage.setItem('portal_client_id', data.clientId);
+    needsBranding = data.needsBranding || false;
+
+    localStorage.setItem('portal_token',       data.token);
+    localStorage.setItem('portal_client_id',   data.clientId);
     localStorage.setItem('portal_client_name', data.clientName);
 
+    // ── Ordre de priorité des redirections ───────────────────────────────────
     if (data.mustChangePassword) {
-      // Première connexion ou mot de passe provisoire → choisir un mot de passe
+      // 1. Mot de passe provisoire → choisir un nouveau mot de passe d'abord
       showChoosePassword();
+    } else if (data.needsBranding) {
+      // 2. Première connexion sans branding → configurer l'identité visuelle
+      showBrandingPanel();
     } else {
+      // 3. Tout est OK → espace client
       window.location.href = `/client.html?client=${data.clientId}`;
     }
 
   } catch {
-    err.textContent = 'Erreur de connexion. Réessayez.';
+    err.textContent   = 'Erreur de connexion. Réessayez.';
     err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Se connecter →';
+    btn.disabled      = false;
+    btn.textContent   = 'Se connecter →';
   }
 }
 
 // ── Choisir son mot de passe ──────────────────────────────────────────────────
 async function setPassword() {
-  const pw = document.getElementById('new-password').value;
+  const pw      = document.getElementById('new-password').value;
   const confirm = document.getElementById('confirm-password').value;
-  const err = document.getElementById('choose-error');
+  const err     = document.getElementById('choose-error');
   const success = document.getElementById('choose-success');
-  const btn = document.getElementById('btn-set-password');
+  const btn     = document.getElementById('btn-set-password');
 
-  err.style.display = 'none';
+  err.style.display     = 'none';
   success.style.display = 'none';
 
   if (pw.length < 8) {
-    err.textContent = 'Le mot de passe doit contenir au moins 8 caractères.';
+    err.textContent   = 'Le mot de passe doit contenir au moins 8 caractères.';
     err.style.display = 'block';
     return;
   }
   if (pw !== confirm) {
-    err.textContent = 'Les mots de passe ne correspondent pas.';
+    err.textContent   = 'Les mots de passe ne correspondent pas.';
     err.style.display = 'block';
     return;
   }
 
-  btn.disabled = true;
+  btn.disabled  = true;
   btn.innerHTML = '<span class="spinner"></span>Enregistrement…';
 
   try {
     const token = authToken || localStorage.getItem('portal_token');
     const r = await fetch('/api/auth/set-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ password: pw })
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body:    JSON.stringify({ password: pw })
     });
-
     if (!r.ok) throw new Error();
 
-    success.textContent = '✅ Mot de passe enregistré ! Redirection…';
+    success.textContent   = '✅ Mot de passe enregistré !';
     success.style.display = 'block';
 
-    const clientId = authClientId || localStorage.getItem('portal_client_id');
+    // Après le mot de passe → vérifier si branding à configurer
     setTimeout(() => {
-      window.location.href = `/client.html?client=${clientId}`;
-    }, 1500);
+      const clientId = authClientId || localStorage.getItem('portal_client_id');
+      if (needsBranding) {
+        showBrandingPanel();
+      } else {
+        window.location.href = `/client.html?client=${clientId}`;
+      }
+    }, 1200);
 
   } catch {
-    err.textContent = 'Erreur lors de l\'enregistrement. Réessayez.';
+    err.textContent   = 'Erreur lors de l\'enregistrement. Réessayez.';
     err.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = 'Enregistrer mon mot de passe →';
+    btn.disabled      = false;
+    btn.textContent   = 'Enregistrer mon mot de passe →';
   }
 }
 
 // ── Vérifier si déjà connecté ─────────────────────────────────────────────────
-const token = localStorage.getItem('portal_token');
+const token    = localStorage.getItem('portal_token');
 const clientId = localStorage.getItem('portal_client_id');
 if (token && clientId) {
   fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
     .then(r => r.json())
     .then(data => {
       if (data.mustChangePassword) {
-        authToken = token;
+        authToken    = token;
         authClientId = clientId;
         showChoosePassword();
+      } else if (data.needsBranding) {
+        authToken    = token;
+        authClientId = clientId;
+        showBrandingPanel();
       } else if (data.clientId) {
         window.location.href = `/client.html?client=${clientId}`;
       }

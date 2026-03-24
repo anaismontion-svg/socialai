@@ -85,7 +85,7 @@ async function getTopPosts(clientId) {
   return data || [];
 }
 
-// ── Publier un post Instagram ─────────────────────────────────────────────────
+// ── Publier un post single ou reel Instagram ──────────────────────────────────
 async function publishToInstagram(accessToken, igAccountId, mediaUrl, caption, mediaType) {
   try {
     // Étape 1 : Créer le container
@@ -105,9 +105,9 @@ async function publishToInstagram(accessToken, igAccountId, mediaUrl, caption, m
 
     const containerId = containerRes.data.id;
 
-    // Attendre que le container soit prêt (pour les vidéos)
+    // Attendre que le container soit prêt (obligatoire pour les vidéos)
     if (mediaType === 'video') {
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await waitForContainer(accessToken, containerId);
     }
 
     // Étape 2 : Publier le container
@@ -129,6 +129,83 @@ async function publishToInstagram(accessToken, igAccountId, mediaUrl, caption, m
   }
 }
 
+// ── Publier un carousel Instagram ────────────────────────────────────────────
+// Meta API : chaque slide = 1 container enfant → assemblage en container parent
+async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, caption) {
+  try {
+    // Étape 1 : Créer un container enfant pour chaque slide
+    const childIds = [];
+
+    for (const url of mediaUrls) {
+      const isVideo = url.match(/\.(mp4|mov|avi)$/i);
+
+      const childRes = await axios.post(
+        `https://graph.instagram.com/v19.0/${igAccountId}/media`,
+        null,
+        {
+          params: {
+            image_url:    !isVideo ? url : undefined,
+            video_url:    isVideo  ? url : undefined,
+            media_type:   isVideo  ? 'VIDEO' : 'IMAGE',
+            is_carousel_item: true,
+            access_token: accessToken
+          }
+        }
+      );
+
+      const childId = childRes.data.id;
+
+      // Attendre que chaque slide vidéo soit prête
+      if (isVideo) {
+        await waitForContainer(accessToken, childId);
+      }
+
+      childIds.push(childId);
+      console.log(`  📎 Slide ${childIds.length}/${mediaUrls.length} uploadée (${childId})`);
+
+      // Pause entre chaque upload pour éviter le rate limit Meta
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+
+    // Étape 2 : Créer le container parent carousel
+    const parentRes = await axios.post(
+      `https://graph.instagram.com/v19.0/${igAccountId}/media`,
+      null,
+      {
+        params: {
+          media_type:   'CAROUSEL',
+          children:     childIds.join(','),
+          caption,
+          access_token: accessToken
+        }
+      }
+    );
+
+    const parentId = parentRes.data.id;
+
+    // Étape 3 : Attendre 30s minimum avant publication (exigence Meta)
+    console.log('⏳ Attente stabilisation container carousel (30s)...');
+    await new Promise(resolve => setTimeout(resolve, 30000));
+
+    // Étape 4 : Publier le carousel
+    const publishRes = await axios.post(
+      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`,
+      null,
+      {
+        params: {
+          creation_id:  parentId,
+          access_token: accessToken
+        }
+      }
+    );
+
+    return { success: true, postId: publishRes.data.id };
+  } catch (err) {
+    console.error('❌ Erreur publication carousel:', err.response?.data || err.message);
+    return { success: false, error: err.response?.data?.error?.message || err.message };
+  }
+}
+
 // ── Publier une story Instagram ───────────────────────────────────────────────
 async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, mediaType) {
   try {
@@ -137,8 +214,8 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
       null,
       {
         params: {
-          image_url: mediaType === 'image' ? mediaUrl : undefined,
-          video_url: mediaType === 'video' ? mediaUrl : undefined,
+          image_url:  mediaType === 'image' ? mediaUrl : undefined,
+          video_url:  mediaType === 'video' ? mediaUrl : undefined,
           media_type: 'STORIES',
           access_token: accessToken
         }
@@ -148,7 +225,7 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
     const containerId = containerRes.data.id;
 
     if (mediaType === 'video') {
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      await waitForContainer(accessToken, containerId);
     }
 
     const publishRes = await axios.post(
@@ -156,7 +233,7 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
       null,
       {
         params: {
-          creation_id: containerId,
+          creation_id:  containerId,
           access_token: accessToken
         }
       }
@@ -167,6 +244,32 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
     console.error('❌ Erreur publication story:', err.response?.data || err.message);
     return { success: false, error: err.response?.data?.error?.message || err.message };
   }
+}
+
+// ── Attendre qu'un container Meta soit prêt ───────────────────────────────────
+// Interroge l'API toutes les 5s jusqu'à statut FINISHED (max 2min)
+async function waitForContainer(accessToken, containerId, maxAttempts = 24) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    const statusRes = await axios.get(
+      `https://graph.instagram.com/v19.0/${containerId}`,
+      {
+        params: {
+          fields:       'status_code',
+          access_token: accessToken
+        }
+      }
+    );
+
+    const status = statusRes.data.status_code;
+    console.log(`  ⏳ Container ${containerId} — statut : ${status} (tentative ${i + 1}/${maxAttempts})`);
+
+    if (status === 'FINISHED') return true;
+    if (status === 'ERROR')    throw new Error(`Container ${containerId} en erreur`);
+  }
+
+  throw new Error(`Timeout container ${containerId} après ${maxAttempts * 5}s`);
 }
 
 // ── Moteur principal de publication ──────────────────────────────────────────
@@ -210,56 +313,78 @@ async function processQueue() {
         caption = await generateCaption(client, item.type, topPosts);
       }
 
-      // Récupérer l'URL du média
-      let mediaUrl = item.media_url;
-      if (!mediaUrl && item.media_id) {
-        const { data: media } = await supabase
-          .from('media')
-          .select('url, type')
-          .eq('id', item.media_id)
-          .single();
-        if (media) mediaUrl = media.url;
-      }
-
-      if (!mediaUrl) {
-        console.warn(`⚠️ Pas de média pour l'item ${item.id}`);
-        await supabase.from('queue').update({
-          statut: 'erreur',
-          error_message: 'Aucun média disponible'
-        }).eq('id', item.id);
-        continue;
-      }
-
-      // Publier selon le type
+      // ── Publier selon le type ───────────────────────────────────────────
       let result;
-      if (item.type === 'story') {
+
+      if (item.type === 'carousel') {
+        // Récupérer les URLs des slides depuis media_urls ou media_ids
+        let mediaUrls = item.media_urls || [];
+
+        if (!mediaUrls.length && item.media_ids?.length) {
+          const { data: medias } = await supabase
+            .from('media')
+            .select('url')
+            .in('id', item.media_ids);
+          mediaUrls = medias?.map(m => m.url) || [];
+        }
+
+        if (mediaUrls.length < 2) {
+          throw new Error('Carousel requiert au moins 2 slides');
+        }
+
+        console.log(`🎠 Publication carousel ${mediaUrls.length} slides pour ${client.name}`);
+        result = await publishCarouselToInstagram(
+          socialAccount.access_token,
+          socialAccount.account_id,
+          mediaUrls,
+          caption
+        );
+
+      } else if (item.type === 'story') {
         result = await publishStoryToInstagram(
           socialAccount.access_token,
           socialAccount.account_id,
-          mediaUrl,
+          item.media_url,
           'image'
         );
+
       } else {
+        // Post single ou reel
+        let mediaUrl = item.media_url;
+        if (!mediaUrl && item.media_id) {
+          const { data: media } = await supabase
+            .from('media')
+            .select('url, type')
+            .eq('id', item.media_id)
+            .single();
+          if (media) mediaUrl = media.url;
+        }
+
+        if (!mediaUrl) {
+          throw new Error('Aucun média disponible');
+        }
+
+        const mediaType = item.type === 'reel' ? 'video' : 'image';
         result = await publishToInstagram(
           socialAccount.access_token,
           socialAccount.account_id,
           mediaUrl,
           caption,
-          'image'
+          mediaType
         );
       }
 
-      // Mettre à jour le statut
+      // ── Mettre à jour le statut ─────────────────────────────────────────
       if (result.success) {
         await supabase.from('queue').update({
-          statut: 'publie',
+          statut:       'publie',
           published_at: now.toISOString(),
           caption
         }).eq('id', item.id);
         console.log(`✅ Publié pour ${client.name} — ${item.type}`);
       } else {
         await supabase.from('queue').update({
-          statut: 'erreur',
+          statut:        'erreur',
           error_message: result.error
         }).eq('id', item.id);
         console.error(`❌ Échec publication pour ${client.name}:`, result.error);
@@ -268,7 +393,7 @@ async function processQueue() {
     } catch (err) {
       console.error(`❌ Erreur traitement item ${item.id}:`, err.message);
       await supabase.from('queue').update({
-        statut: 'erreur',
+        statut:        'erreur',
         error_message: err.message
       }).eq('id', item.id);
     }

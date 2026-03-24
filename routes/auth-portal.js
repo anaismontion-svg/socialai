@@ -23,7 +23,6 @@ function generateToken() {
 }
 
 function generateTempPassword() {
-  // Ex: Rose-42-Tulipe (mémorisable)
   const words1 = ['Rose','Lune','Ciel','Mer','Fleur','Soleil','Étoile','Nuage'];
   const words2 = ['Douce','Bleue','Belle','Libre','Vive','Claire','Pure'];
   const num = Math.floor(Math.random() * 90) + 10;
@@ -62,7 +61,6 @@ function requireAuth(req, res, next) {
   if (!session || Date.now() > session.expiresAt) {
     return res.status(401).json({ error: 'Non authentifié' });
   }
-  // Sécurité : le client ne peut accéder qu'à ses propres données
   const requestedClientId = req.params.clientId;
   if (requestedClientId && requestedClientId !== session.clientId) {
     return res.status(403).json({ error: 'Accès refusé' });
@@ -82,7 +80,7 @@ router.post('/login', async (req, res) => {
 
   const { data: client, error } = await supabase
     .from('clients')
-    .select('id, name, email, password_hash, temp_password_hash, portal_access, first_login')
+    .select('id, name, email, password_hash, temp_password_hash, portal_access, first_login, branding_status')
     .eq('email', email.toLowerCase().trim())
     .eq('portal_access', true)
     .single();
@@ -99,28 +97,33 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
   }
 
+  // ── Détecter si le branding est à configurer ──────────────────────────────
+  const needsBranding = !client.branding_status || client.branding_status === 'pending';
+
   // Créer la session
   const token = generateToken();
   sessions[token] = {
-    clientId: client.id,
-    clientName: client.name,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    mustChangePassword: isTempPassword || client.first_login
+    clientId:          client.id,
+    clientName:        client.name,
+    createdAt:         Date.now(),
+    expiresAt:         Date.now() + 7 * 24 * 60 * 60 * 1000,
+    mustChangePassword: isTempPassword || client.first_login,
+    needsBranding
   };
 
   res.json({
-    success: true,
+    success:            true,
     token,
-    clientId: client.id,
-    clientName: client.name,
-    mustChangePassword: isTempPassword || client.first_login
+    clientId:           client.id,
+    clientName:         client.name,
+    mustChangePassword: isTempPassword || client.first_login,
+    // ← Le front-end utilise ce flag pour rediriger vers branding-setup.html
+    needsBranding
   });
 });
 
 // ─────────────────────────────────────────────
 // POST /api/auth/set-password
-// Le client choisit son nouveau mot de passe
 // ─────────────────────────────────────────────
 router.post('/set-password', requireAuth, async (req, res) => {
   const { password } = req.body;
@@ -135,15 +138,14 @@ router.post('/set-password', requireAuth, async (req, res) => {
   const { error } = await supabase
     .from('clients')
     .update({
-      password_hash: hash,
-      temp_password_hash: null, // Invalider le mot de passe provisoire
-      first_login: false
+      password_hash:      hash,
+      temp_password_hash: null,
+      first_login:        false
     })
     .eq('id', clientId);
 
   if (error) return res.status(500).json({ error: error.message });
 
-  // Mettre à jour la session
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (sessions[token]) sessions[token].mustChangePassword = false;
 
@@ -152,7 +154,6 @@ router.post('/set-password', requireAuth, async (req, res) => {
 
 // ─────────────────────────────────────────────
 // POST /api/auth/reset-password (admin)
-// Génère et envoie un nouveau mot de passe provisoire
 // ─────────────────────────────────────────────
 router.post('/reset-password', async (req, res) => {
   const { clientId, adminKey } = req.body;
@@ -168,17 +169,16 @@ router.post('/reset-password', async (req, res) => {
     .single();
 
   if (error || !client) return res.status(404).json({ error: 'Client introuvable' });
-  if (!client.email) return res.status(400).json({ error: 'Ce client n\'a pas d\'email configuré' });
+  if (!client.email)    return res.status(400).json({ error: 'Ce client n\'a pas d\'email configuré' });
 
   const tempPassword = generateTempPassword();
-  const tempHash = hashPassword(tempPassword);
+  const tempHash     = hashPassword(tempPassword);
 
   await supabase.from('clients').update({
     temp_password_hash: tempHash,
-    first_login: true
+    first_login:        true
   }).eq('id', clientId);
 
-  // Envoyer l'email
   const appUrl = process.env.APP_URL || 'https://socialai-production-5ffb.up.railway.app';
   await sendEmail(
     client.email,
@@ -213,9 +213,10 @@ router.get('/me', (req, res) => {
     return res.status(401).json({ error: 'Session expirée' });
   }
   res.json({
-    clientId: session.clientId,
-    clientName: session.clientName,
-    mustChangePassword: session.mustChangePassword || false
+    clientId:           session.clientId,
+    clientName:         session.clientName,
+    mustChangePassword: session.mustChangePassword || false,
+    needsBranding:      session.needsBranding      || false
   });
 });
 

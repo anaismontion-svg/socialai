@@ -9,17 +9,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Pages espace client ───────────────────────────────────────────────────────
-app.get('/login.html',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/client.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
+app.get('/login.html',         (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/client.html',        (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
+app.get('/branding-setup.html',(req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
-app.use('/api/clients', require('./routes/clients'));
-app.use('/api/media',   require('./routes/media'));
-app.use('/api/queue',   require('./routes/queue'));
-app.use('/api/auth',    require('./routes/auth-portal').router);
-app.use('/api/portal',  require('./routes/client-portal'));
-app.use('/api/reports', require('./routes/reports'));
-app.use('/',            require('./routes/meta'));
+app.use('/api/clients',  require('./routes/clients'));
+app.use('/api/media',    require('./routes/media'));
+app.use('/api/queue',    require('./routes/queue'));
+app.use('/api/auth',     require('./routes/auth-portal').router);
+app.use('/api/portal',   require('./routes/client-portal'));
+app.use('/api/reports',  require('./routes/reports'));
+app.use('/api/ai',       require('./routes/ai'));
+app.use('/api/branding', require('./routes/branding'));
+app.use('/',             require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
@@ -32,6 +35,11 @@ processQueue();
 checkLowContent();
 setInterval(processQueue,    60 * 1000);
 setInterval(checkLowContent, 6 * 60 * 60 * 1000);
+
+// ── Pipeline génération IA ────────────────────────────────────────────────────
+const { runAIPipeline } = require('./routes/ai');
+runAIPipeline();
+setInterval(runAIPipeline, 3 * 60 * 60 * 1000);
 
 // ── Planificateur automatique ─────────────────────────────────────────────────
 const { runScheduler } = require('./routes/scheduler');
