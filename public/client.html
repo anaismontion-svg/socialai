@@ -724,6 +724,7 @@ async function init() {
   document.getElementById('special-date').min   = today;
   document.getElementById('special-date').value = today;
   await Promise.all([loadPosts(), loadHistory(), loadSpecialQuota(), loadMedias()]);
+  checkOnboarding();
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
@@ -1569,6 +1570,301 @@ function updateAriaChatAvatar() {
   const el = document.querySelector('#modal-aria [style*="gradient"]');
   if (el) { el.innerHTML=`<img src="/aria/aria-chat.png" style="width:100%;height:100%;object-fit:contain" alt="Aria">`; el.style.background='transparent'; }
 }
+
+// ══════════════════════════════════════════════════════════════
+// ARIA ONBOARDING — Visite guidée au premier login
+// À injecter dans client.html juste avant init()
+// ══════════════════════════════════════════════════════════════
+
+const ONBOARDING_KEY = 'socialai_onboarding_done_' + (localStorage.getItem('portal_client_id')||'');
+
+const ONBOARDING_STEPS = [
+  {
+    tab:    null,
+    img:    '/aria/aria-special.png',
+    title:  'Bonjour, je suis Aria ! 🐰',
+    text:   `Je suis votre assistante IA personnelle chez SocialAI.\n\nJe gère votre présence sur Instagram et Facebook à votre place : publications, réponses aux messages, analyse des performances...\n\nLaissez-moi vous faire visiter votre espace ! 👇`,
+    cta:    'Commencer la visite →',
+    highlight: null
+  },
+  {
+    tab:    'dashboard',
+    img:    '/aria/aria-dashboard.png',
+    title:  '📊 Votre Dashboard',
+    text:   `C'est votre vue d'ensemble.\n\nVous voyez ici :\n• Vos posts planifiés\n• Votre reach et engagement moyen\n• Votre prochain post à publier\n• Vos meilleures publications`,
+    cta:    'Suivant →',
+    highlight: '#tab-dashboard'
+  },
+  {
+    tab:    'planned',
+    img:    '/aria/aria-planned.png',
+    title:  '📅 Posts planifiés',
+    text:   `Ici vous retrouvez tous les posts que j'ai préparés et planifiés pour vous.\n\nVous pouvez :\n• Voir l'aperçu de chaque publication\n• Modifier la caption si vous voulez y mettre votre touche\n• Me demander une suggestion IA\n• Supprimer un post si besoin`,
+    cta:    'Suivant →',
+    highlight: 'button[onclick*="planned"]'
+  },
+  {
+    tab:    'history',
+    img:    '/aria/aria-history.png',
+    title:  '📸 Historique',
+    text:   `Toutes vos publications Instagram importées sont ici.\n\nJ'analyse leurs performances pour apprendre ce qui fonctionne le mieux chez vous.\n\nLes ⭐ TOP sont les posts que j'utilise comme modèle pour les prochaines publications !`,
+    cta:    'Suivant →',
+    highlight: 'button[onclick*="history"]'
+  },
+  {
+    tab:    'medias',
+    img:    '/aria/aria-media.png',
+    title:  '🖼️ Vos médias',
+    text:   `C'est votre stock de photos et vidéos.\n\nUploadez vos images ici — je les analyse automatiquement et calcule leur potentiel viral.\n\nPlus vous m'en donnez, plus vos publications seront variées et authentiques !`,
+    cta:    'Suivant →',
+    highlight: 'button[onclick*="medias"]'
+  },
+  {
+    tab:    'special',
+    img:    '/aria/aria-special.png',
+    title:  '🚀 Post spécial',
+    text:   `Un événement à annoncer ? Une nouveauté ?\n\nDécrivez-moi simplement ce que vous voulez partager, et je rédige la caption parfaite avec les bons hashtags et la meilleure heure de publication.`,
+    cta:    'Suivant →',
+    highlight: 'button[onclick*="special"]'
+  },
+  {
+    tab:    'dashboard',
+    img:    '/aria/aria-chat.png',
+    title:  '🎯 Conseiller IA',
+    text:   `Et enfin, vous pouvez me parler directement !\n\nJe suis votre consultante stratégie digitale.\n\nPosez-moi vos questions, je vous propose un plan d'action personnalisé et je peux même modifier vos posts planifiés en fonction de votre stratégie.`,
+    cta:    'Suivant →',
+    highlight: 'button[onclick*="strategie"]'
+  },
+  {
+    tab:    'dashboard',
+    img:    '/aria/aria-special.png',
+    title:  'Vous êtes prêt(e) ! 🎉',
+    text:   `Votre espace SocialAI est prêt.\n\nJe m'occupe de tout en coulisses — publications automatiques, réponses aux messages, analyse des performances.\n\nVous n'avez qu'à profiter des résultats ! Si vous avez une question, je suis là 🐰`,
+    cta:    '✨ Accéder à mon espace',
+    highlight: null,
+    finale: true
+  }
+];
+
+let onboardingStep = 0;
+let onboardingActive = false;
+
+function checkOnboarding() {
+  const done = localStorage.getItem(ONBOARDING_KEY);
+  if (!done) {
+    setTimeout(() => startOnboarding(), 800);
+  }
+}
+
+function startOnboarding() {
+  onboardingActive = true;
+  onboardingStep = 0;
+  createOnboardingOverlay();
+  showOnboardingStep(0);
+}
+
+function createOnboardingOverlay() {
+  // Supprimer si existe déjà
+  document.getElementById('onboarding-overlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'onboarding-overlay';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:500;
+    background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;animation:fadeIn 0.4s ease;
+  `;
+
+  overlay.innerHTML = `
+    <div id="onboarding-card" style="
+      background:var(--ink2);border:1px solid rgba(167,139,250,0.3);
+      border-radius:24px;padding:0;width:100%;max-width:520px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 60px rgba(167,139,250,0.15);
+      overflow:hidden;animation:slideUp 0.4s ease;
+      display:flex;flex-direction:column;
+    ">
+      <!-- Aria image zone -->
+      <div id="ob-img-zone" style="
+        background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(77,166,255,0.05));
+        padding:24px 24px 0;display:flex;justify-content:center;
+        min-height:220px;align-items:flex-end;position:relative;
+      ">
+        <img id="ob-aria-img" src="/aria/aria-special.png" style="
+          height:210px;object-fit:contain;
+          filter:drop-shadow(0 8px 24px rgba(167,139,250,0.4));
+          transition:all 0.4s ease;
+        " alt="Aria">
+        <!-- Indicateur d'étapes -->
+        <div id="ob-steps" style="
+          position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+          display:flex;gap:6px;
+        "></div>
+      </div>
+
+      <!-- Contenu -->
+      <div style="padding:24px">
+        <div id="ob-title" style="
+          font-size:18px;font-weight:700;margin-bottom:10px;
+          font-family:'Bricolage Grotesque',sans-serif;
+        "></div>
+        <div id="ob-text" style="
+          font-size:13px;color:var(--chalk2);line-height:1.7;
+          white-space:pre-line;margin-bottom:20px;
+        "></div>
+
+        <!-- Boutons -->
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="ob-cta" onclick="nextOnboardingStep()" style="
+            flex:1;padding:12px;
+            background:linear-gradient(135deg,var(--purple),var(--sky));
+            border:none;border-radius:var(--r);color:white;
+            font-size:13px;font-weight:600;cursor:pointer;
+            font-family:'Bricolage Grotesque',sans-serif;
+            transition:opacity 0.15s;
+          "></button>
+          <button onclick="skipOnboarding()" style="
+            padding:12px 16px;background:transparent;
+            border:1px solid var(--border);border-radius:var(--r);
+            color:var(--chalk3);font-size:12px;cursor:pointer;
+            font-family:'Bricolage Grotesque',sans-serif;
+          ">Passer</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+function showOnboardingStep(stepIndex) {
+  const step = ONBOARDING_STEPS[stepIndex];
+  if (!step) { finishOnboarding(); return; }
+
+  // Changer l'image avec transition
+  const img = document.getElementById('ob-aria-img');
+  const title = document.getElementById('ob-title');
+  const text = document.getElementById('ob-text');
+  const cta = document.getElementById('ob-cta');
+  const stepsEl = document.getElementById('ob-steps');
+
+  if (img) {
+    img.style.opacity = '0';
+    img.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      img.src = step.img;
+      img.style.opacity = '1';
+      img.style.transform = 'translateY(0)';
+    }, 200);
+  }
+
+  // Animer le texte
+  if (title) { title.style.opacity='0'; setTimeout(()=>{title.innerHTML=step.title;title.style.opacity='1';title.style.transition='opacity 0.3s';},150); }
+  if (text)  { text.style.opacity='0';  setTimeout(()=>{text.textContent=step.text;text.style.opacity='1';text.style.transition='opacity 0.3s';},200); }
+  if (cta)   cta.textContent = step.cta;
+
+  // Indicateurs d'étapes
+  if (stepsEl) {
+    stepsEl.innerHTML = ONBOARDING_STEPS.map((_, i) =>
+      `<div style="width:${i===stepIndex?'20':'6'}px;height:6px;border-radius:3px;background:${i===stepIndex?'var(--purple)':'rgba(167,139,250,0.3)'};transition:all 0.3s"></div>`
+    ).join('');
+  }
+
+  // Changer l'onglet en arrière-plan si spécifié
+  if (step.tab) {
+    // Switcher l'onglet en arrière-plan (sans fermer l'overlay)
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + step.tab)?.classList.add('active');
+    updateAriaSide(step.tab);
+  }
+
+  // Highlight de l'onglet concerné
+  clearHighlights();
+  if (step.highlight) {
+    setTimeout(() => highlightElement(step.highlight), 300);
+  }
+
+  // Confettis sur la dernière étape
+  if (step.finale) {
+    setTimeout(() => launchConfetti(), 400);
+  }
+}
+
+function highlightElement(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  el.style.boxShadow = '0 0 0 3px var(--purple), 0 0 20px rgba(167,139,250,0.5)';
+  el.style.position = 'relative';
+  el.style.zIndex = '501';
+  el.setAttribute('data-highlighted', 'true');
+}
+
+function clearHighlights() {
+  document.querySelectorAll('[data-highlighted]').forEach(el => {
+    el.style.boxShadow = '';
+    el.style.zIndex = '';
+    el.removeAttribute('data-highlighted');
+  });
+}
+
+function nextOnboardingStep() {
+  onboardingStep++;
+  if (onboardingStep >= ONBOARDING_STEPS.length) {
+    finishOnboarding();
+  } else {
+    showOnboardingStep(onboardingStep);
+  }
+}
+
+function skipOnboarding() {
+  if (confirm('Passer la visite guidée ? Vous pourrez toujours retrouver Aria sur le côté gauche.')) {
+    finishOnboarding();
+  }
+}
+
+function finishOnboarding() {
+  clearHighlights();
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.4s';
+    setTimeout(() => overlay.remove(), 400);
+  }
+  localStorage.setItem(ONBOARDING_KEY, 'true');
+  onboardingActive = false;
+  // Retour au dashboard
+  switchTab('dashboard');
+}
+
+function launchConfetti() {
+  const colors = ['#a78bfa','#ff4d6d','#00d4aa','#ffb340','#4da6ff'];
+  for (let i = 0; i < 60; i++) {
+    const confetti = document.createElement('div');
+    confetti.style.cssText = `
+      position:fixed;width:8px;height:8px;border-radius:2px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${Math.random()*100}%;top:-10px;
+      z-index:600;pointer-events:none;
+      animation:confettiFall ${1.5+Math.random()*2}s ease-in ${Math.random()*0.5}s forwards;
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 4000);
+  }
+}
+
+// Styles animation
+const obStyle = document.createElement('style');
+obStyle.textContent = `
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1}
+    100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+  }
+  #ob-aria-img{transition:opacity 0.3s ease,transform 0.3s ease}
+  #ob-cta:hover{opacity:0.85}
+`;
+document.head.appendChild(obStyle);
 
 init();
 
