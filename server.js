@@ -20,7 +20,6 @@ app.use('/api/queue',    require('./routes/queue'));
 app.use('/api/auth',     require('./routes/auth-portal').router);
 app.use('/api/portal',   require('./routes/client-portal'));
 app.use('/api/reports',  require('./routes/reports'));
-app.use('/api/ai',       require('./routes/ai'));
 app.use('/api/branding', require('./routes/branding'));
 app.use('/api/pipeline', require('./routes/pipeline'));
 app.use('/',             require('./routes/meta'));
@@ -37,12 +36,16 @@ checkLowContent();
 setInterval(processQueue,    60 * 1000);
 setInterval(checkLowContent, 6 * 60 * 60 * 1000);
 
-// ── Pipeline génération IA ────────────────────────────────────────────────────
+// ── Pipeline génération IA — toutes les 3h ────────────────────────────────────
 const { runAIPipeline } = require('./routes/pipeline');
 runAIPipeline();
 setInterval(runAIPipeline, 3 * 60 * 60 * 1000);
 
-// ── Planificateur automatique ─────────────────────────────────────────────────
+// ── Mise à jour métriques posts — toutes les 6h ───────────────────────────────
+const { syncPostMetrics } = require('./routes/feed');
+setInterval(syncPostMetrics, 6 * 60 * 60 * 1000);
+
+// ── Planificateur automatique — toutes les 24h ────────────────────────────────
 const { runScheduler } = require('./routes/scheduler');
 runScheduler();
 setInterval(runScheduler, 24 * 60 * 60 * 1000);
