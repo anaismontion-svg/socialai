@@ -2,12 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
-// Sessions en mémoire (token -> session)
 const sessions = {};
 
 // ─────────────────────────────────────────────
@@ -31,24 +28,30 @@ function generateTempPassword() {
   return `${w1}-${num}-${w2}`;
 }
 
+// ── Envoi email via Resend API ────────────────────────────────────────────────
 async function sendEmail(to, subject, html) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
+    const fetch = (await import('node-fetch')).default;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from:    'SocialAI <onboarding@resend.dev>',
+        to:      [to],
+        subject,
+        html
+      })
     });
-    await transporter.sendMail({
-      from: `SocialAI <${process.env.GMAIL_USER}>`,
-      to,
-      subject,
-      html
-    });
-    console.log(`📧 Email envoyé à ${to}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur Resend');
+    console.log(`📧 Email envoyé à ${to} via Resend`);
+    return data;
   } catch (err) {
-    console.error('❌ Erreur envoi email:', err.message);
+    console.error('❌ Erreur envoi email Resend:', err.message);
+    throw err;
   }
 }
 
@@ -97,16 +100,14 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
   }
 
-  // ── Détecter si le branding est à configurer ──────────────────────────────
   const needsBranding = !client.branding_status || client.branding_status === 'pending';
 
-  // Créer la session
   const token = generateToken();
   sessions[token] = {
-    clientId:          client.id,
-    clientName:        client.name,
-    createdAt:         Date.now(),
-    expiresAt:         Date.now() + 7 * 24 * 60 * 60 * 1000,
+    clientId:           client.id,
+    clientName:         client.name,
+    createdAt:          Date.now(),
+    expiresAt:          Date.now() + 7 * 24 * 60 * 60 * 1000,
     mustChangePassword: isTempPassword || client.first_login,
     needsBranding
   };
@@ -117,7 +118,6 @@ router.post('/login', async (req, res) => {
     clientId:           client.id,
     clientName:         client.name,
     mustChangePassword: isTempPassword || client.first_login,
-    // ← Le front-end utilise ce flag pour rediriger vers branding-setup.html
     needsBranding
   });
 });
@@ -134,7 +134,6 @@ router.post('/set-password', requireAuth, async (req, res) => {
   }
 
   const hash = hashPassword(password);
-
   const { error } = await supabase
     .from('clients')
     .update({
@@ -180,12 +179,13 @@ router.post('/reset-password', async (req, res) => {
   }).eq('id', clientId);
 
   const appUrl = process.env.APP_URL || 'https://socialai-production-5ffb.up.railway.app';
+
   await sendEmail(
     client.email,
-    'Votre nouveau mot de passe provisoire — SocialAI',
+    'Votre accès à votre espace SocialAI',
     `
     <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#0d0d14;color:#f5f4f0;border-radius:16px">
-      <div style="font-size:24px;font-weight:700;margin-bottom:8px">🔑 Nouveau mot de passe</div>
+      <div style="font-size:24px;font-weight:700;margin-bottom:8px">🔑 Votre accès SocialAI</div>
       <p style="color:#c8c6be;margin-bottom:24px">Bonjour ${client.name},<br>Voici votre mot de passe provisoire pour accéder à votre espace SocialAI.</p>
       <div style="background:#1a1a26;border:1px solid #3a3a50;border-radius:12px;padding:20px;text-align:center;margin-bottom:24px">
         <div style="font-size:13px;color:#7a7870;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Mot de passe provisoire</div>
