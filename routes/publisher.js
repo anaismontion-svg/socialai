@@ -341,9 +341,20 @@ async function processQueue() {
         );
 
       } else if (item.type === 'story') {
-        const storyUrl = item.media_url;
+        let storyUrl = item.media_url;
+
+        // Fallback : récupérer l'URL depuis la table media si media_url est NULL
+        if (!storyUrl && item.media_id) {
+          const { data: media } = await supabase
+            .from('media')
+            .select('url')
+            .eq('id', item.media_id)
+            .single();
+          if (media?.url) storyUrl = media.url;
+        }
+
         if (!storyUrl) {
-          console.error(`❌ Échec publication story pour ${client.name}: aucune media_url`);
+          console.error(`❌ Échec publication story pour ${client.name}: aucune media_url ni media_id valide`);
           throw new Error('Story sans media_url');
         }
         console.log(`📖 Publication story pour ${client.name} — url: ${storyUrl}`);

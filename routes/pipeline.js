@@ -336,6 +336,17 @@ async function generateForClient(client) {
       } catch(err) {
         console.error(`⚠️ Assembleur: ${err.message}`);
       }
+    } else {
+      console.warn(`⚠️ Assembleur indisponible — utilisation des URLs média originales`);
+    }
+
+    // ── Fallback robuste : si pas de visuels assemblés, utiliser les URLs originales
+    const finalMediaUrl  = visualUrls?.[0]  || primaryMedia.url || null;
+    const finalMediaUrls = visualUrls        || mediaList.map(m => m.url).filter(Boolean);
+
+    if (!finalMediaUrl) {
+      console.error(`❌ Aucune URL média disponible pour ${client.name} — post ignoré`);
+      return { skipped: true, reason: 'no_media_url' };
     }
 
     await markAsUsed(mediaList.map(m => m.id));
@@ -349,8 +360,8 @@ async function generateForClient(client) {
       source:       'ai_auto',
       media_id:     primaryMedia.id,
       media_ids:    mediaList.map(m => m.id),
-      media_url:    visualUrls?.[0]  || primaryMedia.url,
-      media_urls:   visualUrls       || mediaList.map(m => m.url),
+      media_url:    finalMediaUrl,
+      media_urls:   finalMediaUrls,
     };
   }
 
