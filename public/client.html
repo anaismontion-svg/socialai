@@ -1670,66 +1670,72 @@ function createOnboardingOverlay() {
   const overlay = document.createElement('div');
   overlay.id = 'onboarding-overlay';
   overlay.style.cssText = `
-    position:fixed;inset:0;z-index:500;
-    background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);
     display:flex;align-items:center;justify-content:center;
     padding:20px;animation:fadeIn 0.4s ease;
   `;
 
   overlay.innerHTML = `
-    <div id="onboarding-card" style="
-      background:var(--ink2);border:1px solid rgba(167,139,250,0.3);
-      border-radius:24px;padding:0;width:100%;max-width:460px;
-      box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 60px rgba(167,139,250,0.15);
-      overflow:visible;animation:slideUp 0.4s ease;
+    <div style="
+      background:#1a1a26;
+      border:1px solid rgba(167,139,250,0.4);
+      border-radius:24px;
+      width:100%;max-width:580px;
+      box-shadow:0 32px 80px rgba(0,0,0,0.8),0 0 60px rgba(167,139,250,0.2);
+      animation:slideUp 0.4s ease;
       display:flex;flex-direction:row;align-items:stretch;
-      max-height:90vh;
+      overflow:hidden;
+      min-height:320px;
     ">
-      <!-- Aria image côté gauche -->
+      <!-- Aria à gauche -->
       <div style="
-        width:160px;flex-shrink:0;
-        background:linear-gradient(160deg,rgba(167,139,250,0.12),rgba(77,166,255,0.06));
-        border-radius:24px 0 0 24px;
+        width:180px;flex-shrink:0;
+        background:linear-gradient(160deg,rgba(167,139,250,0.15),rgba(77,166,255,0.08));
         display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-        padding-bottom:0;overflow:hidden;position:relative;
+        position:relative;padding-bottom:0;
       ">
         <img id="ob-aria-img" src="/aria/aria-special.png" style="
-          width:150px;height:auto;object-fit:contain;object-position:bottom;
+          width:170px;height:auto;object-fit:contain;object-position:bottom;
           filter:drop-shadow(0 8px 20px rgba(167,139,250,0.5));
           transition:opacity 0.3s ease,transform 0.3s ease;
-          position:relative;z-index:1;
+          display:block;
         " alt="Aria">
-        <!-- Indicateur d'étapes -->
         <div id="ob-steps" style="
-          position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-          display:flex;gap:4px;z-index:2;
+          position:absolute;bottom:10px;left:0;right:0;
+          display:flex;gap:4px;justify-content:center;
         "></div>
       </div>
 
-      <!-- Contenu droite -->
-      <div style="flex:1;padding:24px;display:flex;flex-direction:column;border-radius:0 24px 24px 0;min-width:0;overflow-y:auto">
+      <!-- Texte à droite -->
+      <div style="
+        flex:1;padding:28px 24px;
+        display:flex;flex-direction:column;
+        background:#1a1a26;
+        min-width:0;
+      ">
         <div id="ob-title" style="
-          font-size:17px;font-weight:700;margin-bottom:10px;
-          font-family:'Bricolage Grotesque',sans-serif;line-height:1.3;
+          font-size:18px;font-weight:700;margin-bottom:12px;
+          color:#f5f4f0;font-family:'Bricolage Grotesque',sans-serif;
+          line-height:1.3;min-height:28px;
         "></div>
         <div id="ob-text" style="
-          font-size:12px;color:var(--chalk2);line-height:1.7;
-          white-space:pre-line;margin-bottom:20px;flex:1;
+          font-size:13px;color:#c8c6be;line-height:1.75;
+          white-space:pre-line;margin-bottom:24px;flex:1;
+          min-height:80px;
         "></div>
-
-        <!-- Boutons -->
         <div style="display:flex;gap:8px;align-items:center">
           <button id="ob-cta" onclick="nextOnboardingStep()" style="
-            flex:1;padding:11px;
-            background:linear-gradient(135deg,var(--purple),var(--sky));
-            border:none;border-radius:var(--r);color:white;
+            flex:1;padding:12px;
+            background:linear-gradient(135deg,#a78bfa,#4da6ff);
+            border:none;border-radius:10px;color:white;
             font-size:13px;font-weight:600;cursor:pointer;
             font-family:'Bricolage Grotesque',sans-serif;
           "></button>
           <button onclick="skipOnboarding()" style="
-            padding:11px 14px;background:transparent;
-            border:1px solid var(--border);border-radius:var(--r);
-            color:var(--chalk3);font-size:11px;cursor:pointer;
+            padding:12px 16px;background:transparent;
+            border:1px solid #3a3a50;border-radius:10px;
+            color:#7a7870;font-size:11px;cursor:pointer;
             font-family:'Bricolage Grotesque',sans-serif;
           ">Passer</button>
         </div>
