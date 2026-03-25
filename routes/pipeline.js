@@ -342,7 +342,7 @@ async function generateForClient(client) {
 
     queueData = {
       client_id:    client.id,
-      type:         format === 'carousel' ? 'carousel' : format === 'story' ? 'reel' : 'post',
+      type:         format === 'carousel' ? 'carousel' : format === 'story' ? 'story' : 'post',
       statut:       'planifie',
       caption,
       scheduled_at: scheduledAt,

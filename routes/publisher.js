@@ -341,10 +341,16 @@ async function processQueue() {
         );
 
       } else if (item.type === 'story') {
+        const storyUrl = item.media_url;
+        if (!storyUrl) {
+          console.error(`❌ Échec publication story pour ${client.name}: aucune media_url`);
+          throw new Error('Story sans media_url');
+        }
+        console.log(`📖 Publication story pour ${client.name} — url: ${storyUrl}`);
         result = await publishStoryToInstagram(
           socialAccount.access_token,
           socialAccount.account_id,
-          item.media_url,
+          storyUrl,
           'image'
         );
 

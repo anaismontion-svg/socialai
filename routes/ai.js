@@ -4,32 +4,27 @@ const axios     = require('axios');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ─────────────────────────────────────────────
-// 📧 ENVOI EMAIL VIA RESEND
+// 📧 ENVOI EMAIL VIA RESEND (axios — pas node-fetch)
 // ─────────────────────────────────────────────
 async function sendEmail(to, subject, html) {
   console.log(`📧 Tentative envoi email à ${to} — sujet: ${subject}`);
+  console.log(`🔑 RESEND_API_KEY présente: ${!!process.env.RESEND_API_KEY}`);
   try {
-    // node-fetch v3 compatible ESM dans CJS
-    const { default: fetch } = await import('node-fetch');
-    const res = await fetch('https://api.resend.com/emails', {
-      method:  'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type':  'application/json'
-      },
-      body: JSON.stringify({
-        from:    'SocialAI <onboarding@resend.dev>',
-        to:      [to],
-        subject,
-        html
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(JSON.stringify(data));
-    console.log(`✅ Email envoyé à ${to} — id: ${data.id}`);
+    const response = await axios.post(
+      'https://api.resend.com/emails',
+      { from: 'SocialAI <onboarding@resend.dev>', to: [to], subject, html },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type':  'application/json'
+        },
+        timeout: 10000
+      }
+    );
+    console.log(`✅ Email envoyé à ${to} — id: ${response.data.id}`);
     return true;
   } catch (err) {
-    console.error('❌ Erreur email Resend:', err.message);
+    console.error('❌ Erreur email Resend:', err.response?.data || err.message);
     return false;
   }
 }
@@ -358,16 +353,16 @@ async function generateGatheringReply(memory, messageText, accountName, accountD
 
   const questionsByReason = {
     partenariat: [
-      `C'est ${v ? 'vous' : 'toi'} qui gérez le compte de la marque ? Quel type de collaboration ${v ? 'envisagez-vous' : 'envisages-tu'} exactement ?`,
-      `Intéressant ! ${v ? 'Votre' : 'Ton'} marque est dans quel secteur ?`
+      `Pourriez-${v ? 'vous' : 'tu'} me parler un peu plus de ${v ? 'votre' : 'ton'} concept ?`,
+      `Et ${v ? 'votre' : 'ton'} audience, elle ressemble à quoi ?`
     ],
     liste_attente: [
-      `${v ? 'Vous souhaitez' : 'Tu souhaites'} un chaton pour quand à peu près ?`,
+      `${v ? 'Vous souhaitez' : 'Tu souhaites'} un chaton pour quelle période environ ?`,
       `${v ? 'Vous avez' : 'As-tu'} déjà eu des chats Ragdoll ou ce serait une première ?`
     ],
     opportunite_commerciale: [
-      `Pouvez-${v ? 'vous' : 'tu'} m'en dire plus sur ${v ? 'votre' : 'ton'} projet ?`,
-      `C'est pour quel type de prestation ?`
+      `Pourriez-${v ? 'vous' : 'tu'} me parler un peu plus de ${v ? 'votre' : 'ton'} projet ?`,
+      `C'est pour quel type de prestation exactement ?`
     ],
     default: [
       `${v ? 'Vous pouvez' : 'Tu peux'} m'en dire plus ?`,
