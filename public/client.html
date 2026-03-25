@@ -261,6 +261,21 @@ textarea.form-input{resize:vertical;min-height:80px}
   .engagement-grid{grid-template-columns:repeat(2,1fr)}
   .nav-tabs{padding:0 12px}
 }
+/* ARIA WIDGET */
+.aria-widget{display:flex;align-items:flex-end;gap:16px;margin-bottom:24px;padding:16px 20px;background:linear-gradient(135deg,rgba(167,139,250,0.06),rgba(77,166,255,0.03));border:1px solid rgba(167,139,250,0.15);border-radius:var(--r2);position:relative;overflow:hidden}
+.aria-widget::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(167,139,250,0.04),transparent);pointer-events:none}
+.aria-img{width:90px;height:90px;object-fit:contain;object-position:bottom;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(167,139,250,0.3));transition:transform 0.3s ease}
+.aria-img:hover{transform:scale(1.05) translateY(-3px)}
+.aria-img.black-bg{mix-blend-mode:lighten}
+.aria-bubble{flex:1;background:var(--ink2);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r2);border-bottom-left-radius:4px;padding:12px 14px;position:relative}
+.aria-bubble::before{content:'';position:absolute;bottom:12px;left:-8px;border:4px solid transparent;border-right-color:rgba(167,139,250,0.2)}
+.aria-bubble::after{content:'';position:absolute;bottom:13px;left:-6px;border:3px solid transparent;border-right-color:var(--ink2)}
+.aria-bubble-name{font-size:10px;color:var(--purple);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.aria-bubble-text{font-size:13px;color:var(--chalk2);line-height:1.5}
+.aria-bubble-cta{margin-top:8px}
+@keyframes ariaEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.aria-widget{animation:ariaEnter 0.4s ease}
+@media(max-width:600px){.aria-img{width:64px;height:64px}.aria-bubble-text{font-size:12px}}
 </style>
 </head>
 <body>
@@ -389,6 +404,18 @@ textarea.form-input{resize:vertical;min-height:80px}
   <!-- ════ TAB DASHBOARD ════ -->
   <div class="tab-content active" id="tab-dashboard">
 
+    <!-- ARIA DASHBOARD -->
+    <div class="aria-widget">
+      <img src="/aria/aria-dashboard.png" class="aria-img" alt="Aria">
+      <div class="aria-bubble">
+        <div class="aria-bubble-name">✨ Aria · Votre IA</div>
+        <div class="aria-bubble-text" id="aria-dashboard-msg">Bonjour ! Voici un aperçu de votre compte. Tout se passe bien côté publications 📊</div>
+        <div class="aria-bubble-cta">
+          <button class="btn btn-sm btn-purple" style="margin-top:6px;font-size:11px" onclick="openAriaChat()">💬 Me parler</button>
+        </div>
+      </div>
+    </div>
+
     <div class="stats-row" id="stats-row">
       <div class="stat-pill">
         <div class="stat-pill-val" id="stat-total">—</div>
@@ -458,6 +485,16 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB PLANIFIÉS ════ -->
   <div class="tab-content" id="tab-planned">
+
+    <!-- ARIA PLANNED -->
+    <div class="aria-widget">
+      <img src="/aria/aria-planned.png" class="aria-img" alt="Aria">
+      <div class="aria-bubble">
+        <div class="aria-bubble-name">✨ Aria</div>
+        <div class="aria-bubble-text">Voici vos posts planifiés. Cliquez sur l'un d'eux pour modifier la caption ou demander une suggestion IA 📅</div>
+      </div>
+    </div>
+
     <div class="s-header" style="margin-bottom:8px">
       <div class="s-title">📅 Publications planifiées</div>
       <div class="s-count" id="posts-count">0</div>
@@ -473,6 +510,16 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB HISTORIQUE ════ -->
   <div class="tab-content" id="tab-history">
+
+    <!-- ARIA HISTORY -->
+    <div class="aria-widget">
+      <img src="/aria/aria-history.png" class="aria-img" alt="Aria">
+      <div class="aria-bubble">
+        <div class="aria-bubble-name">✨ Aria · Analyse</div>
+        <div class="aria-bubble-text">J'analyse vos publications passées pour identifier ce qui fonctionne le mieux. Les ⭐ TOP sont les posts que je réutilise comme modèle 📈</div>
+      </div>
+    </div>
+
     <div class="s-header" style="margin-bottom:8px">
       <div class="s-title">📸 Publications passées</div>
       <div class="s-count" id="history-count">0</div>
@@ -492,6 +539,16 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB MÉDIAS ════ -->
   <div class="tab-content" id="tab-medias">
+
+    <!-- ARIA MEDIA -->
+    <div class="aria-widget">
+      <img src="/aria/aria-media.png" class="aria-img" alt="Aria">
+      <div class="aria-bubble">
+        <div class="aria-bubble-name">✨ Aria · Médias</div>
+        <div class="aria-bubble-text">Uploadez vos photos et vidéos ici. J'analyse chaque média et calcule son potentiel viral avant de les intégrer dans vos publications 📸</div>
+      </div>
+    </div>
+
     <div class="s-header" style="margin-bottom:8px">
       <div class="s-title">🖼️ Ma médiathèque</div>
       <div class="s-count" id="media-count">0</div>
@@ -530,6 +587,16 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB POST SPÉCIAL ════ -->
   <div class="tab-content" id="tab-special">
+
+    <!-- ARIA SPECIAL -->
+    <div class="aria-widget">
+      <img src="/aria/aria-special.png" class="aria-img" alt="Aria">
+      <div class="aria-bubble">
+        <div class="aria-bubble-name">✨ Aria · Post spécial</div>
+        <div class="aria-bubble-text">Un événement à annoncer ? Dites-moi ce que vous voulez partager et je m'occupe de tout — caption, hashtags, heure optimale 🚀</div>
+      </div>
+    </div>
+
     <div class="special-section">
       <div class="special-header">
         <div class="special-icon">🚀</div>
@@ -675,6 +742,7 @@ async function loadPosts() {
     document.getElementById('posts-count').textContent = posts.length;
     renderPlannedGrid();
     renderNextPost();
+    updateAriaDashboardMsg();
   } catch(e) {
     document.getElementById('planned-grid').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur de chargement</div></div>';
   }
@@ -1154,6 +1222,7 @@ let ariaInitialized = false;
 
 function openAriaChat() {
   openModal('modal-aria');
+  updateAriaChatAvatar();
   if (!ariaInitialized) {
     ariaInitialized = true;
     setTimeout(() => startAriaConversation(), 300);
@@ -1436,6 +1505,30 @@ function resetAriaChat() {
 const styleSheet = document.createElement('style');
 styleSheet.textContent = '@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}} @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0.4}}';
 document.head.appendChild(styleSheet);
+
+// ── Message dynamique Aria sur le Dashboard ───────────────────────────────────
+function updateAriaDashboardMsg() {
+  const el = document.getElementById('aria-dashboard-msg');
+  if (!el) return;
+  const name = localStorage.getItem('portal_client_name') || '';
+  if (posts.length === 0) {
+    el.textContent = `Bonjour ${name} ! Je prépare vos prochaines publications. Revenez dans quelques heures 🕐`;
+  } else if (posts.length === 1) {
+    const date = posts[0].scheduled_at ? new Date(posts[0].scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : 'bientôt';
+    el.textContent = `Bonjour ${name} ! Votre prochain post est planifié pour le ${date}. Tout roule ! 🚀`;
+  } else {
+    el.textContent = `Bonjour ${name} ! ${posts.length} publications planifiées pour vous. Je gère tout ! 📅`;
+  }
+}
+
+// ── Aussi mettre à jour l'avatar Aria dans le header du modal ─────────────────
+function updateAriaChatAvatar() {
+  const avatarEl = document.querySelector('#modal-aria .chat-header-avatar');
+  if (avatarEl) {
+    avatarEl.innerHTML = `<img src="/aria/aria-chat.png" style="width:100%;height:100%;object-fit:contain;object-position:bottom" alt="Aria">`;
+    avatarEl.style.background = 'transparent';
+  }
+}
 
 init();
 
