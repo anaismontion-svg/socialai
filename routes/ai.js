@@ -593,5 +593,6 @@ module.exports = {
   cancelFollowUp,
   processFollowUps,
   replyToComment,
-  replyToDM
+  replyToDM,
+  getMemory   // ← exporté pour meta.js
 };

@@ -11,7 +11,8 @@ const {
   cancelFollowUp,
   processFollowUps,
   replyToComment,
-  replyToDM
+  replyToDM,
+  getMemory   // ← on exporte getMemory pour vérifier le statut
 } = require('./ai');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
@@ -22,22 +23,18 @@ const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN;
 
 // ─────────────────────────────────────────────
 // 🔁 DÉDUPLICATION
-// Cache des IDs déjà traités pour éviter
-// les doublons dus aux webhooks répétés
 // ─────────────────────────────────────────────
-const processedComments = new Set(); // commentaires déjà traités
-const processedMessages = new Set(); // DMs déjà traités
+const processedComments = new Set();
+const processedMessages = new Set();
 
-// Nettoyer le cache toutes les 2h pour éviter la saturation mémoire
 setInterval(() => {
   processedComments.clear();
   processedMessages.clear();
   console.log('🧹 Cache déduplication nettoyé');
 }, 2 * 60 * 60 * 1000);
 
-// ── Job de relance — vérifie toutes les heures ────────────────────────────────
+// ── Job de relance toutes les heures ─────────────────────────────────────────
 setInterval(async () => {
-  console.log('⏰ Vérification des relances...');
   await processFollowUps(supabase);
 }, 60 * 60 * 1000);
 processFollowUps(supabase);
@@ -60,17 +57,14 @@ router.get('/auth/meta/callback', async (req, res) => {
         code
       })
     );
-
     const { data: longToken } = await axios.get(
       `https://graph.instagram.com/access_token`,
       { params: { grant_type:'ig_exchange_token', client_secret:APP_SECRET, access_token:tokenData.access_token } }
     );
-
     const { data: igData } = await axios.get(
       `https://graph.instagram.com/v19.0/me`,
       { params: { fields:'id,name,username', access_token:longToken.access_token } }
     );
-
     const { error: upsertError } = await supabase
       .from('social_accounts')
       .upsert({
@@ -81,8 +75,6 @@ router.get('/auth/meta/callback', async (req, res) => {
         access_token:     longToken.access_token,
         token_expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
       }, { onConflict:'account_id' });
-
-    console.log('Upsert error:', upsertError);
     res.json({ success:true, account:igData.username, dbError:upsertError });
   } catch (err) {
     console.error(err.response?.data || err.message);
@@ -112,7 +104,7 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
   for (const entry of body.entry) {
     console.log('🔑 entry.id reçu:', entry.id);
 
-    // ── Récupérer le compte + infos client ──────────────────────────────────
+    // ── Récupérer le compte + infos client ────────────────────────────────
     const { data: account } = await supabase
       .from('social_accounts')
       .select('access_token, account_name, description, client_id')
@@ -136,7 +128,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
         isSoloEntrepreneur = client.solo_entrepreneur !== false;
         clientEmail        = client.email || null;
         clientPlan         = (client.plan || 'starter').toLowerCase();
-
         if (client.status === 'paused') {
           console.log(`⏸ Client en pause — ignoré`);
           continue;
@@ -144,7 +135,7 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
       }
     }
 
-    // ── DMs ──────────────────────────────────────────────────────────────────
+    // ── DMs ───────────────────────────────────────────────────────────────
     if (entry.messaging) {
       for (const event of entry.messaging) {
         if (!event.message) continue;
@@ -156,7 +147,7 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
 
         if (!messageText || senderId === entry.id) continue;
 
-        // ── DÉDUPLICATION DM ─────────────────────────────────────────────────
+        // Déduplication
         if (messageId && processedMessages.has(messageId)) {
           console.log(`⏭️ DM déjà traité (${messageId}) — ignoré`);
           continue;
@@ -165,7 +156,7 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
 
         console.log('📩 DM reçu de', senderId, ':', messageText);
 
-        // STARTER → pas de réponse aux DMs
+        // STARTER → pas de DMs
         if (clientPlan === 'starter') {
           console.log('⚡ Forfait Starter — DMs non gérés');
           continue;
@@ -174,6 +165,38 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
         try {
           await cancelFollowUp(supabase, senderId);
 
+          // ═══════════════════════════════════════════════════════════════
+          // ✅ FIX CLEF : Charger la mémoire AVANT de classifier
+          // Si la conversation est déjà en cours (gathering_info,
+          // waiting_coordinates, coordinates_received) → on passe
+          // directement à generateReply qui gère ces statuts
+          // ═══════════════════════════════════════════════════════════════
+          const memory = await getMemory(senderId, supabase);
+          console.log(`💾 Statut mémoire pour ${senderId}: ${memory.status}`);
+
+          if (memory.status === 'gathering_info' ||
+              memory.status === 'waiting_coordinates' ||
+              memory.status === 'coordinates_received') {
+            // Conversation déjà engagée → continuer le flow
+            console.log(`🔄 Continuation conversation (${memory.status})`);
+            const reply = await generateReply(
+              messageText,
+              account.account_name,
+              senderId,
+              account.access_token,
+              account.description,
+              senderUsername,
+              isSoloEntrepreneur,
+              clientEmail,
+              supabase
+            );
+            if (reply) {
+              await replyToDM(senderId, reply, account.access_token);
+            }
+            continue;
+          }
+
+          // Premier contact ou conversation normale → classifier
           const classification = await classifyMessage(messageText);
           console.log('🔍 Classification:', classification);
 
@@ -186,12 +209,16 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
               classification.categorie,
               messageText,
               senderUsername,
-              isSoloEntrepreneur
+              isSoloEntrepreneur,
+              supabase   // ← passer supabase pour persister
             );
-            if (transitionReply) await replyToDM(senderId, transitionReply, account.access_token);
+            if (transitionReply) {
+              await replyToDM(senderId, transitionReply, account.access_token);
+            }
             continue;
           }
 
+          // Réponse normale
           const reply = await generateReply(
             messageText,
             account.account_name,
@@ -200,7 +227,8 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
             account.description,
             senderUsername,
             isSoloEntrepreneur,
-            clientEmail
+            clientEmail,
+            supabase   // ← passer supabase pour persister
           );
 
           if (reply) {
@@ -215,7 +243,7 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
       }
     }
 
-    // ── Commentaires ──────────────────────────────────────────────────────────
+    // ── Commentaires ──────────────────────────────────────────────────────
     if (entry.changes) {
       for (const change of entry.changes) {
         if (change.field !== 'comments') continue;
@@ -224,7 +252,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
         const commentText = change.value?.text;
         if (!commentId || !commentText) continue;
 
-        // ── DÉDUPLICATION COMMENTAIRE ────────────────────────────────────────
         if (processedComments.has(commentId)) {
           console.log(`⏭️ Commentaire déjà traité (${commentId}) — ignoré`);
           continue;
@@ -237,7 +264,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
           const classification = await classifyMessage(commentText);
           console.log('🔍 Classification commentaire:', classification);
 
-          // Commentaire sensible → laisser sans réponse
           if (classification.besoin_humain || classification.categorie === 'plainte_grave') {
             console.log('🙋 Commentaire sensible — laissé sans réponse');
             continue;
