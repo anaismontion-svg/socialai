@@ -9,9 +9,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Pages espace client ───────────────────────────────────────────────────────
-app.get('/login.html',         (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/client.html',        (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
-app.get('/branding-setup.html',(req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
+app.get('/login.html',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/client.html',         (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
+app.get('/branding-setup.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
 app.use('/api/clients',  require('./routes/clients'));
@@ -22,6 +22,7 @@ app.use('/api/portal',   require('./routes/client-portal'));
 app.use('/api/reports',  require('./routes/reports'));
 app.use('/api/ai',       require('./routes/ai'));
 app.use('/api/branding', require('./routes/branding'));
+app.use('/api/pipeline', require('./routes/pipeline'));
 app.use('/',             require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
@@ -37,7 +38,7 @@ setInterval(processQueue,    60 * 1000);
 setInterval(checkLowContent, 6 * 60 * 60 * 1000);
 
 // ── Pipeline génération IA ────────────────────────────────────────────────────
-const { runAIPipeline } = require('./routes/ai');
+const { runAIPipeline } = require('./routes/pipeline');
 runAIPipeline();
 setInterval(runAIPipeline, 3 * 60 * 60 * 1000);
 
