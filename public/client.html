@@ -1671,82 +1671,67 @@ function createOnboardingOverlay() {
   overlay.id = 'onboarding-overlay';
   overlay.style.cssText = `
     position:fixed;inset:0;z-index:9999;
-    background:linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.92) 70%);
-    display:flex;align-items:flex-end;justify-content:center;
-    padding:0;animation:fadeIn 0.4s ease;
     pointer-events:none;
   `;
 
   overlay.innerHTML = `
     <div style="
-      background:linear-gradient(to top, #0d0d14 60%, transparent 100%);
-      width:100%;
-      display:flex;align-items:flex-end;justify-content:center;
-      padding:0 20px 32px;
+      position:fixed;bottom:24px;left:24px;
+      width:380px;max-width:calc(100vw - 48px);
+      background:#1a1a26;
+      border:1px solid rgba(167,139,250,0.4);
+      border-radius:20px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 30px rgba(167,139,250,0.15);
+      animation:slideUpBottom 0.5s ease;
+      display:flex;flex-direction:row;align-items:flex-end;
+      overflow:hidden;
       pointer-events:auto;
     ">
+      <!-- Aria à gauche -->
       <div style="
-        background:#1a1a26;
-        border:1px solid rgba(167,139,250,0.4);
-        border-radius:24px;
-        width:100%;max-width:620px;
-        box-shadow:0 -8px 40px rgba(167,139,250,0.15),0 0 0 1px rgba(167,139,250,0.1);
-        animation:slideUpBottom 0.5s ease;
-        display:flex;flex-direction:row;align-items:flex-end;
-        overflow:hidden;
-        min-height:200px;
+        width:110px;flex-shrink:0;
+        background:linear-gradient(160deg,rgba(167,139,250,0.12),rgba(77,166,255,0.06));
+        display:flex;align-items:flex-end;justify-content:center;
+        overflow:hidden;min-height:160px;
       ">
-        <!-- Aria à gauche, debout depuis le bas -->
-        <div style="
-          width:160px;flex-shrink:0;
-          background:linear-gradient(160deg,rgba(167,139,250,0.12),rgba(77,166,255,0.06));
-          display:flex;align-items:flex-end;justify-content:center;
-          position:relative;overflow:hidden;
-          min-height:220px;
-        ">
-          <img id="ob-aria-img" src="/aria/aria-special.png" style="
-            width:155px;height:auto;object-fit:contain;object-position:bottom;
-            filter:drop-shadow(0 -4px 20px rgba(167,139,250,0.6));
-            transition:opacity 0.3s ease,transform 0.3s ease;
-            display:block;margin-bottom:-2px;
-          " alt="Aria">
-          <div id="ob-steps" style="
-            position:absolute;bottom:8px;left:0;right:0;
-            display:flex;gap:4px;justify-content:center;
-          "></div>
-        </div>
+        <img id="ob-aria-img" src="/aria/aria-special.png" style="
+          width:105px;height:auto;object-fit:contain;object-position:bottom;
+          filter:drop-shadow(0 -4px 16px rgba(167,139,250,0.5));
+          transition:opacity 0.3s ease,transform 0.3s ease;
+          display:block;margin-bottom:-2px;
+        " alt="Aria">
+      </div>
 
-        <!-- Texte à droite -->
-        <div style="
-          flex:1;padding:24px 24px 24px 20px;
-          display:flex;flex-direction:column;justify-content:center;
-          background:#1a1a26;min-width:0;
-        ">
+      <!-- Texte à droite -->
+      <div style="flex:1;padding:16px 16px 16px 12px;display:flex;flex-direction:column;min-width:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div id="ob-title" style="
-            font-size:17px;font-weight:700;margin-bottom:8px;
+            font-size:14px;font-weight:700;
             color:#f5f4f0;font-family:'Bricolage Grotesque',sans-serif;
-            line-height:1.3;
+            line-height:1.3;flex:1;
           "></div>
-          <div id="ob-text" style="
-            font-size:12.5px;color:#c8c6be;line-height:1.7;
-            white-space:pre-line;margin-bottom:18px;
-          "></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="ob-cta" onclick="nextOnboardingStep()" style="
-              flex:1;padding:11px;
-              background:linear-gradient(135deg,#a78bfa,#4da6ff);
-              border:none;border-radius:10px;color:white;
-              font-size:13px;font-weight:600;cursor:pointer;
-              font-family:'Bricolage Grotesque',sans-serif;
-            "></button>
-            <button onclick="skipOnboarding()" style="
-              padding:11px 16px;background:transparent;
-              border:1px solid #3a3a50;border-radius:10px;
-              color:#7a7870;font-size:11px;cursor:pointer;
-              font-family:'Bricolage Grotesque',sans-serif;
-            ">Passer</button>
-          </div>
         </div>
+        <div id="ob-text" style="
+          font-size:11.5px;color:#c8c6be;line-height:1.65;
+          white-space:pre-line;margin-bottom:14px;
+        "></div>
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+          <button id="ob-cta" onclick="nextOnboardingStep()" style="
+            flex:1;padding:9px;
+            background:linear-gradient(135deg,#a78bfa,#4da6ff);
+            border:none;border-radius:8px;color:white;
+            font-size:12px;font-weight:600;cursor:pointer;
+            font-family:'Bricolage Grotesque',sans-serif;
+          "></button>
+          <button onclick="skipOnboarding()" style="
+            padding:9px 12px;background:transparent;
+            border:1px solid #3a3a50;border-radius:8px;
+            color:#7a7870;font-size:10px;cursor:pointer;
+            font-family:'Bricolage Grotesque',sans-serif;
+          ">Passer</button>
+        </div>
+        <!-- Indicateur d'étapes -->
+        <div id="ob-steps" style="display:flex;gap:4px;justify-content:center"></div>
       </div>
     </div>
   `;
