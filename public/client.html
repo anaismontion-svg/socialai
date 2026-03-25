@@ -261,21 +261,26 @@ textarea.form-input{resize:vertical;min-height:80px}
   .engagement-grid{grid-template-columns:repeat(2,1fr)}
   .nav-tabs{padding:0 12px}
 }
-/* ARIA WIDGET */
-.aria-widget{display:flex;align-items:flex-end;gap:16px;margin-bottom:24px;padding:16px 20px;background:linear-gradient(135deg,rgba(167,139,250,0.06),rgba(77,166,255,0.03));border:1px solid rgba(167,139,250,0.15);border-radius:var(--r2);position:relative;overflow:hidden}
-.aria-widget::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(167,139,250,0.04),transparent);pointer-events:none}
-.aria-img{width:90px;height:90px;object-fit:contain;object-position:bottom;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(167,139,250,0.3));transition:transform 0.3s ease}
-.aria-img:hover{transform:scale(1.05) translateY(-3px)}
-.aria-img.black-bg{mix-blend-mode:lighten}
-.aria-bubble{flex:1;background:var(--ink2);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r2);border-bottom-left-radius:4px;padding:12px 14px;position:relative}
-.aria-bubble::before{content:'';position:absolute;bottom:12px;left:-8px;border:4px solid transparent;border-right-color:rgba(167,139,250,0.2)}
-.aria-bubble::after{content:'';position:absolute;bottom:13px;left:-6px;border:3px solid transparent;border-right-color:var(--ink2)}
-.aria-bubble-name{font-size:10px;color:var(--purple);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.aria-bubble-text{font-size:13px;color:var(--chalk2);line-height:1.5}
-.aria-bubble-cta{margin-top:8px}
-@keyframes ariaEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.aria-widget{animation:ariaEnter 0.4s ease}
-@media(max-width:600px){.aria-img{width:64px;height:64px}.aria-bubble-text{font-size:12px}}
+/* ARIA GRANDE SUR LE CÔTÉ */
+.page-layout{display:flex;align-items:flex-start;gap:0;position:relative}
+.aria-side{width:200px;flex-shrink:0;position:sticky;top:80px;display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:20px}
+.aria-side-img{width:190px;height:auto;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(167,139,250,0.35));transition:transform 0.4s ease;animation:ariaEnter 0.5s ease}
+.aria-side-img:hover{transform:scale(1.04) translateY(-4px)}
+.aria-side-bubble{background:var(--ink2);border:1px solid rgba(167,139,250,0.25);border-radius:var(--r2);border-top-left-radius:4px;padding:10px 12px;position:relative;width:100%}
+.aria-side-bubble::before{content:'';position:absolute;top:14px;left:-8px;border:4px solid transparent;border-right-color:rgba(167,139,250,0.25)}
+.aria-side-bubble::after{content:'';position:absolute;top:15px;left:-6px;border:3px solid transparent;border-right-color:var(--ink2)}
+.aria-side-name{font-size:9px;color:var(--purple);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
+.aria-side-text{font-size:11px;color:var(--chalk3);line-height:1.5}
+.aria-side-cta{margin-top:8px}
+.content-area{flex:1;min-width:0;padding-left:20px}
+@keyframes ariaEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+/* Retirer les anciens aria-widget inline */
+.aria-widget{display:none}
+@media(max-width:768px){
+  .aria-side{display:none}
+  .content-area{padding-left:0}
+  .page-layout{display:block}
+}
 </style>
 </head>
 <body>
@@ -400,6 +405,23 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="banner-icon">⏸</div>
     <div><strong>Service suspendu</strong><br>Contactez votre community manager pour le réactiver.</div>
   </div>
+
+  <div class="page-layout">
+
+    <!-- ARIA CÔTÉ GAUCHE -->
+    <div class="aria-side" id="aria-side">
+      <img id="aria-side-img" src="/aria/aria-dashboard.png" class="aria-side-img" alt="Aria">
+      <div class="aria-side-bubble">
+        <div class="aria-side-name">✨ Aria · Votre IA</div>
+        <div class="aria-side-text" id="aria-side-text">Bonjour ! Tout se passe bien 📊</div>
+        <div class="aria-side-cta">
+          <button class="btn btn-sm btn-purple" style="font-size:10px;margin-top:6px;width:100%" onclick="openAriaChat()">💬 Me parler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="content-area">
 
   <!-- ════ TAB DASHBOARD ════ -->
   <div class="tab-content active" id="tab-dashboard">
@@ -657,6 +679,9 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
   </div>
 
+    </div><!-- fin content-area -->
+  </div><!-- fin page-layout -->
+
 </div>
 
 <div class="toast-wrap" id="toasts"></div>
@@ -705,17 +730,19 @@ async function init() {
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab)?.classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => {
     if (t.textContent.toLowerCase().includes(tab) ||
        (tab==='dashboard' && t.textContent.includes('Dashboard')) ||
        (tab==='planned'   && t.textContent.includes('Planifi')) ||
        (tab==='history'   && t.textContent.includes('Historique')) ||
        (tab==='medias'    && t.textContent.includes('médias')) ||
-       (tab==='special'   && t.textContent.includes('spécial'))) {
+       (tab==='special'   && t.textContent.includes('spécial')) ||
+       (tab==='strategie' && t.textContent.includes('Conseiller'))) {
       t.classList.add('active');
     }
   });
+  updateAriaSide(tab);
 }
 
 // ── Load Posts ────────────────────────────────────────────────────────────────
@@ -1506,28 +1533,41 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = '@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}} @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0.4}}';
 document.head.appendChild(styleSheet);
 
-// ── Message dynamique Aria sur le Dashboard ───────────────────────────────────
+// ── Aria côté — change selon l'onglet ────────────────────────────────────────
+const ARIA_TABS = {
+  dashboard: { img:'/aria/aria-dashboard.png', text:'Bonjour ! Je surveille votre compte en permanence 📊' },
+  planned:   { img:'/aria/aria-planned.png',   text:'Vos posts planifiés — cliquez pour modifier ou suggérer à l\'IA 📅' },
+  history:   { img:'/aria/aria-history.png',   text:'J\'analyse vos publications pour identifier ce qui performe 📈' },
+  medias:    { img:'/aria/aria-media.png',      text:'Uploadez vos photos — je calcule leur potentiel viral instantanément 📸' },
+  special:   { img:'/aria/aria-special.png',   text:'Un événement à annoncer ? Je prépare tout pour vous 🚀' },
+  strategie: { img:'/aria/aria-chat.png',       text:'Prête à construire votre stratégie digitale 🎯' },
+};
+
+function updateAriaSide(tab) {
+  const cfg = ARIA_TABS[tab] || ARIA_TABS.dashboard;
+  const img = document.getElementById('aria-side-img');
+  const txt = document.getElementById('aria-side-text');
+  if (img) { img.style.opacity='0'; setTimeout(()=>{img.src=cfg.img;img.style.opacity='1';},200); }
+  if (txt) txt.textContent = cfg.text;
+}
+
+// ── Message dynamique Aria Dashboard ─────────────────────────────────────────
 function updateAriaDashboardMsg() {
-  const el = document.getElementById('aria-dashboard-msg');
-  if (!el) return;
-  const name = localStorage.getItem('portal_client_name') || '';
-  if (posts.length === 0) {
-    el.textContent = `Bonjour ${name} ! Je prépare vos prochaines publications. Revenez dans quelques heures 🕐`;
-  } else if (posts.length === 1) {
-    const date = posts[0].scheduled_at ? new Date(posts[0].scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : 'bientôt';
-    el.textContent = `Bonjour ${name} ! Votre prochain post est planifié pour le ${date}. Tout roule ! 🚀`;
-  } else {
-    el.textContent = `Bonjour ${name} ! ${posts.length} publications planifiées pour vous. Je gère tout ! 📅`;
-  }
+  const txt = document.getElementById('aria-side-text');
+  if (!txt) return;
+  const name = localStorage.getItem('portal_client_name')||'';
+  const n = posts.length;
+  if (n === 0) txt.textContent = `Bonjour ${name} ! Je prépare vos prochaines publications 🕐`;
+  else if (n === 1) {
+    const d = posts[0].scheduled_at ? new Date(posts[0].scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long'}) : 'bientôt';
+    txt.textContent = `Prochain post le ${d}. Tout roule ${name} ! 🚀`;
+  } else txt.textContent = `${n} publications planifiées pour vous. Je gère tout ${name} ! 📅`;
 }
 
 // ── Aussi mettre à jour l'avatar Aria dans le header du modal ─────────────────
 function updateAriaChatAvatar() {
-  const avatarEl = document.querySelector('#modal-aria .chat-header-avatar');
-  if (avatarEl) {
-    avatarEl.innerHTML = `<img src="/aria/aria-chat.png" style="width:100%;height:100%;object-fit:contain;object-position:bottom" alt="Aria">`;
-    avatarEl.style.background = 'transparent';
-  }
+  const el = document.querySelector('#modal-aria [style*="gradient"]');
+  if (el) { el.innerHTML=`<img src="/aria/aria-chat.png" style="width:100%;height:100%;object-fit:contain" alt="Aria">`; el.style.background='transparent'; }
 }
 
 init();
