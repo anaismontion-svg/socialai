@@ -30,39 +30,106 @@ async function sendEmail(to, subject, html) {
 }
 
 // ─────────────────────────────────────────────
-// 💾 MÉMOIRE DE CONVERSATION PAR EXPÉDITEUR
+// 💾 MÉMOIRE PERSISTANTE — SUPABASE
+// Survit aux redémarrages Railway
 // ─────────────────────────────────────────────
-const conversationMemory = {};
+const memoryCache = {}; // Cache RAM pour la session courante
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-function getMemory(senderId) {
-  if (!conversationMemory[senderId]) {
-    conversationMemory[senderId] = {
-      firstContactAt:        null,
-      lastSeenAt:            null,
-      isFirstContact:        true,
-      // 'normal' | 'gathering_info' | 'waiting_coordinates' | 'coordinates_received'
-      status:                'normal',
-      reason:                null,
-      originalMessage:       null,
-      vouvoiement:           true,
-      firstName:             null,
-      firstNameConfirmed:    false,
-      phoneNumber:           null,
-      gatheringTurns:        0,       // nb de tours en mode gathering_info
-      history:               [],
-      knownFacts:            []
-    };
+// Charger depuis Supabase (ou créer si inexistant)
+async function getMemory(senderId, supabase = null) {
+  // 1. Vérifier le cache RAM d'abord (évite trop de requêtes)
+  if (memoryCache[senderId]) return memoryCache[senderId];
+
+  // 2. Charger depuis Supabase si disponible
+  if (supabase) {
+    try {
+      const { data } = await supabase
+        .from('dm_memory')
+        .select('*')
+        .eq('sender_id', senderId)
+        .single();
+
+      if (data) {
+        const memory = {
+          firstContactAt:     data.first_contact_at,
+          lastSeenAt:         data.last_seen_at,
+          isFirstContact:     data.is_first_contact,
+          status:             data.status || 'normal',
+          reason:             data.reason,
+          originalMessage:    data.original_message,
+          vouvoiement:        data.vouvoiement !== false,
+          firstName:          data.first_name,
+          firstNameConfirmed: data.first_name_confirmed || false,
+          phoneNumber:        data.phone_number,
+          gatheringTurns:     data.gathering_turns || 0,
+          history:            data.history || [],
+          knownFacts:         data.known_facts || [],
+          _supabase:          supabase,
+          _senderId:          senderId
+        };
+        memoryCache[senderId] = memory;
+        return memory;
+      }
+    } catch(e) { /* Pas encore en base, on crée */ }
   }
-  return conversationMemory[senderId];
+
+  // 3. Nouvelle mémoire vierge
+  const memory = {
+    firstContactAt:     null,
+    lastSeenAt:         null,
+    isFirstContact:     true,
+    status:             'normal',
+    reason:             null,
+    originalMessage:    null,
+    vouvoiement:        true,
+    firstName:          null,
+    firstNameConfirmed: false,
+    phoneNumber:        null,
+    gatheringTurns:     0,
+    history:            [],
+    knownFacts:         [],
+    _supabase:          supabase,
+    _senderId:          senderId
+  };
+  memoryCache[senderId] = memory;
+  return memory;
+}
+
+// Sauvegarder en Supabase après chaque interaction
+async function saveMemory(memory) {
+  const supabase = memory._supabase;
+  const senderId = memory._senderId;
+  if (!supabase || !senderId) return;
+
+  try {
+    await supabase.from('dm_memory').upsert({
+      sender_id:            senderId,
+      first_contact_at:     memory.firstContactAt,
+      last_seen_at:         memory.lastSeenAt,
+      is_first_contact:     memory.isFirstContact,
+      status:               memory.status,
+      reason:               memory.reason,
+      original_message:     memory.originalMessage,
+      vouvoiement:          memory.vouvoiement,
+      first_name:           memory.firstName,
+      first_name_confirmed: memory.firstNameConfirmed,
+      phone_number:         memory.phoneNumber,
+      gathering_turns:      memory.gatheringTurns,
+      history:              memory.history.slice(-20), // garder les 20 derniers
+      known_facts:          memory.knownFacts,
+      updated_at:           new Date().toISOString()
+    }, { onConflict: 'sender_id' });
+  } catch(e) {
+    console.error('❌ Erreur sauvegarde mémoire:', e.message);
+  }
 }
 
 // ─────────────────────────────────────────────
 // ⏱️ TIMING DU CONTACT
 // ─────────────────────────────────────────────
-function getContactTiming(senderId) {
-  const now    = new Date();
-  const memory = getMemory(senderId);
+function getContactTiming(memory) {
+  const now = new Date();
   if (memory.isFirstContact) {
     memory.isFirstContact = false;
     memory.firstContactAt = now;
@@ -211,15 +278,16 @@ Retourne UNIQUEMENT la réponse.`,
 // ─────────────────────────────────────────────
 async function generateReply(
   messageText,
-  accountName     = '',
-  senderId        = '',
-  accessToken     = '',
+  accountName        = '',
+  senderId           = '',
+  accessToken        = '',
   accountDescription = '',
-  senderUsername  = '',
+  senderUsername     = '',
   isSoloEntrepreneur = true,
-  clientEmail     = null
+  clientEmail        = null,
+  supabase           = null
 ) {
-  const memory = getMemory(senderId);
+  const memory = await getMemory(senderId, supabase);
 
   // Vouvoiement/tutoiement
   if (/\b(tu|toi|ton|ta|tes|t'|t'as|t'es|vas-y|fais)\b/i.test(messageText))
@@ -248,24 +316,16 @@ async function generateReply(
       .join('\n');
     console.log(`📨 Coordonnées reçues de ${senderId} — envoi email résumé`);
     await sendEmailSummary(
-      {
-        senderId,
-        firstName:           memory.firstName,
-        originalMessage:     memory.originalMessage,
-        accountName,
-        conversationHistory: historyText,
-        knownFacts:          memory.knownFacts
-      },
-      memory.reason,
-      messageText,
-      clientEmail
+      { senderId, firstName:memory.firstName, originalMessage:memory.originalMessage, accountName, conversationHistory:historyText, knownFacts:memory.knownFacts },
+      memory.reason, messageText, clientEmail
     );
     const v   = memory.vouvoiement !== false;
     const rep = isSoloEntrepreneur
       ? `Merci beaucoup ! 😊\n\nJe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`
       : `Merci beaucoup ! 😊\n\nNotre équipe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`;
-    memory.history.push({ role:'user',      content:messageText });
+    memory.history.push({ role:'user', content:messageText });
     memory.history.push({ role:'assistant', content:rep });
+    await saveMemory(memory);
     await delay(2000);
     return rep;
   }
@@ -276,14 +336,12 @@ async function generateReply(
     return null;
   }
 
-  // ── STATUT : gathering_info — on continue à collecter des infos
-  // après 2 échanges on demande les coordonnées
+  // ── STATUT : gathering_info — collecte d'infos
   if (memory.status === 'gathering_info') {
     memory.gatheringTurns++;
     memory.history.push({ role:'user', content:messageText });
 
     if (memory.gatheringTurns >= 2) {
-      // On a assez d'infos, on passe à la demande de coordonnées
       memory.status = 'waiting_coordinates';
       const v = memory.vouvoiement !== false;
       const phoneRequest = v
@@ -294,16 +352,18 @@ async function generateReply(
         : `Notre équipe reviendra vers ${v ? 'vous' : 'toi'} au plus vite.`;
       const rep = `${phoneRequest}\n\n${suite}`;
       memory.history.push({ role:'assistant', content:rep });
+      await saveMemory(memory);
       await delay(2000);
       return rep;
     }
 
-    // Continuer à collecter des infos avec Claude
-    return await generateGatheringReply(memory, messageText, accountName, accountDescription, isSoloEntrepreneur);
+    const rep = await generateGatheringReply(memory, messageText, accountName, accountDescription, isSoloEntrepreneur);
+    await saveMemory(memory);
+    return rep;
   }
 
-  // ── Génération normale ────────────────────────────────────────────────────
-  const timing   = getContactTiming(senderId);
+  // ── Génération normale ──────────────────────────────────────────────────────
+  const timing   = getContactTiming(memory);
   const greeting = buildGreeting(timing, memory, senderUsername);
   const v        = memory.vouvoiement !== false;
 
@@ -313,9 +373,7 @@ async function generateReply(
   const knownInfoText = knownInfo.length ? `\nINFOS DÉJÀ CONNUES :\n${knownInfo.join('\n')}\n` : '';
 
   const systemPrompt = `Tu es la community manager du compte Instagram @${accountName}.
-${isSoloEntrepreneur
-  ? 'Entreprise individuelle. Utilise toujours "je", jamais "notre équipe".'
-  : 'Cette entreprise a une équipe.'}
+${isSoloEntrepreneur ? 'Entreprise individuelle. Utilise "je", jamais "notre équipe".' : 'Cette entreprise a une équipe.'}
 Contexte : ${accountDescription || 'Compte Instagram professionnel'}
 ${knownInfoText}
 RÈGLES :
@@ -327,18 +385,15 @@ RÈGLES :
 IMPORTANT : Ne commence JAMAIS par une salutation ni "Merci pour votre message" — déjà géré.`;
 
   const msgs = [...memory.history.slice(-10), { role:'user', content:messageText }];
-
   const response = await anthropic.messages.create({
-    model:       'claude-sonnet-4-20250514',
-    max_tokens:  350,
-    temperature: 1,
-    system:      systemPrompt,
-    messages:    msgs
+    model:'claude-sonnet-4-20250514', max_tokens:350, temperature:1,
+    system:systemPrompt, messages:msgs
   });
 
   const body = response.content[0].text;
-  memory.history.push({ role:'user',      content:messageText });
+  memory.history.push({ role:'user', content:messageText });
   memory.history.push({ role:'assistant', content:body });
+  await saveMemory(memory);
 
   await delay(body.length > 200 ? 3000 : Math.random() > 0.5 ? 2000 : 1000);
   return greeting + body;
@@ -416,40 +471,39 @@ async function generateHumanNeededReply(
   reason             = '',
   originalMessage    = '',
   senderUsername     = '',
-  isSoloEntrepreneur = true
+  isSoloEntrepreneur = true,
+  supabase           = null
 ) {
-  const memory = getMemory(senderId);
+  const memory = await getMemory(senderId, supabase);
   if (/\b(tu|toi|ton|ta|tes|t'|t'as|t'es)\b/i.test(originalMessage))
     memory.vouvoiement = false;
 
-  // On passe en mode "collecte d'infos" — pas directement aux coordonnées
   memory.status          = 'gathering_info';
   memory.reason          = reason;
   memory.originalMessage = originalMessage;
   memory.gatheringTurns  = 0;
 
-  const timing   = getContactTiming(senderId);
+  const timing   = getContactTiming(memory);
   const greeting = buildGreeting(timing, memory, senderUsername);
   const v        = memory.vouvoiement !== false;
 
   await delay(2000);
 
-  // Première réponse : accuser réception + première question selon la raison
   const firstQuestionByReason = {
-    partenariat: `C'est avec plaisir que j'écoute ${v ? 'votre' : 'ta'} proposition ! ✨\n\nQuel type de collaboration ${v ? 'avez-vous' : 'as-tu'} en tête ?`,
-    liste_attente: `Bien sûr, je serais ravie de ${v ? 'vous' : 'te'} mettre sur la liste ! 🐱\n\n${v ? 'Vous cherchez' : 'Tu cherches'} un chaton pour quelle période environ ?`,
-    opportunite_commerciale: `Merci beaucoup pour ce contact ! ✨\n\nEst-ce que ${v ? 'vous pouvez' : 'tu peux'} m'en dire un peu plus sur ${v ? 'votre' : 'ton'} projet ?`,
-    question_personnelle: `Bien sûr, je suis là ! 😊\n\nDe quoi s'agit-il ?`,
-    plainte_grave: `Je suis vraiment désolée d'entendre ça. 😔\n\nEst-ce que ${v ? 'vous pouvez' : 'tu peux'} me donner plus de détails sur ce qui s'est passé ?`,
-    default: `Avec plaisir ! ✨\n\n${v ? 'Vous pouvez' : 'Tu peux'} m'en dire plus ?`
+    partenariat:             `C'est avec plaisir que j'écoute ${v?'votre':'ta'} proposition ! ✨\n\nQuel type de collaboration ${v?'avez-vous':'as-tu'} en tête ?`,
+    liste_attente:           `Bien sûr, je serais ravie de ${v?'vous':'te'} mettre sur la liste ! 🐱\n\n${v?'Vous cherchez':'Tu cherches'} un chaton pour quelle période environ ?`,
+    opportunite_commerciale: `Merci beaucoup pour ce contact ! ✨\n\nEst-ce que ${v?'vous pouvez':'tu peux'} m'en dire un peu plus sur ${v?'votre':'ton'} projet ?`,
+    question_personnelle:    `Bien sûr, je suis là ! 😊\n\nDe quoi s'agit-il ?`,
+    plainte_grave:           `Je suis vraiment désolée d'entendre ça. 😔\n\nEst-ce que ${v?'vous pouvez':'tu peux'} me donner plus de détails ?`,
+    default:                 `Avec plaisir ! ✨\n\n${v?'Vous pouvez':'Tu peux'} m'en dire plus ?`
   };
 
   const firstQuestion = firstQuestionByReason[reason] || firstQuestionByReason.default;
-  // greeting = "Bonjour,\n\n" — corps commence directement par la réaction + question
   const reponse = `${greeting}${firstQuestion}`;
 
   memory.history.push({ role:'user',      content:originalMessage });
   memory.history.push({ role:'assistant', content:reponse });
+  await saveMemory(memory);
   return reponse;
 }
 
