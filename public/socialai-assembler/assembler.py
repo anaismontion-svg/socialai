@@ -1,24 +1,21 @@
 # assembler.py — Microservice Flask de génération de visuels Instagram
-# Déployé séparément sur Railway, appelé par Node via HTTP
+# Formats : single, story, carousel, citation
 
 from flask import Flask, request, jsonify
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 import numpy as np
 import requests
-import tempfile
 import os
-import json
-import boto3
+import textwrap
 from io import BytesIO
 from supabase import create_client
 
 app = Flask(__name__)
 
-# ── Config ────────────────────────────────────────────────────────────────────
-SUPABASE_URL     = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY     = os.environ.get('SUPABASE_SERVICE_KEY')
-FONT_BASE        = '/app/fonts/'
-DEFAULT_FONTS    = {
+SUPABASE_URL  = os.environ.get('SUPABASE_URL')
+SUPABASE_KEY  = os.environ.get('SUPABASE_SERVICE_KEY')
+FONT_BASE     = '/app/fonts/'
+DEFAULT_FONTS = {
     'Lora-Italic':    'Lora-Italic-Variable.ttf',
     'Lora-Regular':   'Lora-Variable.ttf',
     'Poppins-Light':  'Poppins-Light.ttf',
@@ -50,19 +47,17 @@ def download_image(url):
     return Image.open(BytesIO(r.content)).convert('RGB')
 
 def load_logo(url, width, style='thick'):
-    r = requests.get(url, timeout=15)
+    r    = requests.get(url, timeout=15)
     logo = Image.open(BytesIO(r.content)).convert('RGBA')
     arr  = np.array(logo)
-    # Détourer le fond noir
     rc, g, b = arr[:,:,0], arr[:,:,1], arr[:,:,2]
     arr[:,:,3] = np.where((rc < 80) & (g < 80) & (b < 80), 0, arr[:,:,3])
     arr[:,:,0] = np.where(arr[:,:,3]>10, 255, 0)
     arr[:,:,1] = np.where(arr[:,:,3]>10, 255, 0)
     arr[:,:,2] = np.where(arr[:,:,3]>10, 255, 0)
-    logo = Image.fromarray(arr, 'RGBA')
-    # Épaisseur du trait
+    logo  = Image.fromarray(arr, 'RGBA')
     dilate = {'thick': 6, 'normal': 3, 'thin': 1}.get(style, 3)
-    alpha = logo.split()[3]
+    alpha  = logo.split()[3]
     for _ in range(dilate):
         alpha = alpha.filter(ImageFilter.MaxFilter(3))
     logo.putalpha(alpha)
@@ -74,8 +69,16 @@ def load_logo(url, width, style='thick'):
     lw, lh = logo.size
     return logo.resize((width, int(lh * width / lw)), Image.LANCZOS)
 
+def load_logo_dark(url, width, style='thick', color=(60, 25, 35)):
+    logo = load_logo(url, width, style)
+    arr  = np.array(logo)
+    arr[:,:,0] = np.where(arr[:,:,3]>10, color[0], 0)
+    arr[:,:,1] = np.where(arr[:,:,3]>10, color[1], 0)
+    arr[:,:,2] = np.where(arr[:,:,3]>10, color[2], 0)
+    return Image.fromarray(arr, 'RGBA')
+
 def smart_crop(img, target_w, target_h):
-    pw, ph = img.size
+    pw, ph    = img.size
     tgt_ratio = target_w / target_h
     src_ratio = pw / ph
     if src_ratio > tgt_ratio:
@@ -84,25 +87,24 @@ def smart_crop(img, target_w, target_h):
         img   = img.crop((left, 0, left + new_w, ph))
     else:
         new_h = int(pw / tgt_ratio)
-        # Portrait → prendre depuis le haut (visage en haut)
-        top = 0 if ph > pw else (ph - new_h) // 2
-        top = min(top, ph - new_h)
-        img = img.crop((0, top, pw, top + new_h))
+        top   = 0 if ph > pw else (ph - new_h) // 2
+        top   = min(top, ph - new_h)
+        img   = img.crop((0, top, pw, top + new_h))
     return img.resize((target_w, target_h), Image.LANCZOS)
 
 def add_gradient(img, start_pct, max_alpha, color=(10,10,10)):
     W, H = img.size
-    ov = Image.new('RGBA', (W, H), (0,0,0,0))
-    d  = ImageDraw.Draw(ov)
+    ov   = Image.new('RGBA', (W, H), (0,0,0,0))
+    d    = ImageDraw.Draw(ov)
     for y in range(int(H * start_pct), H):
         a = int(max_alpha * (y - H * start_pct) / (H * (1 - start_pct)))
         d.line([(0,y),(W,y)], fill=(*color, a))
     return Image.alpha_composite(img.convert('RGBA'), ov).convert('RGB')
 
 def add_gradient_top(img, end_pct, max_alpha, color):
-    W, H = img.size
-    ov = Image.new('RGBA', (W, H), (0,0,0,0))
-    d  = ImageDraw.Draw(ov)
+    W, H      = img.size
+    ov        = Image.new('RGBA', (W, H), (0,0,0,0))
+    d         = ImageDraw.Draw(ov)
     fade_zone = int(H * end_pct)
     for y in range(fade_zone):
         a = int(max_alpha * (1 - y / fade_zone) ** 2.2)
@@ -114,22 +116,10 @@ def paste_layer(canvas, layer, x, y):
     c.paste(layer, (x, y), layer)
     return c.convert('RGB')
 
-def upload_to_supabase(img, filename, client_id):
-    buf = BytesIO()
-    img.save(buf, format='JPEG', quality=95)
-    buf.seek(0)
-    path = f"{client_id}/generated/{filename}"
-    supabase.storage.from_('media').upload(
-        path, buf.read(),
-        file_options={"content-type": "image/jpeg", "upsert": "true"}
-    )
-    result = supabase.storage.from_('media').get_public_url(path)
-    return result
-
-def wrap_text(text, font, max_width, draw):
-    words = text.split()
-    lines = []
-    current = ''
+def draw_wrapped_text(draw, text, font, max_width, x, y, fill, line_spacing=1.4):
+    words    = text.split()
+    lines    = []
+    current  = ''
     for word in words:
         test = f"{current} {word}".strip()
         bbox = draw.textbbox((0,0), test, font=font)
@@ -141,13 +131,28 @@ def wrap_text(text, font, max_width, draw):
             current = word
     if current:
         lines.append(current)
-    return lines
+    _, _, _, h = draw.textbbox((0,0), 'A', font=font)
+    line_h = int(h * line_spacing)
+    for i, line in enumerate(lines):
+        draw.text((x, y + i * line_h), line, font=font, fill=fill)
+    return y + len(lines) * line_h
+
+def upload_to_supabase(img, filename, client_id):
+    buf = BytesIO()
+    img.save(buf, format='JPEG', quality=95)
+    buf.seek(0)
+    path = f"{client_id}/generated/{filename}"
+    supabase.storage.from_('media').upload(
+        path, buf.read(),
+        file_options={"content-type": "image/jpeg", "upsert": "true"}
+    )
+    return supabase.storage.from_('media').get_public_url(path)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FORMAT 1 — SINGLE POST 1080×1080
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_single(photo_url, logo_url, branding, titre, caption):
-    W, H = 1080, 1080
+    W, H    = 1080, 1080
     palette = branding['palette']
     primary = hex_to_rgb(palette['primary'])
     light   = hex_to_rgb(palette.get('text_light', '#ffffff'))
@@ -157,33 +162,26 @@ def generate_single(photo_url, logo_url, branding, titre, caption):
     photo  = ImageEnhance.Color(photo).enhance(0.88)
     canvas = smart_crop(photo, W, H)
     canvas = add_gradient(canvas, 0.46, 215)
+    draw   = ImageDraw.Draw(canvas)
 
-    draw = ImageDraw.Draw(canvas)
-
-    # Cadre fin couleur primaire
     if branding.get('frame_border', True):
         draw.rectangle([(18,18),(W-18,H-18)], outline=primary, width=1)
 
-    # Logo
-    logo_pos  = branding.get('logo_position', 'bottom-right')
-    logo_size = 185
-    logo = load_logo(logo_url, logo_size, branding.get('logo_style','thick'))
-    if logo_pos == 'bottom-right':
-        lx, ly = W - logo.width - 40, H - logo.height - 40
-    elif logo_pos == 'bottom-left':
-        lx, ly = 40, H - logo.height - 40
-    elif logo_pos == 'top-right':
-        lx, ly = W - logo.width - 40, 40
-    else:  # top-left
-        lx, ly = 36, 32
+    logo_pos = branding.get('logo_position', 'bottom-right')
+    logo     = load_logo(logo_url, 185, branding.get('logo_style','thick'))
+    positions = {
+        'bottom-right': (W - logo.width - 40, H - logo.height - 40),
+        'bottom-left':  (40, H - logo.height - 40),
+        'top-right':    (W - logo.width - 40, 40),
+        'top-left':     (36, 32),
+    }
+    lx, ly = positions.get(logo_pos, positions['bottom-right'])
     canvas = paste_layer(canvas, logo, lx, ly)
-    draw = ImageDraw.Draw(canvas)
+    draw   = ImageDraw.Draw(canvas)
 
-    # Fonts
     ft = get_font(branding['fonts']['titre'], 56)
     fc = get_font(branding['fonts']['corps'], 29)
 
-    # Texte — remonter depuis le bas
     caption2_y = H - 82
     caption1_y = caption2_y - 46
     sep_y      = caption1_y - 28
@@ -191,20 +189,14 @@ def generate_single(photo_url, logo_url, branding, titre, caption):
 
     draw.text((56, titre_y), titre, font=ft, fill=primary)
     draw.line([(56, sep_y),(200, sep_y)], fill=primary, width=1)
-
-    # Caption sur 2 lignes max
-    lines = wrap_text(caption, fc, W - 120, draw)
-    for i, line in enumerate(lines[:2]):
-        draw.text((56, caption1_y + i * 44), line, font=fc,
-                  fill=light if i == 0 else taupe)
-
+    draw_wrapped_text(draw, caption, fc, W - 120, 56, caption1_y, light)
     return canvas
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FORMAT 2 — STORY 1080×1920
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_story(photo_url, logo_url, branding, titre, caption, tagline):
-    W, H = 1080, 1920
+    W, H    = 1080, 1920
     palette = branding['palette']
     primary = hex_to_rgb(palette['primary'])
     light   = hex_to_rgb(palette.get('text_light', '#ffffff'))
@@ -213,32 +205,22 @@ def generate_story(photo_url, logo_url, branding, titre, caption, tagline):
     photo  = download_image(photo_url)
     canvas = smart_crop(photo, W, H)
 
-    # Dégradé couleur primaire en haut
     if branding.get('gradient_top', True):
         canvas = add_gradient_top(canvas, 0.38, 115, primary)
-
-    # Dégradé noir en bas
     canvas = add_gradient(canvas, 0.56, 220)
 
-    # Logo en haut à gauche
     logo = load_logo(logo_url, 320, branding.get('logo_style','thick'))
     canvas = paste_layer(canvas, logo, 36, 32)
 
     draw = ImageDraw.Draw(canvas)
-    ft = get_font(branding['fonts']['titre'], 66)
-    fc = get_font(branding['fonts']['corps'], 34)
-    fg = get_font(branding['fonts']['corps'], 27)
+    ft   = get_font(branding['fonts']['titre'], 66)
+    fc   = get_font(branding['fonts']['corps'], 34)
+    fg   = get_font(branding['fonts']['corps'], 27)
 
     draw.line([(80, H-372),(260, H-372)], fill=(255,255,255), width=1)
-    draw.text((80, H-354), titre,                    font=ft, fill=primary)
-    draw.text((80, H-272), caption,                  font=fc, fill=light)
-    lines = wrap_text(caption, fc, W - 160, draw)
-    y = H - 272
-    for line in lines[:2]:
-        draw.text((80, y), line, font=fc, fill=light)
-        y += 52
-    draw.text((80, H-160), tagline, font=fg, fill=muted)
-
+    draw.text((80, H-354), titre, font=ft, fill=primary)
+    y = draw_wrapped_text(draw, caption, fc, W - 160, 80, H-272, light)
+    draw.text((80, y + 20), tagline, font=fg, fill=muted)
     return canvas
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +228,7 @@ def generate_story(photo_url, logo_url, branding, titre, caption, tagline):
 # ─────────────────────────────────────────────────────────────────────────────
 def generate_carousel_slide(photo_url, logo_url, branding, titre, caption,
                              slide_num, total_slides):
-    W, H = 1080, 1080
+    W, H    = 1080, 1080
     palette = branding['palette']
     primary = hex_to_rgb(palette['primary'])
     light   = hex_to_rgb(palette.get('text_light', '#ffffff'))
@@ -256,22 +238,19 @@ def generate_carousel_slide(photo_url, logo_url, branding, titre, caption,
     photo  = ImageEnhance.Color(photo).enhance(0.88)
     canvas = smart_crop(photo, W, H)
     canvas = add_gradient(canvas, 0.48, 205)
-
-    draw = ImageDraw.Draw(canvas)
+    draw   = ImageDraw.Draw(canvas)
 
     if branding.get('frame_border', True):
         draw.rectangle([(18,18),(W-18,H-18)], outline=primary, width=1)
 
-    # Numéro de slide
     fn = get_font(branding['fonts']['corps'], 22)
     draw.rounded_rectangle([(36,36),(130,70)], radius=14, fill=(13,13,13,170))
     draw.text((83, 53), f"{slide_num} / {total_slides}",
               font=fn, fill=primary, anchor='mm')
 
-    # Logo
-    logo = load_logo(logo_url, 185, branding.get('logo_style','thick'))
+    logo   = load_logo(logo_url, 185, branding.get('logo_style','thick'))
     canvas = paste_layer(canvas, logo, W - logo.width - 40, H - logo.height - 40)
-    draw = ImageDraw.Draw(canvas)
+    draw   = ImageDraw.Draw(canvas)
 
     ft = get_font(branding['fonts']['titre'], 52)
     fc = get_font(branding['fonts']['corps'], 30)
@@ -283,12 +262,106 @@ def generate_carousel_slide(photo_url, logo_url, branding, titre, caption,
 
     draw.text((56, titre_y), titre, font=ft, fill=primary)
     draw.line([(56, sep_y),(200, sep_y)], fill=primary, width=1)
+    draw_wrapped_text(draw, caption, fc, W - 120, 56, caption1_y, light)
+    return canvas
 
-    lines = wrap_text(caption, fc, W - 120, draw)
-    for i, line in enumerate(lines[:2]):
-        draw.text((56, caption1_y + i * 44), line, font=fc,
-                  fill=light if i == 0 else taupe)
+# ─────────────────────────────────────────────────────────────────────────────
+# FORMAT 4 — CITATION 1080×1080
+# Fond coloré uni + citation générée par IA — pas de photo
+# ─────────────────────────────────────────────────────────────────────────────
+def generate_citation(logo_url, branding, citation_text, sous_titre=None,
+                       variant=0):
+    W, H    = 1080, 1080
+    palette = branding['palette']
 
+    # Alterner entre 3 variantes de fond selon le variant
+    bg_options = [
+        palette.get('dark',      '#0d0d0d'),   # variant 0 — fond sombre
+        palette.get('primary',   '#e8b4b8'),   # variant 1 — fond couleur primaire
+        palette.get('light',     '#f5f0eb'),   # variant 2 — fond clair
+    ]
+    text_options = [
+        palette.get('text_light', '#ffffff'),  # texte sur sombre
+        palette.get('text_dark',  '#2c1a1e'),  # texte sur primaire
+        palette.get('text_dark',  '#2c1a1e'),  # texte sur clair
+    ]
+    accent_options = [
+        palette.get('primary',   '#e8b4b8'),   # accent sur sombre
+        palette.get('dark',      '#0d0d0d'),   # accent sur primaire
+        palette.get('primary',   '#e8b4b8'),   # accent sur clair
+    ]
+
+    v      = variant % 3
+    bg_rgb = hex_to_rgb(bg_options[v])
+    tx_rgb = hex_to_rgb(text_options[v])
+    ac_rgb = hex_to_rgb(accent_options[v])
+
+    # Fond uni
+    canvas = Image.new('RGB', (W, H), bg_rgb)
+    draw   = ImageDraw.Draw(canvas)
+
+    # Cadre fin en accent
+    draw.rectangle([(30,30),(W-30,H-30)], outline=ac_rgb, width=1)
+
+    # Guillemets décoratifs grands
+    fq = get_font(branding['fonts']['titre'], 180)
+    draw.text((60, 20), '\u201c', font=fq, fill=(*ac_rgb, 40))
+
+    # Citation — centrée verticalement
+    ft       = get_font(branding['fonts']['titre'], 58)
+    fc       = get_font(branding['fonts']['corps'], 30)
+    max_w    = W - 160
+
+    # Calculer hauteur totale pour centrage
+    words    = citation_text.split()
+    lines    = []
+    current  = ''
+    for word in words:
+        test = f"{current} {word}".strip()
+        bbox = draw.textbbox((0,0), test, font=ft)
+        if bbox[2] - bbox[0] <= max_w:
+            current = test
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+
+    _, _, _, lh = draw.textbbox((0,0), 'A', font=ft)
+    line_h     = int(lh * 1.5)
+    total_h    = len(lines) * line_h
+    start_y    = (H - total_h) // 2 - 40
+
+    # Dessiner chaque ligne centrée
+    for i, line in enumerate(lines):
+        bbox = draw.textbbox((0,0), line, font=ft)
+        lw   = bbox[2] - bbox[0]
+        x    = (W - lw) // 2
+        draw.text((x, start_y + i * line_h), line, font=ft, fill=tx_rgb)
+
+    # Ligne décorative sous la citation
+    sep_y = start_y + total_h + 30
+    draw.line([(W//2 - 60, sep_y),(W//2 + 60, sep_y)], fill=ac_rgb, width=1)
+
+    # Sous-titre (tagline ou nom client)
+    if sous_titre:
+        bbox = draw.textbbox((0,0), sous_titre, font=fc)
+        sw   = bbox[2] - bbox[0]
+        draw.text(((W - sw)//2, sep_y + 20), sous_titre, font=fc,
+                  fill=(*tx_rgb[:3], 180) if len(tx_rgb) == 3 else tx_rgb)
+
+    # Logo — couleur adaptée au fond
+    if v == 0:
+        logo = load_logo(logo_url, 180, branding.get('logo_style','thick'))
+    else:
+        dark_color = hex_to_rgb(palette.get('dark', '#0d0d0d'))
+        logo = load_logo_dark(logo_url, 180, branding.get('logo_style','thick'),
+                              color=dark_color)
+
+    logo_x = (W - logo.width) // 2
+    logo_y = H - logo.height - 50
+    canvas = paste_layer(canvas, logo, logo_x, logo_y)
     return canvas
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -299,51 +372,54 @@ def assemble():
     try:
         data        = request.json
         client_id   = data['client_id']
-        format_type = data['format']      # 'single' | 'story' | 'carousel'
-        photo_urls  = data['photo_urls']  # liste d'URLs
+        format_type = data['format']
+        photo_urls  = data.get('photo_urls', [])
         logo_url    = data['logo_url']
-        branding    = data['branding']    # JSON complet du branding client
-        titre       = data['titre']
-        caption     = data['caption']
+        branding    = data['branding']
+        titre       = data.get('titre', '')
+        caption     = data.get('caption', '')
         tagline     = data.get('tagline', branding.get('tagline', ''))
+        titres      = data.get('titres', [titre])
+        captions    = data.get('captions', [caption])
+        citation    = data.get('citation_text', '')
+        sous_titre  = data.get('sous_titre', tagline)
+        variant     = data.get('variant', 0)
 
+        import time
+        ts          = int(time.time())
         output_urls = []
 
         if format_type == 'single':
             img = generate_single(photo_urls[0], logo_url, branding, titre, caption)
-            url = upload_to_supabase(img, f"single_{client_id}_{int(__import__('time').time())}.jpg", client_id)
-            output_urls.append(url)
+            output_urls.append(upload_to_supabase(img, f"single_{client_id}_{ts}.jpg", client_id))
 
         elif format_type == 'story':
             img = generate_story(photo_urls[0], logo_url, branding, titre, caption, tagline)
-            url = upload_to_supabase(img, f"story_{client_id}_{int(__import__('time').time())}.jpg", client_id)
-            output_urls.append(url)
+            output_urls.append(upload_to_supabase(img, f"story_{client_id}_{ts}.jpg", client_id))
 
         elif format_type == 'carousel':
             total = len(photo_urls)
             for i, photo_url in enumerate(photo_urls):
-                # Titre différent par slide — l'IA peut en envoyer plusieurs
-                slide_titre = data.get('titres', [titre] * total)[i]
-                slide_cap   = data.get('captions', [caption] * total)[i]
                 img = generate_carousel_slide(
                     photo_url, logo_url, branding,
-                    slide_titre, slide_cap,
+                    titres[i] if i < len(titres) else titre,
+                    captions[i] if i < len(captions) else caption,
                     i + 1, total
                 )
-                url = upload_to_supabase(
-                    img,
-                    f"carousel_{client_id}_{i+1}_{int(__import__('time').time())}.jpg",
-                    client_id
-                )
-                output_urls.append(url)
+                output_urls.append(upload_to_supabase(
+                    img, f"carousel_{client_id}_{i+1}_{ts}.jpg", client_id))
+
+        elif format_type == 'citation':
+            img = generate_citation(logo_url, branding, citation, sous_titre, variant)
+            output_urls.append(upload_to_supabase(img, f"citation_{client_id}_{ts}.jpg", client_id))
 
         return jsonify({ 'success': True, 'urls': output_urls })
 
     except Exception as e:
-        print(f"❌ Erreur assembleur: {e}")
+        import traceback
+        print(f"❌ Erreur assembleur: {e}\n{traceback.format_exc()}")
         return jsonify({ 'success': False, 'error': str(e) }), 500
 
-# ── Health check ──────────────────────────────────────────────────────────────
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({ 'status': 'ok' })
