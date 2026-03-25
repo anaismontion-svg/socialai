@@ -191,6 +191,39 @@ textarea.form-input{resize:vertical;min-height:80px}
 .score-fill{height:100%;border-radius:3px}
 .score-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0}
 
+/* CHAT STRATÉGIQUE */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:500px;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--rose));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.chat-name{font-size:14px;font-weight:600}
+.chat-desc{font-size:11px;color:var(--chalk3)}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.chat-msg{display:flex;gap:10px;align-items:flex-start;max-width:85%}
+.chat-msg.user{flex-direction:row-reverse;align-self:flex-end}
+.chat-msg-avatar{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+.chat-msg.ai .chat-msg-avatar{background:linear-gradient(135deg,var(--purple),var(--rose))}
+.chat-msg.user .chat-msg-avatar{background:var(--ink3);border:1px solid var(--border)}
+.chat-bubble{padding:12px 14px;border-radius:var(--r2);font-size:13px;line-height:1.6;white-space:pre-wrap}
+.chat-msg.ai .chat-bubble{background:var(--ink3);border:1px solid var(--border);border-top-left-radius:4px;color:var(--chalk2)}
+.chat-msg.user .chat-bubble{background:var(--rose);color:white;border-top-right-radius:4px}
+.chat-msg.ai .chat-bubble strong{color:var(--chalk);font-weight:600}
+.chat-typing{display:flex;gap:4px;align-items:center;padding:12px 14px}
+.chat-typing span{width:6px;height:6px;border-radius:50%;background:var(--chalk3);animation:typing 1.2s infinite}
+.chat-typing span:nth-child(2){animation-delay:0.2s}
+.chat-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-input-wrap{padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--ink2)}
+.chat-input-row{display:flex;gap:10px;align-items:flex-end}
+.chat-input{flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;color:var(--chalk);font-size:13px;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color 0.15s}
+.chat-input:focus{border-color:var(--purple)}
+.chat-send{width:40px;height:40px;border-radius:var(--r);background:var(--purple);color:white;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.chat-send:hover{background:#8b70e0}
+.chat-send:disabled{opacity:0.4;cursor:not-allowed}
+.chat-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.chat-suggestion{font-size:11px;padding:5px 12px;border-radius:20px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--purple);cursor:pointer;transition:all 0.15s}
+.chat-suggestion:hover{background:rgba(167,139,250,0.2)}
+.apply-posts-banner{margin:12px 0;padding:14px 16px;background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.25);border-radius:var(--r);font-size:13px}
+
 /* UPLOAD PROGRESS */
 .upload-progress{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px}
 .upload-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
@@ -240,6 +273,45 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="modal-close" onclick="closeModal('modal-post-detail')">✕</button>
     </div>
     <div id="post-detail-content"></div>
+  </div>
+</div>
+
+<!-- MODAL ARIA — CONSEILLÈRE STRATÉGIQUE IA -->
+<div class="overlay" id="modal-aria">
+  <div class="modal" style="max-width:680px;padding:0;overflow:hidden;max-height:85vh;display:flex;flex-direction:column">
+    <!-- Header -->
+    <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(77,166,255,0.05));flex-shrink:0">
+      <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700">Aria — Conseillère Stratégie Digitale</div>
+        <div style="font-size:11px;color:var(--mint);display:flex;align-items:center;gap:5px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--mint);display:inline-block;animation:statusPulse 2s infinite"></span>
+          En ligne · IA spécialisée community management
+        </div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="resetAriaChat()" style="font-size:10px">↺ Nouvelle conv.</button>
+        <button class="modal-close" onclick="closeModal('modal-aria')">✕</button>
+      </div>
+    </div>
+    <!-- Messages -->
+    <div id="aria-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:300px"></div>
+    <!-- Suggestions -->
+    <div id="aria-suggestions" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px"></div>
+    <!-- Zone de saisie -->
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-shrink:0">
+      <textarea id="aria-input"
+        style="flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;color:var(--chalk);font-size:13px;resize:none;max-height:100px;min-height:42px;font-family:'Bricolage Grotesque',sans-serif;line-height:1.5;outline:none;transition:border-color 0.15s"
+        placeholder="Posez votre question stratégique…"
+        rows="1"
+        onfocus="this.style.borderColor='var(--purple)'"
+        onblur="this.style.borderColor='var(--border)'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAriaMessage()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button id="aria-send-btn"
+        onclick="sendAriaMessage()"
+        style="width:42px;height:42px;border-radius:var(--r);background:linear-gradient(135deg,var(--purple),var(--sky));border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity 0.15s">➤</button>
+    </div>
   </div>
 </div>
 
@@ -304,6 +376,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   <button class="nav-tab" onclick="switchTab('history')">📸 Historique</button>
   <button class="nav-tab" onclick="switchTab('medias')">🖼️ Mes médias</button>
   <button class="nav-tab" onclick="switchTab('special')">🚀 Post spécial</button>
+  <button class="nav-tab" onclick="switchTab('strategie')">🎯 Conseiller IA</button>
 </div>
 
 <div class="wrap">
@@ -368,10 +441,11 @@ textarea.form-input{resize:vertical;min-height:80px}
           <div class="help-card-title">Contenu urgent</div>
           <div class="help-card-desc">Publier quelque chose rapidement</div>
         </div>
-        <div class="help-card" onclick="setHelpSubject('strategie')">
+        <div class="help-card" onclick="openAriaChat()" style="border-color:rgba(167,139,250,0.3);background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(77,166,255,0.04))">
           <div class="help-card-icon">🎯</div>
           <div class="help-card-title">Question stratégie</div>
-          <div class="help-card-desc">Conseil sur votre présence en ligne</div>
+          <div class="help-card-desc">Parler avec Aria, votre IA stratégique</div>
+          <div style="font-size:10px;color:var(--purple);margin-top:6px;font-weight:600">✨ Conseillère IA</div>
         </div>
         <div class="help-card" onclick="setHelpSubject('autre')">
           <div class="help-card-icon">💬</div>
@@ -1071,7 +1145,535 @@ function toast(msg,type='info'){
   setTimeout(()=>el.remove(),4500);
 }
 
+// ══════════════════════════════════════════════════════════════
+// ARIA — CONSEILLÈRE STRATÉGIQUE IA
+// ══════════════════════════════════════════════════════════════
+let ariaHistory = [];
+let ariaLoading = false;
+let ariaInitialized = false;
+
+function openAriaChat() {
+  openModal('modal-aria');
+  if (!ariaInitialized) {
+    ariaInitialized = true;
+    setTimeout(() => startAriaConversation(), 300);
+  }
+}
+
+function startAriaConversation() {
+  const name = localStorage.getItem('portal_client_name') || 'votre compte';
+  const ctx = buildAriaContext();
+
+  const intro = `Bonjour ! Je suis **Aria**, votre conseillère en stratégie digitale. 🎯
+
+J'ai accès aux données de votre compte **${name}** :
+• ${ctx.posts} post${ctx.posts>1?'s':''} planifié${ctx.posts>1?'s':''}
+• ${ctx.historyCount} publications historiques analysées
+• ${ctx.avgLikes} likes en moyenne par post
+
+Pour vous proposer la meilleure stratégie, commençons par l'essentiel : **quel est votre objectif principal sur Instagram en ce moment ?**`;
+
+  addAriaMessage('ai', intro);
+  showAriaSuggestions([
+    '🚀 Gagner plus de followers',
+    '💰 Convertir en clients',
+    '❤️ Améliorer l\'engagement',
+    '🌟 Renforcer mon image de marque'
+  ]);
+}
+
+function buildAriaContext() {
+  return {
+    clientName:   localStorage.getItem('portal_client_name') || 'votre compte',
+    posts:        posts.length,
+    historyCount: historyPosts.length,
+    topPosts:     historyPosts.filter(p => (p.performance_score||0) >= 60).length,
+    avgLikes:     historyPosts.length > 0
+      ? Math.round(historyPosts.reduce((s,p)=>s+(p.likes||0),0)/historyPosts.length) : 0,
+    avgComments:  historyPosts.length > 0
+      ? Math.round(historyPosts.reduce((s,p)=>s+(p.comments||0),0)/historyPosts.length) : 0,
+    mediaStock:   medias.filter(m=>!m.used).length,
+    plan:         clientPlan,
+    plannedCaptions: posts.slice(0,3).map((p,i) =>
+      `Post ${i+1} (${p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '?'}) : "${(p.caption||'').slice(0,80)}..."`)
+  };
+}
+
+function addAriaMessage(role, content, extraHtml='') {
+  const el = document.createElement('div');
+  const isUser = role === 'user';
+  const time = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  el.style.cssText = `display:flex;gap:10px;align-items:flex-start;animation:tin 0.3s ease;${isUser?'flex-direction:row-reverse':''}`;
+  el.innerHTML = `
+    <div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:${isUser?'linear-gradient(135deg,var(--rose),var(--amber))':'linear-gradient(135deg,var(--purple),var(--sky))'}">
+      ${isUser?'👤':'🧠'}
+    </div>
+    <div style="max-width:75%">
+      <div style="padding:12px 14px;border-radius:var(--r2);font-size:13px;line-height:1.6;${isUser
+        ? 'background:linear-gradient(135deg,rgba(255,77,109,0.12),rgba(255,179,64,0.06));border:1px solid rgba(255,77,109,0.2);border-top-right-radius:4px;color:var(--chalk)'
+        : 'background:var(--ink3);border:1px solid var(--border);border-top-left-radius:4px;color:var(--chalk2)'}">
+        ${formatAriaText(content)}${extraHtml}
+      </div>
+      <div style="font-size:10px;color:var(--chalk3);margin-top:3px;${isUser?'text-align:right':''}">${time}</div>
+    </div>`;
+
+  document.getElementById('aria-messages').appendChild(el);
+  document.getElementById('aria-messages').scrollTop = 99999;
+  ariaHistory.push({ role: role === 'ai' ? 'assistant' : 'user', content });
+}
+
+function formatAriaText(text) {
+  return escHtml(text)
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n/g,'<br>');
+}
+
+function showAriaSuggestions(items) {
+  const el = document.getElementById('aria-suggestions');
+  if (!items?.length) { el.innerHTML=''; return; }
+  el.innerHTML = items.map(s =>
+    `<button onclick="useAriaSuggestion('${escHtml(s)}')" style="font-size:11px;padding:5px 12px;border-radius:20px;background:var(--ink3);border:1px solid var(--border);color:var(--chalk3);cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;transition:all 0.15s" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--chalk3)'">${s}</button>`
+  ).join('');
+}
+
+function useAriaSuggestion(text) {
+  document.getElementById('aria-input').value = text;
+  sendAriaMessage();
+}
+
+function showAriaTyping() {
+  const el = document.createElement('div');
+  el.id = 'aria-typing';
+  el.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+  el.innerHTML = `
+    <div style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🧠</div>
+    <div style="padding:12px 14px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r2);border-top-left-radius:4px;display:flex;gap:5px;align-items:center">
+      ${[0,200,400].map(d=>`<span style="width:7px;height:7px;border-radius:50%;background:var(--chalk3);display:inline-block;animation:typingBounce 1.2s ${d}ms ease-in-out infinite"></span>`).join('')}
+    </div>`;
+  document.getElementById('aria-messages').appendChild(el);
+  document.getElementById('aria-messages').scrollTop = 99999;
+}
+
+async function sendAriaMessage() {
+  const input = document.getElementById('aria-input');
+  const msg = input.value.trim();
+  if (!msg || ariaLoading) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('aria-send-btn').disabled = true;
+  document.getElementById('aria-suggestions').innerHTML = '';
+  ariaLoading = true;
+
+  addAriaMessage('user', msg);
+  showAriaTyping();
+
+  try {
+    const ctx = buildAriaContext();
+    const systemPrompt = `Tu es Aria, consultante experte en stratégie digitale Instagram pour SocialAI.
+
+COMPTE CLIENT : ${ctx.clientName}
+DONNÉES RÉELLES :
+- Posts planifiés : ${ctx.posts} (${ctx.plannedCaptions.join(' | ')})
+- Historique : ${ctx.historyCount} publications
+- Top posts (score ≥60) : ${ctx.topPosts}
+- Likes moyens : ${ctx.avgLikes} | Commentaires moyens : ${ctx.avgComments}
+- Stock médias disponibles : ${ctx.mediaStock}
+- Forfait : ${ctx.plan}
+
+PHILOSOPHIE CONTENU (RÈGLE ABSOLUE) :
+- Jamais de "achetez", "commandez", "soldes" → toujours "voici ce qu'on sait faire"
+- Montrer le savoir-faire, la passion, les coulisses, l'authenticité
+- Call-to-action subtil : "si vous rêvez de la même chose, contactez-nous"
+- Inspirer avant de vendre
+
+TON RÔLE :
+1. Poser des questions ciblées (max 2 à la fois) pour comprendre objectifs et obstacles
+2. Analyser les données du compte pour des recommandations personnalisées
+3. Proposer un plan d'action concret et priorisé
+4. IMPORTANT : quand tu proposes un plan, propose aussi des reformulations spécifiques pour les posts planifiés en cours, en respectant la philosophie contenu
+
+FORMAT :
+- **gras** pour les points importants
+- Listes avec • pour les actions
+- Quand tu proposes de modifier des posts planifiés : indique clairement "**Modification suggérée pour [date]** : [nouvelle caption proposée]"
+- Sois concise, pratique, humaine
+
+PHASE ACTUELLE : ${ariaHistory.length < 4 ? 'discovery (poser des questions)' : ariaHistory.length < 8 ? 'analysis (approfondir)' : 'recommendation (plan + modifications posts)'}`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        system: systemPrompt,
+        messages: [...ariaHistory.slice(-12), { role:'user', content:msg }]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || "Je rencontre une difficulté. Réessayez dans un instant.";
+
+    document.getElementById('aria-typing')?.remove();
+
+    // Détecter les modifications de posts suggérées
+    const postModifs = extractPostModifications(reply);
+    let extraHtml = '';
+    if (postModifs.length > 0) {
+      extraHtml = buildPostModifButtons(postModifs);
+    } else if (reply.length > 400) {
+      // Long message = probablement un plan
+      extraHtml = `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="sendPlanToCM()" style="font-size:11px;padding:5px 12px;border-radius:var(--r);background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:var(--purple);cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">📩 Envoyer ce plan à mon CM</button>
+      </div>`;
+    }
+
+    addAriaMessage('ai', reply, extraHtml);
+
+    // Suggestions contextuelles
+    showAriaSuggestions(getAriaSuggestions(reply));
+
+  } catch(err) {
+    document.getElementById('aria-typing')?.remove();
+    addAriaMessage('ai', 'Je rencontre une difficulté technique. Réessayez dans quelques secondes.');
+  }
+
+  ariaLoading = false;
+  document.getElementById('aria-send-btn').disabled = false;
+}
+
+function extractPostModifications(reply) {
+  // Cherche les patterns "Modification suggérée pour [date] : [caption]"
+  const modifs = [];
+  const regex = /\*\*Modification[^:]*?(\d+[^\*]*?)\*\*\s*:?\s*([^\n\*]{20,})/gi;
+  let match;
+  while ((match = regex.exec(reply)) !== null) {
+    modifs.push({ label: match[1].trim(), caption: match[2].trim() });
+  }
+  return modifs;
+}
+
+function buildPostModifButtons(modifs) {
+  return `<div style="margin-top:10px;padding:10px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);display:flex;flex-direction:column;gap:8px">
+    <div style="font-size:11px;font-weight:600;color:var(--purple)">✏️ Modifications suggérées pour vos posts</div>
+    ${modifs.map((m,i) => `
+      <div style="font-size:12px;color:var(--chalk2);background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px">
+        <div style="font-weight:600;color:var(--chalk);margin-bottom:4px">${m.label}</div>
+        <div style="color:var(--chalk3);font-size:11px;margin-bottom:6px" id="modif-text-${i}">${escHtml(m.caption)}</div>
+        ${posts[i] ? `<button onclick="applyAriaModif(${i},'${escHtml(m.caption.replace(/'/g,"'"))}')" style="font-size:10px;padding:3px 10px;border-radius:var(--r);background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:var(--purple);cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">✅ Appliquer sur ce post</button>` : ''}
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+async function applyAriaModif(postIndex, newCaption) {
+  const post = posts[postIndex];
+  if (!post) return;
+  try {
+    const r = await fetch(`/api/portal/posts/${post.id}/caption`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ caption: newCaption })
+    });
+    if (!r.ok) throw new Error();
+    toast('✅ Post modifié selon la stratégie Aria !', 'ok');
+    await loadPosts();
+  } catch { toast('Erreur modification', 'err'); }
+}
+
+async function sendPlanToCM() {
+  const lastAi = [...ariaHistory].reverse().find(m => m.role === 'assistant');
+  if (!lastAi) return;
+  const name = localStorage.getItem('portal_client_name') || 'Client';
+  try {
+    const r = await fetch(`/api/portal/${clientId}/help-request`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        subject: 'strategie',
+        message: `Plan stratégique établi avec Aria (IA) :\n\n${lastAi.content}\n\n---\nConversation générée automatiquement depuis l'espace client.`,
+        urgency: 'normal',
+        clientName: name
+      })
+    });
+    if (!r.ok) throw new Error();
+    toast('Plan envoyé à votre CM ✓', 'ok');
+  } catch { toast('Erreur envoi', 'err'); }
+}
+
+function getAriaSuggestions(reply) {
+  const r = reply.toLowerCase();
+  if (r.includes('objectif') || r.includes('priorité')) {
+    return ['🚀 Avoir plus de visibilité', '🤝 Fidéliser ma communauté', '📞 Générer des contacts'];
+  }
+  if (r.includes('cible') || r.includes('audience') || r.includes('clientèle')) {
+    return ['👶 Familles avec enfants', '🐱 Amoureux des animaux', '💎 Clientèle premium'];
+  }
+  if (r.includes('contenu') || r.includes('post') || r.includes('publication')) {
+    return ['📸 Plus de photos lifestyle', '🎬 Développer les Reels', '💬 Créer de l\'interaction'];
+  }
+  if (r.includes('plan') || r.includes('action') || r.includes('modifier')) {
+    return ['✅ Appliquer ce plan', '🔧 Modifier mes posts', '📩 Envoyer à mon CM'];
+  }
+  return [];
+}
+
+function resetAriaChat() {
+  if (ariaHistory.length > 0 && !confirm('Démarrer une nouvelle conversation avec Aria ?')) return;
+  ariaHistory = [];
+  ariaInitialized = false;
+  document.getElementById('aria-messages').innerHTML = '';
+  document.getElementById('aria-suggestions').innerHTML = '';
+  document.getElementById('aria-input').value = '';
+  ariaInitialized = true;
+  startAriaConversation();
+}
+
+// Ajouter l'animation typing dans le CSS dynamiquement
+const styleSheet = document.createElement('style');
+styleSheet.textContent = '@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}} @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0.4}}';
+document.head.appendChild(styleSheet);
+
 init();
+
+// ══════════════════════════════════════════════════════════════
+// CONSEILLER STRATÉGIQUE IA
+// ══════════════════════════════════════════════════════════════
+let chatHistory = [];
+let chatWaiting = false;
+let proposedChanges = null;
+
+const SYSTEM_PROMPT = `Tu es un expert en stratégie digitale et community management Instagram, spécialisé pour les petites entreprises françaises.
+Tu conseilles le client de façon chaleureuse, concrète et actionnable.
+
+RÈGLES DE CONVERSATION :
+- Commence par te présenter brièvement et poser UNE question ciblée pour comprendre l'objectif du client
+- Pose des questions courtes, une à la fois
+- Après 3-4 échanges, propose une stratégie concrète adaptée
+- Si tu proposes de modifier des posts planifiés, liste-les clairement en JSON dans un bloc spécial comme ceci :
+  MODIFICATIONS_POSTS:{"posts":[{"id":"xxx","nouvelle_caption":"..."}]}:FIN_MODIFICATIONS
+- Adapte tes conseils à l'univers du client (secteur, ton, objectifs)
+- Ne vends jamais directement — mets en valeur le savoir-faire et l'authenticité
+- Sois direct, concis, enthousiaste
+
+INFORMATIONS CLIENT :
+Nom : {{CLIENT_NAME}}
+Secteur : {{CLIENT_SECTOR}}
+Ton : {{CLIENT_TONE}}
+Description : {{CLIENT_DESC}}
+
+POSTS PLANIFIÉS :
+{{PLANNED_POSTS}}`;
+
+function getSystemPrompt() {
+  const name    = localStorage.getItem('portal_client_name') || 'Client';
+  const posts   = (window._plannedPosts || []).slice(0, 5).map((p, i) =>
+    `${i+1}. ID:${p.id} | ${new Date(p.scheduled_at).toLocaleDateString('fr-FR')} | "${(p.caption||'').slice(0,60)}..."`
+  ).join('\n') || 'Aucun post planifié';
+  return SYSTEM_PROMPT
+    .replace('{{CLIENT_NAME}}', name)
+    .replace('{{CLIENT_SECTOR}}', 'Non renseigné')
+    .replace('{{CLIENT_TONE}}', 'Chaleureux et professionnel')
+    .replace('{{CLIENT_DESC}}', '')
+    .replace('{{PLANNED_POSTS}}', posts);
+}
+
+function addChatMsg(role, content) {
+  chatHistory.push({ role, content });
+  renderChatMessages();
+}
+
+function renderChatMessages() {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  el.innerHTML = chatHistory.map(m => {
+    const isUser = m.role === 'user';
+    // Masquer les JSON de modifications dans l'affichage
+    const displayContent = m.content
+      .replace(/MODIFICATIONS_POSTS:.*?:FIN_MODIFICATIONS/gs, '✅ Modifications proposées pour vos posts planifiés (voir bouton ci-dessous)')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return `
+    <div class="chat-msg ${isUser ? 'user' : 'ai'}">
+      <div class="chat-msg-avatar">${isUser ? '👤' : '🎯'}</div>
+      <div class="chat-bubble">${displayContent}</div>
+    </div>`;
+  }).join('');
+
+  // Bouton d'application si des modifications sont proposées
+  const lastMsg = chatHistory[chatHistory.length - 1];
+  if (lastMsg?.role === 'assistant') {
+    const match = lastMsg.content.match(/MODIFICATIONS_POSTS:(.*?):FIN_MODIFICATIONS/s);
+    if (match) {
+      try {
+        proposedChanges = JSON.parse(match[1]);
+        el.innerHTML += `
+        <div class="apply-posts-banner">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">📝 ${proposedChanges.posts?.length} modification(s) proposée(s) pour vos posts planifiés</div>
+          <div style="font-size:12px;color:var(--chalk3);margin-bottom:10px">L'IA propose de mettre à jour les captions de vos prochains posts selon votre stratégie.</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-rose btn-sm" onclick="applyStrategyChanges()">✅ Appliquer les modifications</button>
+            <button class="btn btn-sm" onclick="proposedChanges=null;toast('Modifications ignorées','info')">✕ Ignorer</button>
+          </div>
+        </div>`;
+      } catch(e) {}
+    }
+  }
+
+  el.scrollTop = el.scrollHeight;
+  renderQuickActions();
+}
+
+function renderQuickActions() {
+  const el = document.getElementById('chat-quick-actions');
+  if (!el || chatHistory.length > 2) { if (el) el.innerHTML = ''; return; }
+  const suggestions = [
+    'Je veux plus de visibilité',
+    'Comment toucher plus de monde ?',
+    'J\'ai un événement à annoncer',
+    'Mon engagement est en baisse',
+    'Je veux attirer de nouveaux clients',
+  ];
+  el.innerHTML = suggestions.map(s =>
+    `<button class="chat-suggestion" onclick="quickSend('${s}')">${s}</button>`
+  ).join('');
+}
+
+function quickSend(text) {
+  document.getElementById('chat-input').value = text;
+  sendChatMessage();
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text  = input.value.trim();
+  if (!text || chatWaiting) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  addChatMsg('user', text);
+  chatWaiting = true;
+
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled = true;
+
+  // Afficher l'indicateur de frappe
+  const messagesEl = document.getElementById('chat-messages');
+  const typingEl   = document.createElement('div');
+  typingEl.className = 'chat-msg ai';
+  typingEl.id = 'chat-typing';
+  typingEl.innerHTML = `<div class="chat-msg-avatar">🎯</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
+  messagesEl.appendChild(typingEl);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system:     getSystemPrompt(),
+        messages:   chatHistory.map(m => ({ role: m.role, content: m.content }))
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
+
+    typingEl.remove();
+    addChatMsg('assistant', reply);
+
+  } catch(e) {
+    typingEl.remove();
+    addChatMsg('assistant', 'Une erreur s\'est produite. Veuillez réessayer.');
+  }
+
+  chatWaiting = false;
+  btn.disabled = false;
+}
+
+async function applyStrategyChanges() {
+  if (!proposedChanges?.posts?.length) return;
+  let applied = 0;
+  for (const change of proposedChanges.posts) {
+    try {
+      const r = await fetch(`/api/portal/posts/${change.id}/caption`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+        body: JSON.stringify({ caption: change.nouvelle_caption })
+      });
+      if (r.ok) applied++;
+    } catch(e) {}
+  }
+  toast(`${applied} post(s) mis à jour ✓`, 'ok');
+  proposedChanges = null;
+  await loadPosts();
+  addChatMsg('assistant', `✅ J'ai mis à jour ${applied} caption(s) selon notre stratégie.\n\nVous pouvez les consulter dans l'onglet **Planifiés** pour vérifier et ajuster si besoin.`);
+}
+
+function resetChat() {
+  chatHistory  = [];
+  proposedChanges = null;
+  const el = document.getElementById('chat-messages');
+  if (el) el.innerHTML = '';
+  startChat();
+}
+
+async function startChat() {
+  if (chatHistory.length > 0) return;
+  chatWaiting = true;
+  const btn = document.getElementById('chat-send-btn');
+  if (btn) btn.disabled = true;
+
+  const messagesEl = document.getElementById('chat-messages');
+  if (!messagesEl) return;
+  const typingEl = document.createElement('div');
+  typingEl.className = 'chat-msg ai';
+  typingEl.id = 'chat-typing-init';
+  typingEl.innerHTML = `<div class="chat-msg-avatar">🎯</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
+  messagesEl.appendChild(typingEl);
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system:     getSystemPrompt(),
+        messages:   [{
+          role:    'user',
+          content: 'Bonjour, je souhaite améliorer ma stratégie sur Instagram.'
+        }]
+      })
+    });
+    const data  = await res.json();
+    const reply = data.content?.[0]?.text || 'Bonjour ! Comment puis-je vous aider avec votre stratégie Instagram ?';
+    typingEl.remove();
+    chatHistory.push({ role: 'user', content: 'Bonjour, je souhaite améliorer ma stratégie sur Instagram.' });
+    addChatMsg('assistant', reply);
+  } catch(e) {
+    typingEl.remove();
+    addChatMsg('assistant', 'Bonjour ! Je suis votre conseiller stratégie digitale. Quel est votre principal objectif sur Instagram en ce moment ?');
+  }
+
+  chatWaiting = false;
+  if (btn) btn.disabled = false;
+}
+
+// Démarrer le chat quand on ouvre l'onglet stratégie
+const _origSwitchTab = switchTab;
+window.switchTab = function(tab) {
+  _origSwitchTab(tab);
+  if (tab === 'strategie') {
+    // Stocker les posts pour le contexte
+    window._plannedPosts = posts || [];
+    startChat();
+  }
+};
 </script>
 </body>
 </html>
