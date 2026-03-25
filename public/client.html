@@ -21,6 +21,8 @@ body{font-family:'Bricolage Grotesque',sans-serif;background:var(--ink);color:va
 button{cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* HEADER */
 .header{background:var(--ink2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .header-brand{display:flex;align-items:center;gap:10px}
 .brand-dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--amber));display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -35,29 +37,63 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .plan-chip-pro{background:rgba(167,139,250,0.15);color:var(--purple);border:1px solid rgba(167,139,250,0.3)}
 .btn-logout{font-size:11px;color:var(--chalk3);background:transparent;border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;transition:all 0.15s}
 .btn-logout:hover{color:var(--rose);border-color:var(--rose)}
-.wrap{max-width:900px;margin:0 auto;padding:32px 24px 80px}
+
+/* NAV TABS */
+.nav-tabs{display:flex;gap:4px;background:var(--ink2);border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto}
+.nav-tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--chalk3);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+.nav-tab:hover{color:var(--chalk2)}
+.nav-tab.active{color:var(--chalk);border-bottom-color:var(--rose)}
+
+/* CONTENT */
+.wrap{max-width:960px;margin:0 auto;padding:28px 24px 80px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* BANNERS */
 .banner{border-radius:var(--r2);padding:14px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.6}
 .banner-pause{background:rgba(255,179,64,0.08);border:1px solid rgba(255,179,64,0.25);color:var(--amber)}
 .banner-icon{font-size:20px;flex-shrink:0;margin-top:1px}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
 .stat-pill{background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px}
 .stat-pill-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-1px;margin-bottom:2px}
 .stat-pill-lbl{font-size:11px;color:var(--chalk3);text-transform:uppercase;letter-spacing:0.8px}
 .stat-pill-sub{font-size:11px;color:var(--chalk3);margin-top:2px}
+
+/* SECTION HEADERS */
 .s-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .s-title{font-size:15px;font-weight:600}
 .s-count{font-size:11px;color:var(--chalk3);background:var(--ink3);border:1px solid var(--border);padding:3px 10px;border-radius:20px}
-/* POST GRID CLIENT */
-.post-grid-client{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px}
+
+/* POST GRID */
+.post-grid-client{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
 .post-item-client{border-radius:var(--r2);overflow:hidden;position:relative;background:var(--ink3);border:1px solid var(--border);aspect-ratio:1;cursor:pointer;transition:all 0.2s}
 .post-item-client:hover{border-color:var(--rose);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
 .post-item-client img{width:100%;height:100%;object-fit:cover}
-.post-item-client-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.8) 0%,transparent 50%);display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
+.post-item-client-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
 .post-item-client-badge{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600}
-.badge-planned{background:rgba(0,212,170,0.8);color:white}
+.badge-planned{background:rgba(0,212,170,0.85);color:white}
 .badge-top{background:rgba(255,77,109,0.85);color:white}
+.badge-published{background:rgba(77,166,255,0.85);color:white}
 .post-item-client-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:32px;background:var(--ink3);gap:6px}
 .post-item-client-placeholder span{font-size:10px;color:var(--chalk3)}
+
+/* UPLOAD MÉDIAS */
+.upload-zone-big{border:2px dashed var(--border2);border-radius:var(--r2);padding:40px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:20px}
+.upload-zone-big:hover{border-color:var(--rose);background:rgba(255,77,109,0.03)}
+.upload-zone-big.drag{border-color:var(--mint);background:rgba(0,212,170,0.04)}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.media-item{border-radius:var(--r);overflow:hidden;position:relative;background:var(--ink3);border:1px solid var(--border);aspect-ratio:1}
+.media-item img{width:100%;height:100%;object-fit:cover}
+.media-item-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}
+.media-item:hover .media-item-overlay{opacity:1}
+.media-badge{position:absolute;bottom:6px;left:6px;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600}
+.media-score{position:absolute;top:6px;right:6px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.score-high{background:rgba(0,212,170,0.85);color:white}
+.score-mid{background:rgba(255,179,64,0.85);color:white}
+.score-low{background:rgba(255,77,109,0.85);color:white}
+
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
@@ -67,8 +103,40 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .modal-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
 .modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:none;color:var(--chalk2);font-size:14px;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--border2);color:var(--chalk)}
-.post-detail-img{width:100%;max-height:260px;object-fit:cover;border-radius:var(--r);margin-bottom:16px}
+.post-detail-img{width:100%;max-height:300px;object-fit:cover;border-radius:var(--r);margin-bottom:16px}
 .post-detail-placeholder{width:100%;height:180px;background:var(--ink3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px}
+
+/* STATS ENGAGEMENT */
+.engagement-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.eng-card{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.eng-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.eng-lbl{font-size:10px;color:var(--chalk3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{font-size:11px;color:var(--chalk3);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
+.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s;font-family:'Bricolage Grotesque',sans-serif}
+.form-input:focus{border-color:var(--rose)}
+.form-input::placeholder{color:var(--chalk3)}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* AI TOGGLE */
+.ai-toggle{display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:14px;cursor:pointer;transition:all 0.15s}
+.ai-toggle.active{border-color:var(--mint);background:rgba(0,212,170,0.04)}
+.toggle-knob{width:38px;height:22px;background:var(--surface);border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0}
+.ai-toggle.active .toggle-knob{background:var(--mint)}
+.toggle-knob::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:transform 0.2s}
+.ai-toggle.active .toggle-knob::after{transform:translateX(16px)}
+.toggle-label{font-size:13px;font-weight:500}
+.toggle-desc{font-size:11px;color:var(--chalk3)}
+
+/* UPLOAD ZONE SMALL */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:14px}
+.upload-zone:hover{border-color:var(--rose);background:rgba(255,77,109,0.03)}
+.date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.ai-preview{background:var(--ink3);border:1px solid rgba(0,212,170,0.2);border-radius:var(--r);padding:12px;margin-bottom:14px;display:none}
+.ai-preview-label{font-size:10px;color:var(--mint);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+
 /* SPECIAL SECTION */
 .special-section{background:linear-gradient(135deg,rgba(255,77,109,0.06),rgba(255,179,64,0.04));border:1px solid rgba(255,77,109,0.2);border-radius:var(--r2);padding:24px}
 .special-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -84,26 +152,16 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .locked-icon{font-size:36px;margin-bottom:10px}
 .locked-title{font-size:15px;font-weight:600;margin-bottom:6px}
 .locked-sub{font-size:13px;color:var(--chalk3)}
-/* FORM */
-.form-group{margin-bottom:14px}
-.form-label{font-size:11px;color:var(--chalk3);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.8px;font-weight:500}
-.form-input{width:100%;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;color:var(--chalk);font-size:13px;transition:border-color 0.15s;font-family:'Bricolage Grotesque',sans-serif}
-.form-input:focus{border-color:var(--rose);outline:none}
-.form-input::placeholder{color:var(--chalk3)}
-textarea.form-input{resize:vertical;min-height:80px}
-.ai-toggle{display:flex;align-items:center;gap:10px;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:14px;cursor:pointer;transition:all 0.15s}
-.ai-toggle.active{border-color:var(--mint);background:rgba(0,212,170,0.04)}
-.toggle-knob{width:38px;height:22px;background:var(--surface);border-radius:11px;position:relative;transition:background 0.2s;flex-shrink:0}
-.ai-toggle.active .toggle-knob{background:var(--mint)}
-.toggle-knob::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transition:transform 0.2s}
-.ai-toggle.active .toggle-knob::after{transform:translateX(16px)}
-.toggle-label{font-size:13px;font-weight:500}
-.toggle-desc{font-size:11px;color:var(--chalk3)}
-.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--ink3);margin-bottom:14px}
-.upload-zone:hover{border-color:var(--rose);background:rgba(255,77,109,0.03)}
-.date-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.ai-preview{background:var(--ink3);border:1px solid rgba(0,212,170,0.2);border-radius:var(--r);padding:12px;margin-bottom:14px;display:none}
-.ai-preview-label{font-size:10px;color:var(--mint);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+
+/* AIDE CM */
+.help-section{background:linear-gradient(135deg,rgba(77,166,255,0.06),rgba(167,139,250,0.04));border:1px solid rgba(77,166,255,0.2);border-radius:var(--r2);padding:24px;margin-bottom:24px}
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.help-card{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all 0.15s;text-align:center}
+.help-card:hover{border-color:var(--sky);background:rgba(77,166,255,0.04)}
+.help-card-icon{font-size:28px;margin-bottom:8px}
+.help-card-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.help-card-desc{font-size:11px;color:var(--chalk3)}
+
 /* BTNS */
 .btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:var(--r);border:1px solid var(--border2);background:transparent;color:var(--chalk2);transition:all 0.15s}
 .btn:hover{background:var(--surface);color:var(--chalk)}
@@ -115,24 +173,38 @@ textarea.form-input{resize:vertical;min-height:80px}
 .btn-sm{padding:5px 10px;font-size:11px}
 .btn-purple{background:rgba(167,139,250,0.15);color:var(--purple);border-color:rgba(167,139,250,0.3)}
 .btn-purple:hover{background:rgba(167,139,250,0.25)}
-/* AI SUGGEST */
+.btn-sky{background:rgba(77,166,255,0.15);color:var(--sky);border-color:rgba(77,166,255,0.3)}
+.btn-sky:hover{background:rgba(77,166,255,0.25)}
+.btn-danger{background:rgba(255,77,109,0.1);color:var(--rose);border-color:rgba(255,77,109,0.3)}
+.btn-danger:hover{background:rgba(255,77,109,0.2)}
+
+/* AI SUGGEST BOX */
 .ai-suggestion-box{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:16px;margin-top:12px}
 .ai-suggestion-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:10px}
 .ai-explain-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--chalk2)}
 .ai-explain-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px}
+
 /* SCORE */
 .score-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .score-label{font-size:12px;color:var(--chalk2);width:100px;flex-shrink:0}
 .score-bg{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
 .score-fill{height:100%;border-radius:3px}
 .score-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0}
+
+/* UPLOAD PROGRESS */
+.upload-progress{background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.upload-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
+.upload-progress-fill{height:100%;background:var(--mint);border-radius:2px;transition:width 0.3s;width:0%}
+
 /* DIVIDER */
 .divider{height:1px;background:var(--border);margin:24px 0}
+
 /* EMPTY */
 .empty{text-align:center;padding:40px 20px;color:var(--chalk3)}
 .empty-icon{font-size:36px;margin-bottom:10px;opacity:0.5}
 .empty-title{font-size:15px;font-weight:600;color:var(--chalk2);margin-bottom:4px}
 .empty-sub{font-size:13px}
+
 /* TOAST */
 .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--ink2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 20px rgba(0,0,0,0.4);min-width:240px;animation:tin 0.3s ease}
@@ -141,10 +213,21 @@ textarea.form-input{resize:vertical;min-height:80px}
 .toast.err{border-left:3px solid var(--rose)}
 .toast.info{border-left:3px solid var(--sky)}
 .toast.warn{border-left:3px solid var(--amber)}
+
+/* SPINNER */
 .spinner{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,77,109,0.2);border-top-color:var(--rose);animation:spin 0.7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-screen{display:flex;align-items:center;justify-content:center;min-height:40vh;flex-direction:column;gap:12px;color:var(--chalk3)}
-@media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.date-row{grid-template-columns:1fr}.wrap{padding:20px 16px 64px}.post-grid-client{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .date-row{grid-template-columns:1fr}
+  .wrap{padding:20px 16px 64px}
+  .post-grid-client{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  .help-grid{grid-template-columns:1fr}
+  .engagement-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-tabs{padding:0 12px}
+}
 </style>
 </head>
 <body>
@@ -160,12 +243,51 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- MODAL AIDE CM -->
+<div class="overlay" id="modal-help">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💬 Contacter mon community manager</div>
+      <button class="modal-close" onclick="closeModal('modal-help')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sujet *</label>
+      <select class="form-input" id="help-subject">
+        <option value="">Choisir un sujet…</option>
+        <option value="modification_post">Modifier un post planifié</option>
+        <option value="contenu_urgent">Contenu urgent à publier</option>
+        <option value="probleme_technique">Problème technique</option>
+        <option value="strategie">Question sur la stratégie</option>
+        <option value="autre">Autre demande</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message *</label>
+      <textarea class="form-input" id="help-message" placeholder="Décrivez votre demande en détail…" style="min-height:120px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Urgence</label>
+      <select class="form-input" id="help-urgency">
+        <option value="normal">Normal — sous 24h</option>
+        <option value="urgent">Urgent — sous 4h</option>
+        <option value="critique">Critique — ASAP</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-help')">Annuler</button>
+      <button class="btn btn-sky" onclick="submitHelp()">📨 Envoyer au CM</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <div class="header">
   <div class="header-brand">
     <div class="brand-dot">✦</div>
     <div><div class="brand-name">SocialAI</div><div class="brand-tag">Espace client</div></div>
   </div>
   <div class="header-right">
+    <button class="btn btn-sky btn-sm" onclick="openModal('modal-help')" style="font-size:11px">💬 Aide</button>
     <div class="header-client">
       <div class="client-dot"></div>
       <div class="client-label" id="header-client-name">Chargement…</div>
@@ -175,6 +297,15 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="nav-tab" onclick="switchTab('planned')">📅 Planifiés</button>
+  <button class="nav-tab" onclick="switchTab('history')">📸 Historique</button>
+  <button class="nav-tab" onclick="switchTab('medias')">🖼️ Mes médias</button>
+  <button class="nav-tab" onclick="switchTab('special')">🚀 Post spécial</button>
+</div>
+
 <div class="wrap">
 
   <div class="banner banner-pause" id="banner-pause" style="display:none">
@@ -182,106 +313,206 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div><strong>Service suspendu</strong><br>Contactez votre community manager pour le réactiver.</div>
   </div>
 
-  <div class="stats-row" id="stats-row" style="display:none">
-    <div class="stat-pill">
-      <div class="stat-pill-val" id="stat-total">—</div>
-      <div class="stat-pill-lbl">Posts planifiés</div>
+  <!-- ════ TAB DASHBOARD ════ -->
+  <div class="tab-content active" id="tab-dashboard">
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-pill">
+        <div class="stat-pill-val" id="stat-total">—</div>
+        <div class="stat-pill-lbl">Posts planifiés</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-val" id="stat-reach">—</div>
+        <div class="stat-pill-lbl">Reach moyen</div>
+        <div class="stat-pill-sub">30 derniers jours</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-val" id="stat-engagement">—</div>
+        <div class="stat-pill-lbl">Engagement</div>
+        <div class="stat-pill-sub">Taux moyen</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-val" id="stat-medias">—</div>
+        <div class="stat-pill-lbl">Médias dispo</div>
+        <div class="stat-pill-sub">Pour publication</div>
+      </div>
     </div>
-    <div class="stat-pill">
-      <div class="stat-pill-val" id="stat-history">—</div>
-      <div class="stat-pill-lbl">Publications passées</div>
+
+    <!-- Prochain post -->
+    <div class="s-header">
+      <div class="s-title">🔜 Prochain post planifié</div>
+      <button class="btn btn-sm" onclick="switchTab('planned')">Voir tous →</button>
     </div>
-    <div class="stat-pill">
-      <div class="stat-pill-val" id="stat-special">—</div>
-      <div class="stat-pill-lbl">Post spécial</div>
-      <div class="stat-pill-sub" id="stat-special-sub"></div>
+    <div id="next-post-preview" style="margin-bottom:24px"></div>
+
+    <!-- Top posts -->
+    <div class="s-header">
+      <div class="s-title">⭐ Vos meilleurs posts</div>
+      <button class="btn btn-sm" onclick="switchTab('history')">Voir tout →</button>
+    </div>
+    <div class="post-grid-client" id="top-posts-grid" style="margin-bottom:24px"></div>
+
+    <!-- Aide rapide -->
+    <div class="help-section">
+      <div class="s-header" style="margin-bottom:16px">
+        <div class="s-title">💬 Besoin d'aide ?</div>
+      </div>
+      <div class="help-grid">
+        <div class="help-card" onclick="setHelpSubject('modification_post')">
+          <div class="help-card-icon">✏️</div>
+          <div class="help-card-title">Modifier un post</div>
+          <div class="help-card-desc">Changer le contenu d'un post planifié</div>
+        </div>
+        <div class="help-card" onclick="setHelpSubject('contenu_urgent')">
+          <div class="help-card-icon">⚡</div>
+          <div class="help-card-title">Contenu urgent</div>
+          <div class="help-card-desc">Publier quelque chose rapidement</div>
+        </div>
+        <div class="help-card" onclick="setHelpSubject('strategie')">
+          <div class="help-card-icon">🎯</div>
+          <div class="help-card-title">Question stratégie</div>
+          <div class="help-card-desc">Conseil sur votre présence en ligne</div>
+        </div>
+        <div class="help-card" onclick="setHelpSubject('autre')">
+          <div class="help-card-icon">💬</div>
+          <div class="help-card-title">Autre demande</div>
+          <div class="help-card-desc">Toute autre question ou demande</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Posts planifiés -->
-  <div class="s-header" style="margin-bottom:8px">
-    <div class="s-title">📅 Publications planifiées</div>
-    <div class="s-count" id="posts-count">0</div>
-  </div>
-  <p style="font-size:12px;color:var(--chalk3);margin-bottom:12px">Cliquez sur une publication pour la consulter, la modifier ou demander une suggestion IA.</p>
-
-  <div id="planned-grid">
-    <div class="loading-screen">
-      <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
-      <div>Chargement…</div>
+  <!-- ════ TAB PLANIFIÉS ════ -->
+  <div class="tab-content" id="tab-planned">
+    <div class="s-header" style="margin-bottom:8px">
+      <div class="s-title">📅 Publications planifiées</div>
+      <div class="s-count" id="posts-count">0</div>
+    </div>
+    <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Cliquez sur une publication pour la consulter, modifier la caption ou demander une suggestion IA.</p>
+    <div id="planned-grid">
+      <div class="loading-screen">
+        <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
+        <div>Chargement…</div>
+      </div>
     </div>
   </div>
 
-  <!-- Publications passées -->
-  <div id="history-section" style="display:none">
-    <div class="divider"></div>
+  <!-- ════ TAB HISTORIQUE ════ -->
+  <div class="tab-content" id="tab-history">
     <div class="s-header" style="margin-bottom:8px">
       <div class="s-title">📸 Publications passées</div>
       <div class="s-count" id="history-count">0</div>
     </div>
-    <p style="font-size:12px;color:var(--chalk3);margin-bottom:12px">Vos publications Instagram importées avec leur analyse IA.</p>
+    <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Vos publications Instagram avec leurs statistiques d'engagement.</p>
+
+    <!-- Engagement global -->
+    <div class="engagement-grid" id="engagement-grid" style="display:none">
+      <div class="eng-card"><div class="eng-val" id="eng-likes">—</div><div class="eng-lbl">❤️ Likes</div></div>
+      <div class="eng-card"><div class="eng-val" id="eng-comments">—</div><div class="eng-lbl">💬 Commentaires</div></div>
+      <div class="eng-card"><div class="eng-val" id="eng-reach">—</div><div class="eng-lbl">👁 Reach</div></div>
+      <div class="eng-card"><div class="eng-val" id="eng-saves">—</div><div class="eng-lbl">🔖 Sauvegardes</div></div>
+    </div>
+
     <div class="post-grid-client" id="history-grid"></div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- Post spécial -->
-  <div class="special-section" id="special-section">
-    <div class="special-header">
-      <div class="special-icon">🚀</div>
-      <div><div class="special-title">Demander un post spécial</div></div>
+  <!-- ════ TAB MÉDIAS ════ -->
+  <div class="tab-content" id="tab-medias">
+    <div class="s-header" style="margin-bottom:8px">
+      <div class="s-title">🖼️ Ma médiathèque</div>
+      <div class="s-count" id="media-count">0</div>
     </div>
-    <div class="special-sub">Événement, nouveauté, annonce importante… L'IA s'occupe du reste.</div>
+    <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Uploadez vos photos et vidéos. L'IA les analyse automatiquement et les utilise pour créer vos publications.</p>
 
-    <div id="quota-section" style="display:none">
-      <div class="quota-bar-wrap">
-        <div class="quota-label">
-          <span>Posts spéciaux cette semaine</span>
-          <span id="quota-text">0 / 1</span>
+    <!-- Zone d'upload -->
+    <div class="upload-zone-big" id="upload-zone-big"
+      ondragover="handleDragOver(event)"
+      ondragleave="handleDragLeave(event)"
+      ondrop="handleDrop(event)"
+      onclick="document.getElementById('media-file-input').click()">
+      <input type="file" id="media-file-input" accept="image/*,video/*" multiple style="display:none" onchange="handleMediaUpload(this.files)">
+      <div style="font-size:40px;margin-bottom:12px">📤</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Déposez vos photos et vidéos ici</div>
+      <div style="font-size:12px;color:var(--chalk3)">ou cliquez pour sélectionner • JPG, PNG, MP4, MOV</div>
+      <div style="font-size:11px;color:var(--chalk3);margin-top:8px">L'IA analyse chaque média et calcule son potentiel viral</div>
+    </div>
+
+    <!-- Queue d'upload -->
+    <div id="upload-queue" style="margin-bottom:16px"></div>
+
+    <!-- Grille médias -->
+    <div id="media-loading" style="display:none" class="loading-screen" style="min-height:200px">
+      <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
+      <div>Chargement…</div>
+    </div>
+    <div class="media-grid" id="media-grid"></div>
+
+    <div id="media-empty" class="empty" style="display:none">
+      <div class="empty-icon">🖼️</div>
+      <div class="empty-title">Aucun média</div>
+      <div class="empty-sub">Uploadez vos premières photos pour commencer</div>
+    </div>
+  </div>
+
+  <!-- ════ TAB POST SPÉCIAL ════ -->
+  <div class="tab-content" id="tab-special">
+    <div class="special-section">
+      <div class="special-header">
+        <div class="special-icon">🚀</div>
+        <div><div class="special-title">Demander un post spécial</div></div>
+      </div>
+      <div class="special-sub">Événement, nouveauté, annonce importante… L'IA s'occupe du reste.</div>
+
+      <div id="quota-section" style="display:none">
+        <div class="quota-bar-wrap">
+          <div class="quota-label">
+            <span>Posts spéciaux cette semaine</span>
+            <span id="quota-text">0 / 1</span>
+          </div>
+          <div class="quota-bar"><div class="quota-fill" id="quota-fill" style="width:0%"></div></div>
         </div>
-        <div class="quota-bar"><div class="quota-fill" id="quota-fill" style="width:0%"></div></div>
       </div>
-    </div>
 
-    <div id="special-form">
-      <div class="form-group">
-        <label class="form-label">Votre message / contexte *</label>
-        <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle portée de chatons Ragdoll ! Je veux annoncer ça..."></textarea>
-      </div>
-      <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
-        <div class="toggle-knob"></div>
-        <div><div class="toggle-label">Laisser l'IA écrire la caption</div><div class="toggle-desc">L'IA rédige une caption optimisée</div></div>
-      </div>
-      <div id="manual-caption-section" style="display:none">
+      <div id="special-form">
         <div class="form-group">
-          <label class="form-label">Votre caption</label>
-          <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption…"></textarea>
+          <label class="form-label">Votre message / contexte *</label>
+          <textarea class="form-input" id="special-message" placeholder="Ex: Nous lançons notre nouvelle portée de chatons Ragdoll ! Je veux annoncer ça..."></textarea>
+        </div>
+        <div class="ai-toggle active" id="ai-toggle" onclick="toggleAI()">
+          <div class="toggle-knob"></div>
+          <div><div class="toggle-label">Laisser l'IA écrire la caption</div><div class="toggle-desc">L'IA rédige une caption optimisée</div></div>
+        </div>
+        <div id="manual-caption-section" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Votre caption</label>
+            <textarea class="form-input" id="manual-caption" placeholder="Rédigez votre caption…"></textarea>
+          </div>
+        </div>
+        <div class="ai-preview" id="ai-preview">
+          <div class="ai-preview-label">✨ Caption générée par l'IA</div>
+          <div style="font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap" id="ai-preview-text"></div>
+        </div>
+        <div class="upload-zone" onclick="document.getElementById('special-file').click()">
+          <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
+          <div style="font-size:24px;margin-bottom:6px">📸</div>
+          <div style="font-size:12px;color:var(--chalk3)">Ajouter un visuel (optionnel)</div>
+          <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:6px;display:none"></div>
+        </div>
+        <div class="date-row">
+          <div><label class="form-label">Date</label><input type="date" class="form-input" id="special-date"></div>
+          <div><label class="form-label">Heure</label><input type="time" class="form-input" id="special-time" value="18:00"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">🚀 Envoyer la demande</button>
+          <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
         </div>
       </div>
-      <div class="ai-preview" id="ai-preview">
-        <div class="ai-preview-label">✨ Caption générée par l'IA</div>
-        <div style="font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap" id="ai-preview-text"></div>
-      </div>
-      <div class="upload-zone" onclick="document.getElementById('special-file').click()">
-        <input type="file" id="special-file" accept="image/*,video/*" style="display:none" onchange="handleSpecialFile(this)">
-        <div style="font-size:24px;margin-bottom:6px">📸</div>
-        <div style="font-size:12px;color:var(--chalk3)">Ajouter un visuel (optionnel)</div>
-        <div id="special-file-name" style="font-size:12px;color:var(--mint);margin-top:6px;display:none"></div>
-      </div>
-      <div class="date-row">
-        <div><label class="form-label">Date</label><input type="date" class="form-input" id="special-date"></div>
-        <div><label class="form-label">Heure</label><input type="time" class="form-input" id="special-time" value="18:00"></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-rose" id="btn-submit-special" onclick="submitSpecialPost()">🚀 Envoyer la demande</button>
-        <div style="font-size:11px;color:var(--chalk3)">Vous recevrez une confirmation</div>
-      </div>
-    </div>
 
-    <div class="locked-overlay" id="special-locked" style="display:none">
-      <div class="locked-icon">⏳</div>
-      <div class="locked-title">Quota hebdomadaire atteint</div>
-      <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Renouvellement chaque lundi.<br><br>Passez au <strong style="color:var(--purple)">forfait Pro</strong> pour des posts illimités !</div>
+      <div class="locked-overlay" id="special-locked" style="display:none">
+        <div class="locked-icon">⏳</div>
+        <div class="locked-title">Quota hebdomadaire atteint</div>
+        <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Renouvellement chaque lundi.</div>
+      </div>
     </div>
   </div>
 
@@ -293,27 +524,30 @@ textarea.form-input{resize:vertical;min-height:80px}
 const token    = localStorage.getItem('portal_token');
 const clientId = localStorage.getItem('portal_client_id');
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
 async function checkAuth() {
-  if (!token || !clientId) { window.location.href = '/login.html'; return false; }
+  if (!token || !clientId) { window.location.href='/login.html'; return false; }
   try {
-    const r = await fetch('/api/auth/me', { headers: { Authorization:`Bearer ${token}` } });
-    if (!r.ok) { window.location.href = '/login.html'; return false; }
+    const r = await fetch('/api/auth/me', { headers:{ Authorization:`Bearer ${token}` } });
+    if (!r.ok) { window.location.href='/login.html'; return false; }
     const d = await r.json();
-    if (d.mustChangePassword) { window.location.href = '/login.html'; return false; }
+    if (d.mustChangePassword) { window.location.href='/login.html'; return false; }
     return true;
-  } catch { window.location.href = '/login.html'; return false; }
+  } catch { window.location.href='/login.html'; return false; }
 }
 
 function logout() {
   fetch('/api/auth/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}});
   localStorage.clear();
-  window.location.href = '/login.html';
+  window.location.href='/login.html';
 }
 
 function authHeaders() { return {'Content-Type':'application/json',Authorization:`Bearer ${token}`}; }
 
-let posts=[], historyPosts=[], clientPlan='starter', planLimits={}, specialQuota={}, aiEnabled=true;
+// ── State ─────────────────────────────────────────────────────────────────────
+let posts=[], historyPosts=[], medias=[], clientPlan='starter', specialQuota={}, aiEnabled=true;
 
+// ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   const ok = await checkAuth();
   if (!ok) return;
@@ -323,18 +557,35 @@ async function init() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('special-date').min   = today;
   document.getElementById('special-date').value = today;
-  await Promise.all([loadPosts(), loadHistory(), loadSpecialQuota()]);
+  await Promise.all([loadPosts(), loadHistory(), loadSpecialQuota(), loadMedias()]);
 }
 
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    if (t.textContent.toLowerCase().includes(tab) ||
+       (tab==='dashboard' && t.textContent.includes('Dashboard')) ||
+       (tab==='planned'   && t.textContent.includes('Planifi')) ||
+       (tab==='history'   && t.textContent.includes('Historique')) ||
+       (tab==='medias'    && t.textContent.includes('médias')) ||
+       (tab==='special'   && t.textContent.includes('spécial'))) {
+      t.classList.add('active');
+    }
+  });
+}
+
+// ── Load Posts ────────────────────────────────────────────────────────────────
 async function loadPosts() {
   try {
-    const r = await fetch(`/api/portal/${clientId}/posts`, { headers:{Authorization:`Bearer ${token}`} });
+    const r = await fetch(`/api/portal/${clientId}/posts`,{headers:{Authorization:`Bearer ${token}`}});
     if (r.status===403) {
       const d = await r.json();
       if (d.error==='service_paused') {
         document.getElementById('banner-pause').style.display='flex';
         document.getElementById('planned-grid').innerHTML='';
-        document.getElementById('special-section').style.display='none';
         return;
       }
     }
@@ -342,127 +593,253 @@ async function loadPosts() {
     const data = await r.json();
     posts      = data.posts||[];
     clientPlan = data.plan||'starter';
-    planLimits = data.planLimits||{};
     const chip = document.getElementById('header-plan-chip');
     chip.textContent = clientPlan==='pro'?'🚀 Pro':'⚡ Starter';
     chip.className   = `plan-chip plan-chip-${clientPlan}`;
-    chip.style.display = 'inline-flex';
+    chip.style.display='inline-flex';
+    document.getElementById('stat-total').textContent = posts.length;
+    document.getElementById('posts-count').textContent = posts.length;
     renderPlannedGrid();
-    updateStats();
+    renderNextPost();
   } catch(e) {
-    document.getElementById('planned-grid').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur</div></div>';
+    document.getElementById('planned-grid').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur de chargement</div></div>';
   }
 }
 
+// ── Load History ──────────────────────────────────────────────────────────────
 async function loadHistory() {
   try {
     const r = await fetch(`/api/reports/${clientId}/stats`);
     if (!r.ok) return;
     const data = await r.json();
-    historyPosts = (data.posts||[]).filter(p=>p.source==='instagram_history');
+    historyPosts = (data.posts||[]).filter(p => p.source==='instagram_history');
+    document.getElementById('history-count').textContent = historyPosts.length;
+    if (historyPosts.length > 0) {
+      document.getElementById('engagement-grid').style.display='grid';
+      const totalLikes    = historyPosts.reduce((s,p)=>s+(p.likes||0),0);
+      const totalComments = historyPosts.reduce((s,p)=>s+(p.comments||0),0);
+      const totalReach    = historyPosts.reduce((s,p)=>s+(p.reach||0),0);
+      const totalSaves    = historyPosts.reduce((s,p)=>s+(p.saves||0),0);
+      const n = historyPosts.length;
+      document.getElementById('eng-likes').textContent    = fmtNum(Math.round(totalLikes/n));
+      document.getElementById('eng-comments').textContent = fmtNum(Math.round(totalComments/n));
+      document.getElementById('eng-reach').textContent    = fmtNum(Math.round(totalReach/n));
+      document.getElementById('eng-saves').textContent    = fmtNum(Math.round(totalSaves/n));
+      const avgReach = totalReach/n;
+      const avgEng   = avgReach>0 ? ((totalLikes+totalComments+totalSaves)/(n*avgReach)*100).toFixed(1)+'%' : '—';
+      document.getElementById('stat-reach').textContent      = fmtNum(Math.round(avgReach));
+      document.getElementById('stat-engagement').textContent = avgEng;
+    }
     renderHistoryGrid();
-    document.getElementById('stat-history').textContent = historyPosts.length;
-    if (historyPosts.length>0) document.getElementById('history-section').style.display='block';
+    renderTopPosts();
   } catch(e) { console.error(e); }
 }
 
+// ── Load Medias ───────────────────────────────────────────────────────────────
+async function loadMedias() {
+  try {
+    const r = await fetch(`/api/media/${clientId}`,{headers:{Authorization:`Bearer ${token}`}});
+    if (!r.ok) return;
+    medias = await r.json();
+    const available = medias.filter(m => !m.used).length;
+    document.getElementById('stat-medias').textContent = available;
+    document.getElementById('media-count').textContent = medias.length;
+    renderMediaGrid();
+  } catch(e) { console.error(e); }
+}
+
+// ── Load Special Quota ────────────────────────────────────────────────────────
 async function loadSpecialQuota() {
   try {
-    const r = await fetch(`/api/portal/${clientId}/special-count`, {headers:{Authorization:`Bearer ${token}`}});
+    const r = await fetch(`/api/portal/${clientId}/special-count`,{headers:{Authorization:`Bearer ${token}`}});
     if (!r.ok) return;
     specialQuota = await r.json();
     updateSpecialSection();
   } catch(e) { console.error(e); }
 }
 
-function renderPlannedGrid() {
-  const grid = document.getElementById('planned-grid');
-  const count = document.getElementById('posts-count');
-  count.textContent = posts.length;
-
-  if (clientPlan==='starter' && posts.length>0) {
-    grid.innerHTML = `
-      <div style="background:rgba(0,212,170,0.05);border:1px solid rgba(0,212,170,0.15);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--chalk3);margin-bottom:12px">
-        ⚡ Forfait Starter : vous pouvez voir et modifier votre prochain post planifié. Passez au <strong style="color:var(--purple)">forfait Pro</strong> pour tout voir.
-      </div>`;
-  } else { grid.innerHTML=''; }
-
-  if (posts.length===0) {
-    grid.innerHTML+='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun post planifié</div><div class="empty-sub">L\'IA prépare vos prochaines publications.</div></div>';
+// ── Render Next Post ──────────────────────────────────────────────────────────
+function renderNextPost() {
+  const el = document.getElementById('next-post-preview');
+  if (!posts.length) {
+    el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun post planifié</div><div class="empty-sub">L\'IA prépare vos prochaines publications.</div></div>';
     return;
   }
+  const p = posts[0];
+  const date = p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) : '—';
+  el.innerHTML=`
+  <div style="background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;display:flex;gap:16px;align-items:flex-start;cursor:pointer" onclick="openPostDetail('${p.id}','queue')">
+    <div style="width:80px;height:80px;border-radius:var(--r);overflow:hidden;flex-shrink:0;background:var(--ink3);display:flex;align-items:center;justify-content:center;font-size:28px">
+      ${p.media_url ? `<img src="${p.media_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : '📅'}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:11px;background:rgba(0,212,170,0.15);color:var(--mint);padding:2px 8px;border-radius:10px;font-weight:600">📅 ${date}</span>
+        <span style="font-size:11px;color:var(--chalk3)">${p.type||'post'}</span>
+      </div>
+      <div style="font-size:13px;color:var(--chalk2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${escHtml(p.caption||'Caption à générer…')}</div>
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="event.stopPropagation();openPostDetail('${p.id}','queue')">✏️ Modifier</button>
+        <button class="btn btn-sm btn-purple" onclick="event.stopPropagation();openAISuggestClient('${p.id}','${escHtml(p.caption||'')}','queue')">✨ IA</button>
+      </div>
+    </div>
+  </div>`;
+}
 
-  const gridEl = document.createElement('div');
-  gridEl.className = 'post-grid-client';
-  gridEl.innerHTML = posts.map(p => {
+// ── Render Planned Grid ───────────────────────────────────────────────────────
+function renderPlannedGrid() {
+  const grid = document.getElementById('planned-grid');
+  if (!posts.length) {
+    grid.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Aucun post planifié</div><div class="empty-sub">L\'IA prépare vos prochaines publications.</div></div>';
+    return;
+  }
+  grid.innerHTML=`<div class="post-grid-client">${posts.map(p => {
     const date = p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
     return `
     <div class="post-item-client" onclick="openPostDetail('${p.id}','queue')">
       ${p.media_url
         ? `<img src="${p.media_url}" onerror="this.style.display='none'">`
-        : `<div class="post-item-client-placeholder">${p.type==='recycled'?'♻️':p.special_request?'⭐':'📅'}<span>${date}</span></div>`}
-      <div class="post-item-client-badge badge-planned">Planifié</div>
+        : `<div class="post-item-client-placeholder">${p.type==='reel'?'🎬':p.type==='carousel'?'🎠':'📅'}<span>${date}</span></div>`}
+      <div class="post-item-client-badge badge-planned">📅 ${date}</div>
       <div class="post-item-client-overlay">
-        <div style="font-size:10px;color:rgba(255,255,255,0.9)">${date}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.caption||'—'}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.caption||'—')}</div>
       </div>
     </div>`;
-  }).join('');
-  grid.appendChild(gridEl);
+  }).join('')}</div>`;
 }
 
+// ── Render History Grid ───────────────────────────────────────────────────────
 function renderHistoryGrid() {
   const grid = document.getElementById('history-grid');
-  const count = document.getElementById('history-count');
-  count.textContent = historyPosts.length;
-  if (historyPosts.length===0) { grid.innerHTML=''; return; }
-  grid.innerHTML = historyPosts.slice(0,12).map(p => {
-    const score  = p.performance_score||0;
-    const isTop  = score>=60;
-    const date   = p.original_post_date ? new Date(p.original_post_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  if (!historyPosts.length) {
+    grid.innerHTML='<div class="empty"><div class="empty-icon">📸</div><div class="empty-title">Aucune publication importée</div></div>';
+    return;
+  }
+  grid.innerHTML = historyPosts.slice(0,24).map(p => {
+    const score = p.performance_score||0;
+    const isTop = score>=60;
+    const date  = p.original_post_date ? new Date(p.original_post_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
     return `
     <div class="post-item-client" onclick="openPostDetail('${p.id}','media')">
-      ${p.url
-        ? `<img src="${p.url}" onerror="this.style.display='none'">`
-        : `<div class="post-item-client-placeholder">🖼️<span>${date}</span></div>`}
-      ${isTop?'<div class="post-item-client-badge badge-top">⭐ TOP</div>':''}
+      ${p.url ? `<img src="${p.url}" onerror="this.style.display='none'">` : `<div class="post-item-client-placeholder">🖼️<span>${date}</span></div>`}
+      ${isTop?'<div class="post-item-client-badge badge-top">⭐ TOP</div>':'<div class="post-item-client-badge badge-published">Publié</div>'}
       <div class="post-item-client-overlay">
-        <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.9)"><span>❤️${p.likes||0}</span><span>💬${p.comments||0}</span></div>
+        <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.9)">
+          <span>❤️${fmtNum(p.likes||0)}</span><span>💬${p.comments||0}</span>${p.reach?`<span>👁${fmtNum(p.reach)}</span>`:''}
+        </div>
         <div style="font-size:10px;color:rgba(255,255,255,0.6)">${date}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-function updateStats() {
-  const now=new Date(), nextWeek=new Date(now.getTime()+7*24*60*60*1000);
-  document.getElementById('stat-total').textContent = posts.length;
-  document.getElementById('stats-row').style.display='grid';
+// ── Render Top Posts (dashboard) ──────────────────────────────────────────────
+function renderTopPosts() {
+  const grid = document.getElementById('top-posts-grid');
+  const tops = historyPosts.filter(p=>(p.performance_score||0)>=60).slice(0,4);
+  if (!tops.length) { grid.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">⭐</div><div class="empty-sub">Les stats apparaîtront après 30 jours</div></div>'; return; }
+  grid.innerHTML = tops.map(p => {
+    const date = p.original_post_date ? new Date(p.original_post_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
+    return `
+    <div class="post-item-client" onclick="openPostDetail('${p.id}','media')">
+      ${p.url ? `<img src="${p.url}" onerror="this.style.display='none'">` : `<div class="post-item-client-placeholder">⭐<span>${date}</span></div>`}
+      <div class="post-item-client-badge badge-top">⭐ TOP</div>
+      <div class="post-item-client-overlay">
+        <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.9)"><span>❤️${fmtNum(p.likes||0)}</span><span>💬${p.comments||0}</span></div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function updateSpecialSection() {
-  const quotaSection=document.getElementById('quota-section');
-  const specialForm=document.getElementById('special-form');
-  const specialLocked=document.getElementById('special-locked');
-  const statSpecial=document.getElementById('stat-special');
-  const statSpecialSub=document.getElementById('stat-special-sub');
-  if (specialQuota.unlimited) {
-    quotaSection.style.display='none'; specialForm.style.display='block'; specialLocked.style.display='none';
-    statSpecial.textContent='∞'; statSpecialSub.textContent='Illimité (Pro)';
-  } else {
-    quotaSection.style.display='block';
-    document.getElementById('quota-text').textContent=`${specialQuota.used}/${specialQuota.max}`;
-    const pct=Math.min(100,(specialQuota.used/specialQuota.max)*100);
-    document.getElementById('quota-fill').style.width=pct+'%';
-    document.getElementById('quota-fill').className='quota-fill'+(specialQuota.remaining===0?' full':'');
-    statSpecial.textContent=specialQuota.remaining;
-    statSpecialSub.textContent='restant cette semaine';
-    if (specialQuota.remaining===0) { specialForm.style.display='none'; specialLocked.style.display='block'; }
-    else { specialForm.style.display='block'; specialLocked.style.display='none'; }
+// ── Render Media Grid ─────────────────────────────────────────────────────────
+function renderMediaGrid() {
+  const grid  = document.getElementById('media-grid');
+  const empty = document.getElementById('media-empty');
+  document.getElementById('media-count').textContent = medias.length;
+  if (!medias.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = medias.map(m => {
+    const score = m.potentiel_viral||m.qualite||0;
+    const scoreClass = score>=70?'score-high':score>=40?'score-mid':'score-low';
+    const isVideo = m.type==='video';
+    return `
+    <div class="media-item">
+      ${m.url ? `<img src="${m.url}" onerror="this.outerHTML='<div class=\\'media-item\\'><div class=\\'post-item-client-placeholder\\'>🎬</div></div>'">`
+               : `<div class="post-item-client-placeholder">${isVideo?'🎬':'🖼️'}</div>`}
+      ${score>0?`<div class="media-score ${scoreClass}">${score}%</div>`:''}
+      <div class="media-badge" style="background:${m.used?'rgba(122,120,112,0.85)':'rgba(0,212,170,0.85)'};color:white">
+        ${m.used?'Utilisé':'Dispo'}
+      </div>
+      <div class="media-item-overlay">
+        <button class="btn btn-danger btn-sm" onclick="deleteMedia('${m.id}',event)">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Upload Médias ─────────────────────────────────────────────────────────────
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone-big').classList.add('drag'); }
+function handleDragLeave(e) { document.getElementById('upload-zone-big').classList.remove('drag'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone-big').classList.remove('drag');
+  handleMediaUpload(e.dataTransfer.files);
+}
+
+async function handleMediaUpload(files) {
+  if (!files || !files.length) return;
+  const queue = document.getElementById('upload-queue');
+  for (const file of Array.from(files)) {
+    const id = 'up_' + Date.now() + Math.random();
+    queue.innerHTML += `
+    <div class="upload-progress" id="${id}">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px">${file.name}</span>
+        <span style="font-size:11px;color:var(--chalk3)" id="${id}_status">Analyse IA…</span>
+      </div>
+      <div class="upload-progress-bar"><div class="upload-progress-fill" id="${id}_bar"></div></div>
+    </div>`;
+
+    const bar    = document.getElementById(id+'_bar');
+    const status = document.getElementById(id+'_status');
+    bar.style.width = '30%';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('client_id', clientId);
+
+    try {
+      bar.style.width = '60%';
+      status.textContent = 'Upload en cours…';
+      const r = await fetch('/api/media/upload', { method:'POST', headers:{Authorization:`Bearer ${token}`}, body:formData });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error||'Erreur upload');
+      bar.style.width      = '100%';
+      bar.style.background = 'var(--mint)';
+      status.textContent   = `✅ Score: ${data.analyse?.potentiel_viral||data.analyse?.qualite||'—'}%`;
+      setTimeout(() => document.getElementById(id)?.remove(), 3000);
+      await loadMedias();
+    } catch(e) {
+      bar.style.width      = '100%';
+      bar.style.background = 'var(--rose)';
+      status.textContent   = `❌ ${e.message}`;
+      setTimeout(() => document.getElementById(id)?.remove(), 5000);
+    }
   }
 }
 
-// MODAL DÉTAIL POST
+async function deleteMedia(mediaId, e) {
+  e.stopPropagation();
+  if (!confirm('Supprimer ce média ?')) return;
+  try {
+    const r = await fetch(`/api/media/${mediaId}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+    if (!r.ok) throw new Error();
+    toast('Média supprimé','ok');
+    await loadMedias();
+  } catch { toast('Erreur suppression','err'); }
+}
+
+// ── Modal Détail Post ─────────────────────────────────────────────────────────
 async function openPostDetail(postId, type) {
   openModal('modal-post-detail');
   document.getElementById('post-detail-title').textContent='Chargement…';
@@ -474,25 +851,24 @@ async function openPostDetail(postId, type) {
     const date = post.original_post_date||post.scheduled_at;
     const dateStr = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
     const score = post.performance_score||0;
-    const isTop = post.is_top_content;
 
     document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
-
     document.getElementById('post-detail-content').innerHTML=`
-      ${post.url
-        ?`<img class="post-detail-img" src="${post.url}" onerror="this.style.display='none'">`
+      ${post.media_url||post.url
+        ?`<img class="post-detail-img" src="${post.media_url||post.url}" onerror="this.style.display='none'">`
         :`<div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>`}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
         <span style="font-size:12px;color:var(--chalk3)">${dateStr}</span>
-        ${isTop?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,77,109,0.12);color:var(--rose);font-weight:600">⭐ Top Content</span>':''}
         ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,212,170,0.12);color:var(--mint);font-weight:600">📅 Planifié</span>':''}
+        ${score>=60?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,77,109,0.12);color:var(--rose);font-weight:600">⭐ Top Content</span>':''}
       </div>
-      ${score>0?`
+      ${score>0||post.likes?`
       <div style="margin-bottom:16px">
-        <div style="font-size:11px;color:var(--chalk3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div>
-        <div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--rose)':'var(--mint)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--rose)':'var(--mint)'}">${score}/100</div></div>
-        <div style="display:flex;gap:16px;font-size:12px;color:var(--chalk2);margin-top:8px">
-          <span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}
+        <div class="engagement-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="eng-card"><div class="eng-val">❤️${fmtNum(post.likes||0)}</div><div class="eng-lbl">Likes</div></div>
+          <div class="eng-card"><div class="eng-val">💬${post.comments||0}</div><div class="eng-lbl">Commentaires</div></div>
+          <div class="eng-card"><div class="eng-val">👁${fmtNum(post.reach||0)}</div><div class="eng-lbl">Reach</div></div>
+          <div class="eng-card"><div class="eng-val">🔖${post.saves||0}</div><div class="eng-lbl">Saves</div></div>
         </div>
       </div>`:''}
       <div style="margin-bottom:16px">
@@ -500,29 +876,22 @@ async function openPostDetail(postId, type) {
         <div style="background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:12px;font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
         ${isQueue?`<textarea class="form-input" id="detail-caption-edit" style="margin-top:8px;display:none;min-height:100px">${escHtml(post.caption||'')}</textarea>`:''}
       </div>
-      ${post.analyse_data?`
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;color:var(--chalk3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Analyse IA</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${post.analyse_data.type_contenu?`<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:rgba(167,139,250,0.12);color:var(--purple);border:1px solid rgba(167,139,250,0.2)">${post.analyse_data.type_contenu}</span>`:''}
-          ${(post.analyse_data.hashtags||[]).slice(0,5).map(h=>`<span style="font-size:11px;padding:3px 9px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--chalk3)">${h}</span>`).join('')}
-        </div>
-      </div>`:''}
       <div id="ai-suggestion-result-client"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         ${isQueue?`
-          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit('${post.id}')">✏️ Modifier</button>
+          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier la caption</button>
           <button class="btn btn-sm btn-rose" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button>
           <button class="btn btn-ghost btn-sm" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
         `:''}
         <button class="btn btn-sm btn-purple" onclick="openAISuggestClient('${post.id}','${escHtml(post.caption||'')}','${type}')">✨ Suggestion IA</button>
+        ${isQueue?`<button class="btn btn-sm btn-danger" onclick="deletePost('${post.id}')">🗑️ Supprimer</button>`:''}
       </div>`;
   } catch(e) {
     document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--chalk3)">Erreur de chargement</div>';
   }
 }
 
-function toggleCaptionEdit(id){
+function toggleCaptionEdit(){
   document.getElementById('detail-caption-display').style.display='none';
   document.getElementById('detail-caption-edit').style.display='block';
   document.getElementById('btn-edit-caption').style.display='none';
@@ -552,33 +921,33 @@ async function savePostCaption(postId){
   }catch{toast('Erreur sauvegarde','err');}
 }
 
+async function deletePost(postId){
+  if(!confirm('Supprimer ce post planifié ?'))return;
+  try{
+    const r=await fetch(`/api/queue/${postId}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+    if(!r.ok)throw new Error();
+    closeModal('modal-post-detail');
+    toast('Post supprimé','ok');
+    await loadPosts();
+  }catch{toast('Erreur suppression','err');}
+}
+
 async function openAISuggestClient(postId, currentCaption, type){
   const resultEl=document.getElementById('ai-suggestion-result-client');
+  const directive=prompt('Directive optionnelle :\nEx: "Plus émotionnelle", "Optimise les hashtags", "Plus courte"')||'';
   resultEl.innerHTML='<div style="text-align:center;padding:16px"><span class="spinner"></span> L\'IA analyse…</div>';
-  const directive=prompt('Directive (optionnel) :\nEx: "Rends-la plus émotionnelle", "Optimise les hashtags"');
   try{
     const r=await fetch(`/api/reports/post/${postId}/ai-suggest`,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({directive:directive||'',currentCaption})
+      body:JSON.stringify({directive,currentCaption})
     });
     const data=await r.json();
     if(!r.ok)throw new Error(data.error);
     resultEl.innerHTML=`
       <div class="ai-suggestion-box">
         <div class="ai-suggestion-title">✨ Suggestion de l'IA</div>
-        ${data.ameliorations?.length?`
-          <div style="margin-bottom:10px">
-            <div style="font-size:11px;color:var(--amber);margin-bottom:4px;font-weight:600">💡 Améliorations</div>
-            ${data.ameliorations.map(a=>`<div class="ai-explain-item"><div class="ai-explain-dot" style="background:var(--amber)"></div>${a}</div>`).join('')}
-          </div>`:''}
-        <div style="font-size:11px;color:var(--purple);margin-bottom:6px;font-weight:600">📝 Nouvelle caption</div>
         <div style="background:var(--ink3);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap;margin-bottom:10px" id="ai-client-new-caption">${escHtml(data.suggestion||'')}</div>
-        ${data.explications?.length?`
-          <div style="margin-bottom:10px">
-            <div style="font-size:11px;color:var(--chalk3);margin-bottom:4px">Explications</div>
-            ${data.explications.map(e=>`<div class="ai-explain-item"><div class="ai-explain-dot"></div>${e}</div>`).join('')}
-          </div>`:''}
-        ${type==='queue'?`<button class="btn btn-sm btn-rose" onclick="applyClientAISuggestion('${postId}')">✅ Appliquer</button>`:''}
+        ${type==='queue'?`<button class="btn btn-sm btn-rose" onclick="applyClientAISuggestion('${postId}')">✅ Appliquer cette caption</button>`:''}
       </div>`;
   }catch(e){
     resultEl.innerHTML=`<div style="color:var(--rose);font-size:13px;padding:12px">Erreur: ${e.message}</div>`;
@@ -597,7 +966,48 @@ async function applyClientAISuggestion(postId){
   }catch{toast('Erreur','err');}
 }
 
-// AI TOGGLE
+// ── Aide CM ───────────────────────────────────────────────────────────────────
+function setHelpSubject(subject) {
+  document.getElementById('help-subject').value = subject;
+  openModal('modal-help');
+}
+
+async function submitHelp() {
+  const subject  = document.getElementById('help-subject').value;
+  const message  = document.getElementById('help-message').value.trim();
+  const urgency  = document.getElementById('help-urgency').value;
+  const name     = localStorage.getItem('portal_client_name')||'Client';
+  if (!subject||!message) { toast('Remplissez tous les champs','err'); return; }
+  try {
+    const r = await fetch(`/api/portal/${clientId}/help-request`,{
+      method:'POST', headers:authHeaders(),
+      body:JSON.stringify({subject,message,urgency,clientName:name})
+    });
+    if (!r.ok) throw new Error();
+    closeModal('modal-help');
+    document.getElementById('help-message').value='';
+    toast('Message envoyé à votre CM ✓','ok');
+  } catch { toast('Erreur envoi','err'); }
+}
+
+// ── Special Post ──────────────────────────────────────────────────────────────
+function updateSpecialSection() {
+  const form=document.getElementById('special-form');
+  const locked=document.getElementById('special-locked');
+  const quotaSection=document.getElementById('quota-section');
+  if (specialQuota.unlimited) {
+    quotaSection.style.display='none'; form.style.display='block'; locked.style.display='none';
+  } else {
+    quotaSection.style.display='block';
+    document.getElementById('quota-text').textContent=`${specialQuota.used||0}/${specialQuota.max||1}`;
+    const pct=Math.min(100,((specialQuota.used||0)/(specialQuota.max||1))*100);
+    document.getElementById('quota-fill').style.width=pct+'%';
+    document.getElementById('quota-fill').className='quota-fill'+(specialQuota.remaining===0?' full':'');
+    if (specialQuota.remaining===0) { form.style.display='none'; locked.style.display='block'; }
+    else { form.style.display='block'; locked.style.display='none'; }
+  }
+}
+
 function toggleAI(){
   aiEnabled=!aiEnabled;
   document.getElementById('ai-toggle').classList.toggle('active',aiEnabled);
@@ -609,7 +1019,6 @@ function handleSpecialFile(input){
   if(!input.files[0])return;
   document.getElementById('special-file-name').textContent=`📎 ${input.files[0].name}`;
   document.getElementById('special-file-name').style.display='block';
-  toast('Visuel sélectionné','info');
 }
 
 async function submitSpecialPost(){
@@ -621,7 +1030,6 @@ async function submitSpecialPost(){
   const scheduled_at=dateVal?new Date(`${dateVal}T${timeVal}`).toISOString():null;
   const btn=document.getElementById('btn-submit-special');
   btn.innerHTML='<span class="spinner"></span> Envoi…'; btn.disabled=true;
-  document.getElementById('ai-preview').style.display='none';
   try{
     const r=await fetch(`/api/portal/${clientId}/special-post`,{
       method:'POST',headers:authHeaders(),
@@ -639,14 +1047,18 @@ async function submitSpecialPost(){
     }
     toast('Demande envoyée ! 🚀','ok');
     document.getElementById('special-message').value='';
-    document.getElementById('manual-caption').value='';
-    document.getElementById('special-file-name').style.display='none';
     await Promise.all([loadPosts(),loadSpecialQuota()]);
   }catch{toast('Erreur lors de l\'envoi','err');}
   finally{btn.textContent='🚀 Envoyer la demande';btn.disabled=false;}
 }
 
-function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function fmtNum(n) {
+  if (n>=1000000) return (n/1000000).toFixed(1)+'M';
+  if (n>=1000)    return (n/1000).toFixed(1)+'k';
+  return String(n);
+}
+function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})});
