@@ -143,7 +143,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
         const messageId      = event.message?.mid;
         const senderId       = event.sender?.id;
         const messageText    = event.message?.text;
-        const senderUsername = event.sender?.username || '';
 
         if (!messageText || senderId === entry.id) continue;
 
@@ -162,6 +161,21 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
           continue;
         }
 
+        // ── Récupérer le profil complet de l'expéditeur ──────────────────
+        let senderUsername = event.sender?.username || '';
+        let senderName     = '';
+        try {
+          const { data: profile } = await axios.get(
+            `https://graph.instagram.com/v19.0/${senderId}`,
+            { params: { fields: 'name,username', access_token: account.access_token } }
+          );
+          senderName     = profile?.name     || '';
+          senderUsername = profile?.username || senderUsername;
+          console.log(`👤 Sender: ${senderName} (@${senderUsername})`);
+        } catch(e) {
+          console.warn(`⚠️ Profil sender non récupéré: ${e.message}`);
+        }
+
         try {
           await cancelFollowUp(supabase, senderId);
 
@@ -177,7 +191,6 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
           if (memory.status === 'gathering_info' ||
               memory.status === 'waiting_coordinates' ||
               memory.status === 'coordinates_received') {
-            // Conversation déjà engagée → continuer le flow
             console.log(`🔄 Continuation conversation (${memory.status})`);
             const reply = await generateReply(
               messageText,
@@ -188,15 +201,13 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
               senderUsername,
               isSoloEntrepreneur,
               clientEmail,
-              supabase
+              supabase,
+              senderName
             );
-            if (reply) {
-              await replyToDM(senderId, reply, account.access_token);
-            }
+            if (reply) await replyToDM(senderId, reply, account.access_token);
             continue;
           }
 
-          // Premier contact ou conversation normale → classifier
           const classification = await classifyMessage(messageText);
           console.log('🔍 Classification:', classification);
 
@@ -210,15 +221,13 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
               messageText,
               senderUsername,
               isSoloEntrepreneur,
-              supabase   // ← passer supabase pour persister
+              supabase,
+              senderName
             );
-            if (transitionReply) {
-              await replyToDM(senderId, transitionReply, account.access_token);
-            }
+            if (transitionReply) await replyToDM(senderId, transitionReply, account.access_token);
             continue;
           }
 
-          // Réponse normale
           const reply = await generateReply(
             messageText,
             account.account_name,
@@ -228,7 +237,8 @@ router.post('/webhook/meta', express.raw({ type:'application/json' }), async (re
             senderUsername,
             isSoloEntrepreneur,
             clientEmail,
-            supabase   // ← passer supabase pour persister
+            supabase,
+            senderName
           );
 
           if (reply) {

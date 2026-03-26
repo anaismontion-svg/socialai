@@ -156,26 +156,53 @@ function extractFirstNameFromUsername(username) {
 
 // ─────────────────────────────────────────────
 // 👋 SALUTATION — SIMPLE, SANS RÉPÉTITION
+// Utilise le vrai nom si disponible, sinon devine depuis le pseudo
 // ─────────────────────────────────────────────
-function buildGreeting(timing, memory, senderUsername = '') {
+function buildGreeting(timing, memory, senderUsername = '', senderName = '') {
   const v = memory.vouvoiement !== false;
   switch (timing) {
     case 'first': {
       let greeting = `Bonjour,`;
+
+      // Utiliser le vrai nom en priorité, sinon extraire du pseudo
       if (!memory.firstName) {
-        const guessed = extractFirstNameFromUsername(senderUsername);
-        if (guessed) {
-          greeting += `\nHeureuse de ${v ? 'vous' : 'te'} rencontrer ! ${guessed}, c'est bien ça ?`;
-          memory.firstName          = guessed;
+        let guessedName = null;
+
+        if (senderName) {
+          // Vrai nom depuis l'API Meta — prendre le premier mot
+          const firstName = senderName.split(' ')[0];
+          if (firstName && firstName.length >= 2) {
+            guessedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+          }
+        }
+
+        if (!guessedName) {
+          guessedName = extractFirstNameFromUsername(senderUsername);
+        }
+
+        if (guessedName) {
+          greeting += `\nHeureuse de ${v ? 'vous' : 'te'} rencontrer ! ${guessedName}, c'est bien ça ?`;
+          memory.firstName          = guessedName;
           memory.firstNameConfirmed = false;
           memory.knownFacts.push('prenom_demande');
         }
+      } else if (memory.firstName && memory.firstNameConfirmed) {
+        // Prénom déjà confirmé — l'utiliser directement
+        greeting += `\nRavi${v ? '' : 'e'} de vous retrouver, ${memory.firstName} !`;
       }
+
       return greeting + '\n\n';
     }
-    case 'returning_long':  return `Et bonjour ! Comment ${v ? 'allez-vous' : 'vas-tu'} ?\n\n`;
-    case 'returning_short': return 'Re-bonjour !\n\n';
-    default:                return '';
+    case 'returning_long':
+      return memory.firstName && memory.firstNameConfirmed
+        ? `Et bonjour ${memory.firstName} ! Comment ${v ? 'allez-vous' : 'vas-tu'} ?\n\n`
+        : `Et bonjour ! Comment ${v ? 'allez-vous' : 'vas-tu'} ?\n\n`;
+    case 'returning_short':
+      return memory.firstName && memory.firstNameConfirmed
+        ? `Re-bonjour ${memory.firstName} !\n\n`
+        : 'Re-bonjour !\n\n';
+    default:
+      return '';
   }
 }
 
@@ -285,9 +312,21 @@ async function generateReply(
   senderUsername     = '',
   isSoloEntrepreneur = true,
   clientEmail        = null,
-  supabase           = null
+  supabase           = null,
+  senderName         = ''
 ) {
   const memory = await getMemory(senderId, supabase);
+
+  // Stocker le vrai nom si disponible et prénom pas encore connu
+  if (senderName && !memory.firstName) {
+    const firstName = senderName.split(' ')[0];
+    if (firstName && firstName.length >= 2) {
+      memory.firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+      memory.firstNameConfirmed = true; // vrai nom = confirmé automatiquement
+      memory.knownFacts.push(`prénom_réel:${memory.firstName}`);
+      console.log(`✅ Prénom réel enregistré : ${memory.firstName}`);
+    }
+  }
 
   // Vouvoiement/tutoiement
   if (/\b(tu|toi|ton|ta|tes|t'|t'as|t'es|vas-y|fais)\b/i.test(messageText))
@@ -364,7 +403,7 @@ async function generateReply(
 
   // ── Génération normale ──────────────────────────────────────────────────────
   const timing   = getContactTiming(memory);
-  const greeting = buildGreeting(timing, memory, senderUsername);
+  const greeting = buildGreeting(timing, memory, senderUsername, senderName);
   const v        = memory.vouvoiement !== false;
 
   const knownInfo = [];
@@ -472,7 +511,8 @@ async function generateHumanNeededReply(
   originalMessage    = '',
   senderUsername     = '',
   isSoloEntrepreneur = true,
-  supabase           = null
+  supabase           = null,
+  senderName         = ''
 ) {
   const memory = await getMemory(senderId, supabase);
   if (/\b(tu|toi|ton|ta|tes|t'|t'as|t'es)\b/i.test(originalMessage))
@@ -484,7 +524,7 @@ async function generateHumanNeededReply(
   memory.gatheringTurns  = 0;
 
   const timing   = getContactTiming(memory);
-  const greeting = buildGreeting(timing, memory, senderUsername);
+  const greeting = buildGreeting(timing, memory, senderUsername, senderName);
   const v        = memory.vouvoiement !== false;
 
   await delay(2000);
