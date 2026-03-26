@@ -14,15 +14,16 @@ app.get('/client.html',         (req, res) => res.sendFile(path.join(__dirname, 
 app.get('/branding-setup.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
-app.use('/api/clients',  require('./routes/clients'));
-app.use('/api/media',    require('./routes/media'));
-app.use('/api/queue',    require('./routes/queue'));
-app.use('/api/auth',     require('./routes/auth-portal').router);
-app.use('/api/portal',   require('./routes/client-portal'));
-app.use('/api/reports',  require('./routes/reports'));
-app.use('/api/branding', require('./routes/branding'));
-app.use('/api/pipeline', require('./routes/pipeline'));
-app.use('/',             require('./routes/meta'));
+app.use('/api/clients',         require('./routes/clients'));
+app.use('/api/media',           require('./routes/media'));
+app.use('/api/queue',           require('./routes/queue'));
+app.use('/api/auth',            require('./routes/auth-portal').router);
+app.use('/api/portal',          require('./routes/client-portal'));
+app.use('/api/reports',         require('./routes/reports'));
+app.use('/api/branding',        require('./routes/branding'));
+app.use('/api/pipeline',        require('./routes/pipeline'));
+app.use('/api/story-templates', require('./routes/story-templates'));
+app.use('/',                    require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
