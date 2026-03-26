@@ -14,24 +14,24 @@ const BEST_HOURS = {
 // ─────────────────────────────────────────────
 const PLANS = {
   starter: {
-    postsPerWeek:         3,
-    storiesPerDay:        1,
-    recyclage:            false,
-    reponseDM:            false,
-    reponseCommentaires:  false,
-    postsSpeciauxMax:     1,   // par semaine
-    analyseHistorique:    true,
-    voirModifierPosts:    1,   // nb de posts visibles dans l'espace client
+    postsPerWeek:        3,
+    storiesPerDay:       1,
+    recyclage:           false,
+    reponseDM:           false,
+    reponseCommentaires: false,
+    postsSpeciauxMax:    1,
+    analyseHistorique:   true,
+    voirModifierPosts:   1,
   },
   pro: {
-    postsPerWeek:         7,
-    storiesPerDay:        1,
-    recyclage:            true,
-    reponseDM:            true,
-    reponseCommentaires:  true,
-    postsSpeciauxMax:     999, // illimité
-    analyseHistorique:    true,
-    voirModifierPosts:    999, // tous les posts
+    postsPerWeek:        7,
+    storiesPerDay:       1,
+    recyclage:           true,
+    reponseDM:           true,
+    reponseCommentaires: true,
+    postsSpeciauxMax:    999,
+    analyseHistorique:   true,
+    voirModifierPosts:   999,
   }
 };
 
@@ -66,9 +66,6 @@ function getStoryTime(storyIndex) {
   return now;
 }
 
-// ─────────────────────────────────────────────
-// PHASE DU CLIENT
-// ─────────────────────────────────────────────
 async function getClientFrequency(client) {
   const plan = getPlan(client);
   if (plan.postsPerWeek >= 7) return 'daily';
@@ -77,20 +74,21 @@ async function getClientFrequency(client) {
 
 // ─────────────────────────────────────────────
 // MÉDIAS DISPONIBLES
+// ✅ FIX : ne filtre plus par story_type — prend n'importe quel média dispo
 // ─────────────────────────────────────────────
-async function getAvailableMedia(clientId, storyType = null) {
-  let query = supabase
+async function getAvailableMedia(clientId) {
+  const { data } = await supabase
     .from('media')
     .select('*')
     .eq('client_id', clientId)
-    .eq('used', false);
-  if (storyType) query = query.eq('story_type', storyType);
-  const { data } = await query.limit(1);
+    .eq('used', false)
+    .order('potentiel_viral', { ascending: false }) // meilleurs médias en premier
+    .limit(1);
   return data?.[0] || null;
 }
 
 // ─────────────────────────────────────────────
-// SÉLECTION POST RECYCLABLE (PRO uniquement)
+// RECYCLAGE PRO
 // ─────────────────────────────────────────────
 async function selectRecyclablePost(clientId) {
   const twoMonthsAgo = new Date();
@@ -124,45 +122,25 @@ async function selectRecyclablePost(clientId) {
   return topPosts[0];
 }
 
-// ─────────────────────────────────────────────
-// GÉNÉRATION CAPTION RECYCLÉE
-// ─────────────────────────────────────────────
 async function generateRecycledCaption(originalCaption, client, performanceScore, postStats) {
   const Anthropic = require('@anthropic-ai/sdk');
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
   const statsContext = postStats
-    ? `Stats du post original : ${postStats.likes} likes | ${postStats.comments} commentaires | ${postStats.reach} reach`
+    ? `Stats : ${postStats.likes} likes | ${postStats.comments} commentaires | ${postStats.reach} reach`
     : '';
-
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `Tu es un expert en community management Instagram et copywriting viral.
-
-Ce post a obtenu un score de performance de ${performanceScore}/100 — il a très bien marché !
-${statsContext}
-
-Client : ${client.name}
-Secteur : ${client.sector || 'non précisé'}
-Ton de communication : ${client.tone || 'professionnel'}
-
-Caption originale :
-"${originalCaption}"
-
-Réécris cette caption pour la rendre encore plus engageante.
-- Garde l'essence du message original
-- Améliore l'accroche (les 2 premières lignes sont cruciales)
-- Ajoute un call-to-action plus fort
-- Optimise les hashtags
-- Maximum 150 mots
-
-Retourne uniquement la nouvelle caption, rien d'autre.`
+      content: `Tu es expert en community management Instagram.
+Ce post a obtenu un score de ${performanceScore}/100. ${statsContext}
+Client : ${client.name} | Secteur : ${client.sector || 'non précisé'} | Ton : ${client.tone || 'professionnel'}
+Caption originale : "${originalCaption}"
+Réécris cette caption pour la rendre encore plus engageante. Max 150 mots.
+Retourne uniquement la nouvelle caption.`
     }]
   });
-
   return message.content[0].text;
 }
 
@@ -170,7 +148,6 @@ Retourne uniquement la nouvelle caption, rien d'autre.`
 // PLANIFICATION POSTS — 1 CLIENT
 // ─────────────────────────────────────────────
 async function schedulePostsForClient(client) {
-  // ── Vérifier si le client est en pause ───────────────────────────────────
   if (client.status === 'paused') {
     console.log(`⏸️ ${client.name} est en pause — planification ignorée`);
     return;
@@ -178,11 +155,10 @@ async function schedulePostsForClient(client) {
 
   console.log(`📅 Planification pour ${client.name} (${client.plan || 'starter'})...`);
 
-  const plan = getPlan(client);
-  const frequency = await getClientFrequency(client);
+  const plan          = getPlan(client);
+  const frequency     = await getClientFrequency(client);
   const targetPerWeek = plan.postsPerWeek;
-
-  const nextWeek = new Date();
+  const nextWeek      = new Date();
   nextWeek.setDate(nextWeek.getDate() + 7);
 
   const { data: existingPosts } = await supabase
@@ -198,8 +174,7 @@ async function schedulePostsForClient(client) {
     return;
   }
 
-  const toCreate = targetPerWeek - (existingPosts?.length || 0);
-
+  const toCreate   = targetPerWeek - (existingPosts?.length || 0);
   const { data: lastPost } = await supabase
     .from('queue')
     .select('scheduled_at')
@@ -208,9 +183,7 @@ async function schedulePostsForClient(client) {
     .order('scheduled_at', { ascending: false })
     .limit(1);
 
-  let lastDate = lastPost?.[0]?.scheduled_at || new Date();
-
-  // Indice du post recyclé (uniquement en PRO)
+  let lastDate    = lastPost?.[0]?.scheduled_at || new Date();
   const recycleIndex = plan.recyclage ? Math.floor(toCreate / 2) : -1;
 
   for (let i = 0; i < toCreate; i++) {
@@ -221,39 +194,44 @@ async function schedulePostsForClient(client) {
     let caption  = '';
     let postType = 'post';
 
-    // ── Recyclage (PRO uniquement) ────────────────────────────────────────
+    // Recyclage PRO
     if (i === recycleIndex && plan.recyclage) {
       const recyclable = await selectRecyclablePost(client.id);
       if (recyclable) {
-        media   = recyclable;
-        caption = await generateRecycledCaption(
+        media    = recyclable;
+        caption  = await generateRecycledCaption(
           recyclable.caption, client, recyclable.performance_score,
           { likes: recyclable.likes, comments: recyclable.comments, reach: recyclable.reach }
         );
         postType = 'recycled';
-
         await supabase.from('media').update({
           recycled:     true,
           last_used_at: new Date().toISOString(),
           use_count:    (recyclable.use_count || 0) + 1
         }).eq('id', recyclable.id);
-
         console.log(`♻️ Post recyclé planifié pour ${client.name} (score: ${recyclable.performance_score}/100)`);
       }
     }
 
-    // ── Nouveau média ─────────────────────────────────────────────────────
+    // Nouveau média
     if (!media) {
-      media = await getAvailableMedia(client.id);
+      media   = await getAvailableMedia(client.id);
       const topPosts = await getTopPosts(client.id);
       caption  = await generateCaption(client, 'image', topPosts);
       postType = 'post';
     }
 
+    // ✅ FIX : ne jamais insérer sans media_url si media existe
+    const mediaUrl = media?.url || null;
+    if (!mediaUrl) {
+      console.warn(`⚠️ ${client.name} — aucun média disponible, post ignoré`);
+      continue;
+    }
+
     await supabase.from('queue').insert({
       client_id:    client.id,
       media_id:     media?.id   || null,
-      media_url:    media?.url  || null,
+      media_url:    mediaUrl,
       caption,
       scheduled_at: scheduledAt.toISOString(),
       type:         postType,
@@ -267,6 +245,7 @@ async function schedulePostsForClient(client) {
 
 // ─────────────────────────────────────────────
 // PLANIFICATION STORIES — 1 CLIENT
+// ✅ FIX MAJEUR : ne crée une story QUE si on a un média avec une URL valide
 // ─────────────────────────────────────────────
 async function scheduleStoriesForClient(client) {
   if (client.status === 'paused') return;
@@ -295,22 +274,47 @@ async function scheduleStoriesForClient(client) {
   for (let i = 0; i < storyTypes.length; i++) {
     const storyDef    = storyTypes[i];
     const scheduledAt = getStoryTime(i);
-    const media       = await getAvailableMedia(client.id, storyDef.type);
 
-    let mediaUrl = media?.url || null;
+    // ✅ FIX : chercher n'importe quel média disponible (pas de filtre story_type)
+    let mediaUrl = null;
+    let mediaId  = null;
+
     if (storyDef.type === 'repost') {
+      // Pour le repost : utiliser le post du jour si disponible
       const { data: todayPost } = await supabase
-        .from('queue').select('media_url')
-        .eq('client_id', client.id).eq('type', 'post')
+        .from('queue')
+        .select('media_url, media_id')
+        .eq('client_id', client.id)
+        .eq('type', 'post')
         .gte('scheduled_at', today.toISOString())
         .lt('scheduled_at', tomorrow.toISOString())
+        .not('media_url', 'is', null)
         .limit(1);
-      mediaUrl = todayPost?.[0]?.media_url || mediaUrl;
+
+      if (todayPost?.[0]?.media_url) {
+        mediaUrl = todayPost[0].media_url;
+        mediaId  = todayPost[0].media_id;
+      }
+    }
+
+    // Fallback : prendre n'importe quel média disponible
+    if (!mediaUrl) {
+      const media = await getAvailableMedia(client.id);
+      if (media?.url) {
+        mediaUrl = media.url;
+        mediaId  = media.id;
+      }
+    }
+
+    // ✅ FIX CLEF : si toujours pas de média, on n'insère PAS la story
+    if (!mediaUrl) {
+      console.warn(`⚠️ ${client.name} — story "${storyDef.label}" ignorée : aucun média disponible`);
+      continue;
     }
 
     await supabase.from('queue').insert({
       client_id:    client.id,
-      media_id:     media?.id || null,
+      media_id:     mediaId,
       media_url:    mediaUrl,
       caption:      storyDef.label,
       scheduled_at: scheduledAt.toISOString(),
@@ -332,7 +336,7 @@ async function runScheduler() {
   const { data: clients } = await supabase
     .from('clients')
     .select('*')
-    .in('status', ['active', 'paused']); // on charge les deux pour logger les pauses
+    .in('status', ['active', 'paused']);
 
   if (!clients || clients.length === 0) {
     console.log('Aucun client trouvé');
@@ -351,9 +355,6 @@ async function runScheduler() {
   console.log('✅ Planificateur terminé');
 }
 
-// ─────────────────────────────────────────────
-// EXPORT
-// ─────────────────────────────────────────────
 module.exports = {
   runScheduler,
   schedulePostsForClient,
