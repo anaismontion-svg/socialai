@@ -256,6 +256,19 @@ textarea.form-input{resize:vertical;min-height:80px}
 .cal-day .day-num{font-size:11px;margin-bottom:2px;font-weight:500}
 .cal-day.today .day-num{color:var(--accent)}
 .cal-day.other-month{opacity:0.3}
+
+/* STORIES FIXES */
+.story-type-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all 0.2s}
+.story-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.story-card-preview{height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.story-card-preview img{width:100%;height:100%;object-fit:cover}
+.story-card-preview-placeholder{font-size:40px;opacity:0.4}
+.story-card-body{padding:14px}
+.story-card-status{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px}
+.story-status-ok{background:rgba(34,197,94,0.12);color:var(--green)}
+.story-status-missing{background:rgba(234,179,8,0.12);color:var(--yellow)}
+.story-status-none{background:var(--surface);color:var(--text3)}
 </style>
 </head>
 <body>
@@ -466,6 +479,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="nav-item" onclick="nav('automation')">
           <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>Automatisation
         </div>
+        <div class="nav-item" onclick="nav('stories')">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/></svg>Stories fixes
+        </div>
       </div>
     </nav>
     <div class="sidebar-bottom">
@@ -620,6 +636,19 @@ textarea.form-input{resize:vertical;min-height:80px}
         </div>
       </div>
 
+      <!-- STORIES FIXES -->
+      <div class="panel" id="panel-stories">
+        <div class="section-title">📸 Stories fixes</div>
+        <div class="section-sub">Configurez les 4 stories publiées chaque jour. Elles se régénèrent automatiquement toutes les semaines.</div>
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn story-type-btn active" onclick="selectStoryType('entreprise',this)">🏢 Présentation</button>
+          <button class="btn story-type-btn" onclick="selectStoryType('tarifs',this)">💰 Tarifs</button>
+          <button class="btn story-type-btn" onclick="selectStoryType('temoignage',this)">⭐ Témoignage</button>
+          <button class="btn story-type-btn" onclick="selectStoryType('avant_apres',this)">🔄 Avant/Après</button>
+        </div>
+        <div id="story-templates-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+      </div>
+
       <!-- AUTOMATION -->
       <div class="panel" id="panel-automation">
         <div class="section-title">⚡ Centre d'automatisation</div>
@@ -650,6 +679,18 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
 
     </div>
+  </div>
+</div>
+
+
+<!-- ── MODAL STORY TEMPLATE ── -->
+<div class="overlay" id="modal-story-template">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title" id="story-modal-title">Configurer la story</div>
+      <button class="modal-close" onclick="closeModal('modal-story-template')">✕</button>
+    </div>
+    <div id="story-modal-body"></div>
   </div>
 </div>
 
@@ -1066,8 +1107,8 @@ function buildCalendar(){
   for(let i=1;i<=rem;i++)grid.innerHTML+=`<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
 }
 
-const titles={dashboard:'Vue d\'ensemble',clients:'Gestion des clients',media:'Médiathèque',queue:'File de publication',reports:'Rapports de publications',calendar:'Calendrier éditorial',automation:'Centre d\'automatisation'};
-const navMap={dashboard:0,clients:1,media:2,queue:3,reports:4,calendar:5,automation:6};
+const titles={dashboard:'Vue d\'ensemble',clients:'Gestion des clients',media:'Médiathèque',queue:'File de publication',reports:'Rapports de publications',calendar:'Calendrier éditorial',automation:'Centre d\'automatisation',stories:'Stories fixes'};
+const navMap={dashboard:0,clients:1,media:2,queue:3,reports:4,calendar:5,automation:6,stories:7};
 function nav(page){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1081,6 +1122,7 @@ function nav(page){
   if(page==='reports')loadReports();
   if(page==='calendar')buildCalendar();
   if(page==='dashboard')loadReports();
+  if(page==='stories')loadStoryTemplates();
   closeModal('modal-switch-client');
 }
 
@@ -1094,6 +1136,115 @@ function toast(msg,type='info'){
   el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-text">${msg}</div>`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(()=>el.remove(),3500);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STORIES FIXES
+// ══════════════════════════════════════════════════════════════
+let currentStoryType='entreprise',storyTemplatesData=[];
+
+function selectStoryType(type,btn){
+  currentStoryType=type;
+  document.querySelectorAll('.story-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStoryTemplates();
+}
+
+async function loadStoryTemplates(){
+  try{const r=await fetch('/api/story-templates');storyTemplatesData=await r.json();renderStoryTemplates();}
+  catch(e){console.error(e);}
+}
+
+function renderStoryTemplates(){
+  const grid=document.getElementById('story-templates-grid');
+  const typeLabels={entreprise:{icon:'🏢'},tarifs:{icon:'💰'},temoignage:{icon:'⭐'},avant_apres:{icon:'🔄'}};
+  const info=typeLabels[currentStoryType]||{icon:'📸'};
+  const byClient={};
+  clients.forEach((c,idx)=>{byClient[c.id]={client:c,idx,template:null};});
+  storyTemplatesData.filter(t=>t.type===currentStoryType).forEach(t=>{if(byClient[t.client_id])byClient[t.client_id].template=t;});
+  const items=Object.values(byClient);
+  if(!items.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Aucun client</div></div>';return;}
+  grid.innerHTML=items.map(({client,idx,template})=>{
+    const color=getClientColor(idx);
+    const initials=client.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const hasVisuel=!!template?.visuel_url,hasContent=!!template?.content;
+    const genDate=template?.generated_at?new Date(template.generated_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):null;
+    const statusHtml=hasVisuel
+      ?`<span class="story-card-status story-status-ok">✅ Visuel généré${genDate?' — '+genDate:''}</span>`
+      :hasContent
+        ?`<span class="story-card-status story-status-missing">⏳ Contenu configuré</span>`
+        :`<span class="story-card-status story-status-none">⚙️ Non configuré</span>`;
+    return `<div class="story-card">
+      <div class="story-card-preview">
+        ${hasVisuel?`<img src="${template.visuel_url}" onerror="this.parentElement.innerHTML='<div class=story-card-preview-placeholder>${info.icon}</div>'">`:`<div class="story-card-preview-placeholder">${info.icon}</div>`}
+        <div style="position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);padding:4px 8px;border-radius:6px">
+          <div style="width:22px;height:22px;border-radius:6px;background:${color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white">${initials}</div>
+          <span style="font-size:11px;color:white;font-weight:500">${client.name}</span>
+        </div>
+      </div>
+      <div class="story-card-body">
+        <div style="margin-bottom:8px">${statusHtml}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-accent" onclick="openStoryEditor('${client.id}','${currentStoryType}','${escHtml(client.name)}')">✏️ ${hasContent?'Modifier':'Configurer'}</button>
+          ${hasVisuel?`<button class="btn btn-sm btn-purple" onclick="regenerateStory('${client.id}','${currentStoryType}')">🔄 Régénérer</button>`:''}
+          ${template?.actif!==false
+            ?`<button class="btn btn-sm btn-yellow" onclick="toggleStoryTemplate('${client.id}','${currentStoryType}',false)">⏸ Désactiver</button>`
+            :`<button class="btn btn-sm btn-green" onclick="toggleStoryTemplate('${client.id}','${currentStoryType}',true)">▶ Activer</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openStoryEditor(clientId,type,clientName){
+  const titles2={entreprise:'🏢 Présentation entreprise',tarifs:'💰 Tarifs & Services',temoignage:'⭐ Témoignage client',avant_apres:'🔄 Avant / Après'};
+  document.getElementById('story-modal-title').textContent=`${titles2[type]} — ${clientName}`;
+  const existing=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);
+  const c2=existing?.content||{};
+  const forms={
+    entreprise:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||clientName)}"></div><div class="form-group"><label class="form-label">Accroche</label><input class="form-input" id="st-sous_titre" value="${escHtml(c2.sous_titre||'')}"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="st-texte">${escHtml(c2.texte||'')}</textarea></div>`,
+    tarifs:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Nos tarifs')}"></div><div class="form-group"><label class="form-label">Services & tarifs (un par ligne)</label><textarea class="form-input" id="st-services" style="min-height:120px">${escHtml((c2.services||'').replace(/<br>/g,'\n'))}</textarea></div>`,
+    temoignage:`<div class="form-group"><label class="form-label">Témoignage *</label><textarea class="form-input" id="st-texte" style="min-height:100px">${escHtml(c2.texte||'')}</textarea></div><div class="form-group"><label class="form-label">Nom du client</label><input class="form-input" id="st-nom_client" value="${escHtml(c2.nom_client||'')}"></div><div class="form-group"><label class="form-label">Note</label><select class="form-select form-input" id="st-note">${[5,4,3].map(n=>`<option value="${n}" ${c2.note==n?'selected':''}>${'⭐'.repeat(n)}</option>`).join('')}</select></div>`,
+    avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div><div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:16px;font-size:12px;color:var(--text3);line-height:1.8">Uploadez vos photos dans la médiathèque et taguez-les :<br><strong>story_category = 'avant'</strong> et <strong>story_category = 'apres'</strong></div>`
+  };
+  document.getElementById('story-modal-body').innerHTML=`${forms[type]||''}<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="closeModal('modal-story-template')">Annuler</button><button class="btn btn-purple" onclick="saveStoryTemplate('${clientId}','${type}')">💾 Enregistrer</button><button class="btn btn-accent" onclick="saveAndGenerateStory('${clientId}','${type}')">🎨 Générer le visuel</button></div>`;
+  openModal('modal-story-template');
+}
+
+function collectStoryFormData(type){
+  const get=id=>document.getElementById(id)?.value?.trim()||'';
+  switch(type){
+    case 'entreprise': return{titre:get('st-titre'),sous_titre:get('st-sous_titre'),texte:get('st-texte')};
+    case 'tarifs':     return{titre:get('st-titre'),services:get('st-services').replace(/\n/g,'<br>')};
+    case 'temoignage': return{texte:get('st-texte'),nom_client:get('st-nom_client'),note:parseInt(get('st-note')||'5')};
+    case 'avant_apres':return{titre:get('st-titre')};
+    default:           return{};
+  }
+}
+
+async function saveStoryTemplate(clientId,type){
+  const content=collectStoryFormData(type);
+  try{const r=await fetch('/api/story-templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});if(!r.ok)throw new Error();await loadStoryTemplates();closeModal('modal-story-template');toast('Template enregistré ✓','success');}
+  catch{toast('Erreur sauvegarde','warn');}
+}
+
+async function saveAndGenerateStory(clientId,type){
+  const content=collectStoryFormData(type);
+  const btn=event.target;btn.disabled=true;btn.textContent='⏳ Génération...';
+  try{const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});const data=await r.json();if(!r.ok)throw new Error(data.error);await loadStoryTemplates();closeModal('modal-story-template');toast('Visuel généré ! 🎨','success');}
+  catch(e){toast('Erreur: '+e.message,'warn');}
+  finally{btn.disabled=false;btn.textContent='🎨 Générer le visuel';}
+}
+
+async function regenerateStory(clientId,type){
+  toast('Régénération...','info');
+  try{const t=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content:t?.content||{}})});if(!r.ok)throw new Error();await loadStoryTemplates();toast('Visuel régénéré ✓','success');}
+  catch{toast('Erreur régénération','warn');}
+}
+
+async function toggleStoryTemplate(clientId,type,actif){
+  try{await fetch('/api/story-templates/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,actif})});await loadStoryTemplates();toast(actif?'Story activée ▶':'Story désactivée ⏸','success');}
+  catch{toast('Erreur','warn');}
 }
 </script>
 </body>

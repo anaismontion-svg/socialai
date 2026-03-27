@@ -1,0 +1,111 @@
+// routes/story-templates.js
+// À ajouter dans server.js : app.use('/api/story-templates', require('./routes/story-templates'));
+
+const express  = require('express');
+const router   = express.Router();
+const axios    = require('axios');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase      = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const ASSEMBLER_URL = process.env.ASSEMBLER_URL || 'http://localhost:5001';
+
+// ── GET tous les templates ───────────────────────────────────────────────────
+router.get('/', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('story_templates')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json(data || []);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST sauvegarder un template ─────────────────────────────────────────────
+router.post('/', async (req, res) => {
+  const { clientId, type, content } = req.body;
+  if (!clientId || !type) return res.status(400).json({ error: 'clientId et type requis' });
+  try {
+    const { data, error } = await supabase
+      .from('story_templates')
+      .upsert({
+        client_id: clientId,
+        type,
+        content,
+        actif:     true,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'client_id,type' })
+      .select();
+    if (error) throw error;
+    res.json({ success: true, template: data[0] });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST générer le visuel via assembleur ────────────────────────────────────
+router.post('/generate', async (req, res) => {
+  const { clientId, type, content } = req.body;
+  if (!clientId || !type) return res.status(400).json({ error: 'clientId et type requis' });
+
+  try {
+    // Récupérer les infos client
+    const { data: client } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('id', clientId)
+      .single();
+    if (!client) throw new Error('Client introuvable');
+
+    // Sauvegarder le contenu d'abord
+    await supabase.from('story_templates').upsert({
+      client_id: clientId, type, content, actif: true,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'client_id,type' });
+
+    // Appeler l'assembleur
+    const response = await axios.post(
+      `${ASSEMBLER_URL}/story`,
+      { client_id: clientId, client_name: client.name, branding: client.branding || {}, story_type: type, content },
+      { responseType: 'arraybuffer', timeout: 60000 }
+    );
+
+    // Upload dans Supabase Storage
+    const buffer   = Buffer.from(response.data);
+    const filename = `story_${type}_${Date.now()}.jpg`;
+    const path     = `stories/${clientId}/${filename}`;
+
+    const { error: uploadErr } = await supabaseAdmin.storage
+      .from('media')
+      .upload(path, buffer, { contentType: 'image/jpeg', upsert: true });
+    if (uploadErr) throw new Error(`Upload: ${uploadErr.message}`);
+
+    const { data: urlData } = supabaseAdmin.storage.from('media').getPublicUrl(path);
+    const visualUrl = urlData.publicUrl;
+
+    // Mettre à jour le template avec le visuel
+    await supabase.from('story_templates').update({
+      visuel_url:   visualUrl,
+      generated_at: new Date().toISOString()
+    }).eq('client_id', clientId).eq('type', type);
+
+    res.json({ success: true, visuel_url: visualUrl });
+
+  } catch(e) {
+    console.error('❌ Génération story template:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── POST toggle actif/inactif ─────────────────────────────────────────────────
+router.post('/toggle', async (req, res) => {
+  const { clientId, type, actif } = req.body;
+  try {
+    await supabase.from('story_templates')
+      .update({ actif })
+      .eq('client_id', clientId)
+      .eq('type', type);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+module.exports = router;
