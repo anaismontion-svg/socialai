@@ -261,8 +261,8 @@ textarea.form-input{resize:vertical;min-height:80px}
 .story-type-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
 .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all 0.2s}
 .story-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
-.story-card-preview{height:180px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.story-card-preview img{width:100%;height:100%;object-fit:cover}
+.story-card-preview{height:aspect-ratio:9/16;max-height:420px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.story-card-preview img{width:100%;height:100%;object-fit:cover;transition:transform 0.2s}.story-card-preview img:hover{transform:scale(1.03)}}
 .story-card-preview-placeholder{font-size:40px;opacity:0.4}
 .story-card-body{padding:14px}
 .story-card-status{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px}
@@ -1176,7 +1176,7 @@ function renderStoryTemplates(){
         :`<span class="story-card-status story-status-none">⚙️ Non configuré</span>`;
     return `<div class="story-card">
       <div class="story-card-preview">
-        ${hasVisuel?`<img src="${template.visuel_url}" onerror="this.parentElement.innerHTML='<div class=story-card-preview-placeholder>${info.icon}</div>'">`:`<div class="story-card-preview-placeholder">${info.icon}</div>`}
+        ${hasVisuel?`<img src="${template.visuel_url}" onclick="window.open('${template.visuel_url}','_blank')" onerror="this.parentElement.innerHTML='<div class=story-card-preview-placeholder>${info.icon}</div>'">`:`<div class="story-card-preview-placeholder">${info.icon}</div>`}
         <div style="position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);padding:4px 8px;border-radius:6px">
           <div style="width:22px;height:22px;border-radius:6px;background:${color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white">${initials}</div>
           <span style="font-size:11px;color:white;font-weight:500">${client.name}</span>
