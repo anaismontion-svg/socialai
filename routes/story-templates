@@ -1,6 +1,3 @@
-// routes/story-templates.js
-// À ajouter dans server.js : app.use('/api/story-templates', require('./routes/story-templates'));
-
 const express  = require('express');
 const router   = express.Router();
 const axios    = require('axios');
@@ -66,21 +63,11 @@ router.post('/generate', async (req, res) => {
     const response = await axios.post(
       `${ASSEMBLER_URL}/story`,
       { client_id: clientId, client_name: client.name, branding: client.branding || {}, story_type: type, content },
-      { responseType: 'arraybuffer', timeout: 60000 }
+      { timeout: 60000 }
     );
 
-    // Upload dans Supabase Storage
-    const buffer   = Buffer.from(response.data);
-    const filename = `story_${type}_${Date.now()}.jpg`;
-    const path     = `stories/${clientId}/${filename}`;
-
-    const { error: uploadErr } = await supabaseAdmin.storage
-      .from('media')
-      .upload(path, buffer, { contentType: 'image/jpeg', upsert: true });
-    if (uploadErr) throw new Error(`Upload: ${uploadErr.message}`);
-
-    const { data: urlData } = supabaseAdmin.storage.from('media').getPublicUrl(path);
-    const visualUrl = urlData.publicUrl;
+    if (!response.data.success) throw new Error(response.data.error);
+    const visualUrl = response.data.url;
 
     // Mettre à jour le template avec le visuel
     await supabase.from('story_templates').update({
@@ -107,5 +94,3 @@ router.post('/toggle', async (req, res) => {
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
-
-module.exports = router;
