@@ -1,3 +1,29 @@
+    // Appeler l'assembleur
+    const response = await axios.post(
+      `${ASSEMBLER_URL}/story`,
+      { client_id: clientId, client_name: client.name, branding: client.branding || {}, story_type: type, content },
+      { timeout: 60000 }
+    );
+
+    if (!response.data.success) throw new Error(response.data.error);
+    const visualUrl = response.data.url;
+
+    // Mettre à jour le template avec le visuel
+    await supabase.from('story_templates').update({
+      visuel_url:   visualUrl,
+      generated_at: new Date().toISOString()
+    }).eq('client_id', clientId).eq('type', type);
+
+    res.json({ success: true, visuel_url: visualUrl });
+```
+
+Puis dans le terminal VSCode :
+```
+git add .
+git commit -m "fix: story generate uses JSON response"
+git push
+🐰envoie le code complet23:46javascript// routes/story-templates.js
+
 const express  = require('express');
 const router   = express.Router();
 const axios    = require('axios');
@@ -94,3 +120,5 @@ router.post('/toggle', async (req, res) => {
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
+
+module.exports = router;
