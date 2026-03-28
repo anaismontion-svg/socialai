@@ -261,39 +261,41 @@ textarea.form-input{resize:vertical;min-height:80px}
 .story-type-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
 .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all 0.2s}
 .story-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
-.story-card-preview{height:aspect-ratio:9/16;max-height:420px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.story-card-preview img{width:100%;height:100%;object-fit:cover;transition:transform 0.2s}.story-card-preview img:hover{transform:scale(1.03)}}
+.story-card-preview{aspect-ratio:9/16;max-height:420px;background:var(--bg3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:zoom-in}
+.story-card-preview img{width:100%;height:100%;object-fit:cover;transition:transform 0.2s}
+.story-card-preview img:hover{transform:scale(1.03)}
 .story-card-preview-placeholder{font-size:40px;opacity:0.4}
 .story-card-body{padding:14px}
 .story-card-status{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px}
 .story-status-ok{background:rgba(34,197,94,0.12);color:var(--green)}
 .story-status-missing{background:rgba(234,179,8,0.12);color:var(--yellow)}
 .story-status-none{background:var(--surface);color:var(--text3)}
+
+/* PHOTO PICKER GRID */
+.photo-picker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;background:var(--bg3)}
+.photo-picker-item{aspect-ratio:1;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.15s;position:relative}
+.photo-picker-item:hover{border-color:var(--accent)}
+.photo-picker-item.selected{border-color:var(--accent)}
+.photo-picker-item.selected::after{content:'✓';position:absolute;inset:0;background:rgba(255,59,107,0.5);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700}
+.photo-picker-item img{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════
-     ÉCRAN DE CONNEXION ADMIN
-     ═══════════════════════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">✦</div>
     <div class="login-title">SocialAI</div>
     <div class="login-sub">Accès réservé au community manager</div>
-    <input class="login-input" type="password" id="admin-password" placeholder="••••••••••••"
-           onkeydown="if(event.key==='Enter') checkLogin()">
+    <input class="login-input" type="password" id="admin-password" placeholder="••••••••••••" onkeydown="if(event.key==='Enter') checkLogin()">
     <button class="login-btn" onclick="checkLogin()">Accéder au back office →</button>
     <div class="login-error" id="login-error">Mot de passe incorrect</div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     APPLICATION BACK OFFICE (cachée jusqu'à connexion)
-     ═══════════════════════════════════════════════════════════ -->
 <div id="app">
 
-<!-- ── MODAL POST DETAIL ── -->
+<!-- MODAL POST DETAIL -->
 <div class="overlay" id="modal-post-detail">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -304,7 +306,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── MODAL ADD CLIENT ── -->
+<!-- MODAL ADD CLIENT -->
 <div class="overlay" id="modal-add-client">
   <div class="modal">
     <div class="modal-header">
@@ -358,7 +360,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── MODAL CHANGE PLAN ── -->
+<!-- MODAL CHANGE PLAN -->
 <div class="overlay" id="modal-change-plan">
   <div class="modal" style="max-width:420px">
     <div class="modal-header">
@@ -385,7 +387,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── MODAL SWITCH CLIENT ── -->
+<!-- MODAL SWITCH CLIENT -->
 <div class="overlay" id="modal-switch-client">
   <div class="modal" style="max-width:380px">
     <div class="modal-header">
@@ -399,7 +401,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── MODAL UPLOAD ── -->
+<!-- MODAL UPLOAD -->
 <div class="overlay" id="modal-upload">
   <div class="modal" style="max-width:600px">
     <div class="modal-header">
@@ -428,6 +430,17 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="btn" onclick="closeModal('modal-upload')">Fermer</button>
       <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">🤖 Analyser →</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL STORY TEMPLATE -->
+<div class="overlay" id="modal-story-template">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <div class="modal-title" id="story-modal-title">Configurer la story</div>
+      <button class="modal-close" onclick="closeModal('modal-story-template')">✕</button>
+    </div>
+    <div id="story-modal-body"></div>
   </div>
 </div>
 
@@ -515,37 +528,16 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="section-title">Bonjour 👋 Voici votre tableau de bord</div>
         <div class="section-sub" id="dashboard-date">Chargement...</div>
         <div class="stats-grid">
-          <div class="stat-card" style="--glow-color:rgba(255,59,107,0.08)">
-            <div class="stat-icon">👥</div><div class="stat-label">Clients actifs</div>
-            <div class="stat-value" id="stat-clients">0</div><div class="stat-delta">Comptes gérés</div>
-          </div>
-          <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)">
-            <div class="stat-icon">📸</div><div class="stat-label">Publications</div>
-            <div class="stat-value" id="stat-posts">0</div><div class="stat-delta">Historique + planifiés</div>
-          </div>
-          <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)">
-            <div class="stat-icon">❤️</div><div class="stat-label">Likes total</div>
-            <div class="stat-value" id="stat-likes">0</div><div class="stat-delta">Toutes publications</div>
-          </div>
-          <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)">
-            <div class="stat-icon">📊</div><div class="stat-label">Engagement moy.</div>
-            <div class="stat-value" id="stat-engagement">0</div><div class="stat-delta">Likes+comments/post</div>
-          </div>
+          <div class="stat-card" style="--glow-color:rgba(255,59,107,0.08)"><div class="stat-icon">👥</div><div class="stat-label">Clients actifs</div><div class="stat-value" id="stat-clients">0</div><div class="stat-delta">Comptes gérés</div></div>
+          <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)"><div class="stat-icon">📸</div><div class="stat-label">Publications</div><div class="stat-value" id="stat-posts">0</div><div class="stat-delta">Historique + planifiés</div></div>
+          <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)"><div class="stat-icon">❤️</div><div class="stat-label">Likes total</div><div class="stat-value" id="stat-likes">0</div><div class="stat-delta">Toutes publications</div></div>
+          <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)"><div class="stat-icon">📊</div><div class="stat-label">Engagement moy.</div><div class="stat-value" id="stat-engagement">0</div><div class="stat-delta">Likes+comments/post</div></div>
         </div>
         <div class="grid-2">
-          <div class="card">
-            <div class="card-header"><div class="card-title">📈 Évolution engagement</div></div>
-            <canvas id="chart-dashboard" height="160"></canvas>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">⭐ Top publications</div><button class="card-action" onclick="nav('reports')">Voir tout →</button></div>
-            <div id="dashboard-top-posts"></div>
-          </div>
+          <div class="card"><div class="card-header"><div class="card-title">📈 Évolution engagement</div></div><canvas id="chart-dashboard" height="160"></canvas></div>
+          <div class="card"><div class="card-header"><div class="card-title">⭐ Top publications</div><button class="card-action" onclick="nav('reports')">Voir tout →</button></div><div id="dashboard-top-posts"></div></div>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">👥 Clients actifs</div><button class="card-action" onclick="nav('clients')">Gérer →</button></div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="dashboard-clients"></div>
-        </div>
+        <div class="card"><div class="card-header"><div class="card-title">👥 Clients actifs</div><button class="card-action" onclick="nav('clients')">Gérer →</button></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="dashboard-clients"></div></div>
       </div>
 
       <!-- CLIENTS -->
@@ -585,16 +577,8 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="section-sub" id="reports-client-label">Publications historiques + planifiées</div>
         <div class="stats-grid" id="reports-stats-grid" style="margin-bottom:20px"></div>
         <div class="comparison-grid" id="reports-comparison" style="display:none">
-          <div class="comparison-card comparison-before">
-            <div class="comparison-label">📅 Avant l'IA</div>
-            <div class="comparison-value" id="cmp-before-val">—</div>
-            <div class="comparison-sub" id="cmp-before-sub">eng. moyen / post</div>
-          </div>
-          <div class="comparison-card comparison-after">
-            <div class="comparison-label">🤖 Avec l'IA</div>
-            <div class="comparison-value" id="cmp-after-val" style="color:var(--accent)">—</div>
-            <div class="comparison-sub" id="cmp-after-sub">eng. moyen / post</div>
-          </div>
+          <div class="comparison-card comparison-before"><div class="comparison-label">📅 Avant l'IA</div><div class="comparison-value" id="cmp-before-val">—</div><div class="comparison-sub" id="cmp-before-sub">eng. moyen / post</div></div>
+          <div class="comparison-card comparison-after"><div class="comparison-label">🤖 Avec l'IA</div><div class="comparison-value" id="cmp-after-val" style="color:var(--accent)">—</div><div class="comparison-sub" id="cmp-after-sub">eng. moyen / post</div></div>
         </div>
         <div class="card" style="margin-bottom:20px">
           <div class="card-header">
@@ -682,68 +666,40 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-
-<!-- ── MODAL STORY TEMPLATE ── -->
-<div class="overlay" id="modal-story-template">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-header">
-      <div class="modal-title" id="story-modal-title">Configurer la story</div>
-      <button class="modal-close" onclick="closeModal('modal-story-template')">✕</button>
-    </div>
-    <div id="story-modal-body"></div>
-  </div>
-</div>
-
 </div><!-- fin #app -->
 
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-// AUTH BACK OFFICE — Vérification mot de passe admin
-// ══════════════════════════════════════════════════════════════
 const SESSION_KEY = 'socialai_admin_session';
 
 function checkLogin() {
   const pwd = document.getElementById('admin-password').value;
   if (!pwd) return;
-  // Vérification côté serveur via l'endpoint reset-password avec une clé fictive
-  // On utilise une vérification simple : on envoie la clé au backend
   verifyAdminKey(pwd);
 }
 
 async function verifyAdminKey(key) {
   try {
-    // Utilise l'endpoint existant pour valider la clé admin
     const r = await fetch('/api/auth/reset-password', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ clientId:'check-only', adminKey: key })
     });
     const data = await r.json();
-    // Si l'erreur est "Client introuvable" et PAS "Clé admin invalide" → clé correcte
     if (data.error === 'Client introuvable') {
-      // Clé valide !
       sessionStorage.setItem(SESSION_KEY, key);
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       init();
-    } else {
-      showLoginError();
-    }
-  } catch {
-    showLoginError();
-  }
+    } else { showLoginError(); }
+  } catch { showLoginError(); }
 }
 
 function showLoginError() {
   const err = document.getElementById('login-error');
   err.style.display = 'block';
   document.getElementById('admin-password').style.borderColor = 'var(--accent)';
-  setTimeout(() => {
-    err.style.display = 'none';
-    document.getElementById('admin-password').style.borderColor = '';
-  }, 3000);
+  setTimeout(() => { err.style.display = 'none'; document.getElementById('admin-password').style.borderColor = ''; }, 3000);
 }
 
 function logout() {
@@ -753,22 +709,12 @@ function logout() {
   document.getElementById('admin-password').value = '';
 }
 
-// Vérifier si déjà connecté
 window.addEventListener('DOMContentLoaded', () => {
   const saved = sessionStorage.getItem(SESSION_KEY);
-  if (saved) {
-    verifyAdminKey(saved).catch(() => {
-      document.getElementById('login-screen').style.display = 'flex';
-    });
-  }
-  document.getElementById('admin-password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkLogin();
-  });
+  if (saved) { verifyAdminKey(saved).catch(() => { document.getElementById('login-screen').style.display = 'flex'; }); }
+  document.getElementById('admin-password').addEventListener('keydown', e => { if (e.key === 'Enter') checkLogin(); });
 });
 
-// ══════════════════════════════════════════════════════════════
-// TOUT LE CODE BACK OFFICE (inchangé par rapport à ton original)
-// ══════════════════════════════════════════════════════════════
 let clients=[], activeClient=null, mediaItems=[], reportsData=null;
 let reportsChart=null, dashChart=null;
 let currentChartMetric='likes', currentReportTab='all';
@@ -794,7 +740,6 @@ async function loadClients() {
 }
 
 function getClientColor(idx){const c=['linear-gradient(135deg,#E1306C,#833AB4)','linear-gradient(135deg,#f97316,#eab308)','linear-gradient(135deg,#14b8a6,#8b5cf6)','linear-gradient(135deg,#3b82f6,#06b6d4)','linear-gradient(135deg,#10b981,#059669)'];return c[idx%c.length];}
-
 function updateSidebarClient(){if(!activeClient)return;const i=activeClient.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);document.getElementById('sidebar-client-avatar').textContent=i;document.getElementById('sidebar-client-name').textContent=activeClient.name;document.getElementById('sidebar-client-plan').textContent='Plan '+(activeClient.plan||'starter').charAt(0).toUpperCase()+(activeClient.plan||'starter').slice(1);}
 
 function renderClients(){
@@ -834,7 +779,6 @@ function renderDashboardClients(){
 }
 
 function selectClient(id){activeClient=clients.find(c=>c.id===id||c.id===parseInt(id));if(!activeClient)return;updateSidebarClient();renderClients();renderSwitcherList();renderDashboardClients();closeModal('modal-switch-client');}
-
 function renderSwitcherList(){
   const el=document.getElementById('client-switch-list');
   el.innerHTML=clients.map((c,idx)=>{
@@ -1141,7 +1085,8 @@ function toast(msg,type='info'){
 // ══════════════════════════════════════════════════════════════
 // STORIES FIXES
 // ══════════════════════════════════════════════════════════════
-let currentStoryType='entreprise',storyTemplatesData=[];
+let currentStoryType='entreprise', storyTemplatesData=[], storyClientMedias={};
+let selectedPhotoUrl = '';
 
 function selectStoryType(type,btn){
   currentStoryType=type;
@@ -1196,29 +1141,79 @@ function renderStoryTemplates(){
   }).join('');
 }
 
-function openStoryEditor(clientId,type,clientName){
+async function openStoryEditor(clientId, type, clientName){
   const titles2={entreprise:'🏢 Présentation entreprise',tarifs:'💰 Tarifs & Services',temoignage:'⭐ Témoignage client',avant_apres:'🔄 Avant / Après'};
   document.getElementById('story-modal-title').textContent=`${titles2[type]} — ${clientName}`;
   const existing=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);
   const c2=existing?.content||{};
+  selectedPhotoUrl = c2.photo_url || '';
+
   const forms={
     entreprise:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||clientName)}"></div><div class="form-group"><label class="form-label">Accroche</label><input class="form-input" id="st-sous_titre" value="${escHtml(c2.sous_titre||'')}"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="st-texte">${escHtml(c2.texte||'')}</textarea></div>`,
     tarifs:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Nos tarifs')}"></div><div class="form-group"><label class="form-label">Services & tarifs (un par ligne)</label><textarea class="form-input" id="st-services" style="min-height:120px">${escHtml((c2.services||'').replace(/<br>/g,'\n'))}</textarea></div>`,
     temoignage:`<div class="form-group"><label class="form-label">Témoignage *</label><textarea class="form-input" id="st-texte" style="min-height:100px">${escHtml(c2.texte||'')}</textarea></div><div class="form-group"><label class="form-label">Nom du client</label><input class="form-input" id="st-nom_client" value="${escHtml(c2.nom_client||'')}"></div><div class="form-group"><label class="form-label">Note</label><select class="form-select form-input" id="st-note">${[5,4,3].map(n=>`<option value="${n}" ${c2.note==n?'selected':''}>${'⭐'.repeat(n)}</option>`).join('')}</select></div>`,
-    avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div><div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;margin-bottom:16px;font-size:12px;color:var(--text3);line-height:1.8">Uploadez vos photos dans la médiathèque et taguez-les :<br><strong>story_category = 'avant'</strong> et <strong>story_category = 'apres'</strong></div>`
+    avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div>`
   };
-  document.getElementById('story-modal-body').innerHTML=`${forms[type]||''}<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="closeModal('modal-story-template')">Annuler</button><button class="btn btn-purple" onclick="saveStoryTemplate('${clientId}','${type}')">💾 Enregistrer</button><button class="btn btn-accent" onclick="saveAndGenerateStory('${clientId}','${type}')">🎨 Générer le visuel</button></div>`;
+
+  // Charger les photos du client
+  let photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Chargement des photos...</div>';
+  try {
+    const mr = await fetch(`/api/media/${clientId}`);
+    const medias = await mr.json();
+    const photos = medias.filter(m => m.type==='photo' && m.url);
+    if(photos.length === 0){
+      photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Aucune photo disponible dans la médiathèque</div>';
+    } else {
+      photosHtml = `<div class="photo-picker-grid" id="photo-picker-grid">${photos.map(m=>`<div class="photo-picker-item${selectedPhotoUrl===m.url?' selected':''}" onclick="selectStoryPhoto('${m.url}',this)"><img src="${m.url}" onerror="this.parentElement.style.display='none'"></div>`).join('')}</div>`;
+    }
+  } catch(e) {
+    photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Erreur chargement photos</div>';
+  }
+
+  document.getElementById('story-modal-body').innerHTML=`
+    ${forms[type]||''}
+    <div class="form-group">
+      <label class="form-label">📸 Photo de fond ${selectedPhotoUrl?'<span style="color:var(--green);font-size:10px">✓ Sélectionnée</span>':''}</label>
+      ${selectedPhotoUrl?`<div style="margin-bottom:8px;border-radius:var(--r-sm);overflow:hidden;height:100px"><img id="st-photo-preview-img" src="${selectedPhotoUrl}" style="width:100%;height:100%;object-fit:cover"></div>`:''}
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Cliquez sur une photo pour la sélectionner comme fond :</div>
+      ${photosHtml}
+      ${selectedPhotoUrl?`<button class="btn btn-sm" style="margin-top:6px;font-size:11px" onclick="selectStoryPhoto('',null)">✕ Retirer la photo</button>`:''}
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn" onclick="closeModal('modal-story-template')">Annuler</button>
+      <button class="btn btn-purple" onclick="saveStoryTemplate('${clientId}','${type}')">💾 Enregistrer</button>
+      <button class="btn btn-accent" onclick="saveAndGenerateStory('${clientId}','${type}')">🎨 Générer le visuel</button>
+    </div>`;
+
   openModal('modal-story-template');
+}
+
+function selectStoryPhoto(url, el){
+  selectedPhotoUrl = url;
+  // Mise à jour visuelle
+  document.querySelectorAll('.photo-picker-item').forEach(i=>i.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  // Mettre à jour la preview et le bouton retirer
+  const previewImg = document.getElementById('st-photo-preview-img');
+  if(url){
+    if(previewImg){ previewImg.src = url; }
+    else {
+      const label = document.querySelector('.form-group:last-of-type .form-label');
+      if(label) label.innerHTML = '📸 Photo de fond <span style="color:var(--green);font-size:10px">✓ Sélectionnée</span>';
+    }
+  }
+  toast(url ? 'Photo sélectionnée ✓' : 'Photo retirée', 'success');
 }
 
 function collectStoryFormData(type){
   const get=id=>document.getElementById(id)?.value?.trim()||'';
+  const photo_url = selectedPhotoUrl || '';
   switch(type){
-    case 'entreprise': return{titre:get('st-titre'),sous_titre:get('st-sous_titre'),texte:get('st-texte')};
-    case 'tarifs':     return{titre:get('st-titre'),services:get('st-services').replace(/\n/g,'<br>')};
-    case 'temoignage': return{texte:get('st-texte'),nom_client:get('st-nom_client'),note:parseInt(get('st-note')||'5')};
-    case 'avant_apres':return{titre:get('st-titre')};
-    default:           return{};
+    case 'entreprise': return{titre:get('st-titre'),sous_titre:get('st-sous_titre'),texte:get('st-texte'),photo_url};
+    case 'tarifs':     return{titre:get('st-titre'),services:get('st-services').replace(/\n/g,'<br>'),photo_url};
+    case 'temoignage': return{texte:get('st-texte'),nom_client:get('st-nom_client'),note:parseInt(get('st-note')||'5'),photo_url};
+    case 'avant_apres':return{titre:get('st-titre'),photo_url};
+    default:           return{photo_url};
   }
 }
 
