@@ -3,12 +3,8 @@ const axios     = require('axios');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// ─────────────────────────────────────────────
-// 📧 ENVOI EMAIL VIA RESEND (axios — pas node-fetch)
-// ─────────────────────────────────────────────
 async function sendEmail(to, subject, html) {
   console.log(`📧 Tentative envoi email à ${to} — sujet: ${subject}`);
-  console.log(`🔑 RESEND_API_KEY présente: ${!!process.env.RESEND_API_KEY}`);
   try {
     const response = await axios.post(
       'https://api.resend.com/emails',
@@ -29,19 +25,12 @@ async function sendEmail(to, subject, html) {
   }
 }
 
-// ─────────────────────────────────────────────
-// 💾 MÉMOIRE PERSISTANTE — SUPABASE
-// Survit aux redémarrages Railway
-// ─────────────────────────────────────────────
-const memoryCache = {}; // Cache RAM pour la session courante
+const memoryCache = {};
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Charger depuis Supabase (ou créer si inexistant)
 async function getMemory(senderId, supabase = null) {
-  // 1. Vérifier le cache RAM d'abord (évite trop de requêtes)
   if (memoryCache[senderId]) return memoryCache[senderId];
 
-  // 2. Charger depuis Supabase si disponible
   if (supabase) {
     try {
       const { data } = await supabase
@@ -71,10 +60,9 @@ async function getMemory(senderId, supabase = null) {
         memoryCache[senderId] = memory;
         return memory;
       }
-    } catch(e) { /* Pas encore en base, on crée */ }
+    } catch(e) {}
   }
 
-  // 3. Nouvelle mémoire vierge
   const memory = {
     firstContactAt:     null,
     lastSeenAt:         null,
@@ -96,7 +84,6 @@ async function getMemory(senderId, supabase = null) {
   return memory;
 }
 
-// Sauvegarder en Supabase après chaque interaction
 async function saveMemory(memory) {
   const supabase = memory._supabase;
   const senderId = memory._senderId;
@@ -116,7 +103,7 @@ async function saveMemory(memory) {
       first_name_confirmed: memory.firstNameConfirmed,
       phone_number:         memory.phoneNumber,
       gathering_turns:      memory.gatheringTurns,
-      history:              memory.history.slice(-20), // garder les 20 derniers
+      history:              memory.history.slice(-20),
       known_facts:          memory.knownFacts,
       updated_at:           new Date().toISOString()
     }, { onConflict: 'sender_id' });
@@ -125,9 +112,6 @@ async function saveMemory(memory) {
   }
 }
 
-// ─────────────────────────────────────────────
-// ⏱️ TIMING DU CONTACT
-// ─────────────────────────────────────────────
 function getContactTiming(memory) {
   const now = new Date();
   if (memory.isFirstContact) {
@@ -143,9 +127,6 @@ function getContactTiming(memory) {
   return 'same_session';
 }
 
-// ─────────────────────────────────────────────
-// 👤 EXTRACTION PRÉNOM DEPUIS PSEUDO
-// ─────────────────────────────────────────────
 function extractFirstNameFromUsername(username) {
   if (!username) return null;
   const cleaned = username.replace(/[0-9._\-]/g, ' ').trim();
@@ -154,22 +135,16 @@ function extractFirstNameFromUsername(username) {
   return words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase();
 }
 
-// ─────────────────────────────────────────────
-// 👋 SALUTATION — SIMPLE, SANS RÉPÉTITION
-// Utilise le vrai nom si disponible, sinon devine depuis le pseudo
-// ─────────────────────────────────────────────
 function buildGreeting(timing, memory, senderUsername = '', senderName = '') {
   const v = memory.vouvoiement !== false;
   switch (timing) {
     case 'first': {
       let greeting = `Bonjour,`;
 
-      // Utiliser le vrai nom en priorité, sinon extraire du pseudo
       if (!memory.firstName) {
         let guessedName = null;
 
         if (senderName) {
-          // Vrai nom depuis l'API Meta — prendre le premier mot
           const firstName = senderName.split(' ')[0];
           if (firstName && firstName.length >= 2) {
             guessedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
@@ -187,7 +162,6 @@ function buildGreeting(timing, memory, senderUsername = '', senderName = '') {
           memory.knownFacts.push('prenom_demande');
         }
       } else if (memory.firstName && memory.firstNameConfirmed) {
-        // Prénom déjà confirmé — l'utiliser directement
         greeting += `\nRavi${v ? '' : 'e'} de vous retrouver, ${memory.firstName} !`;
       }
 
@@ -206,9 +180,6 @@ function buildGreeting(timing, memory, senderUsername = '', senderName = '') {
   }
 }
 
-// ─────────────────────────────────────────────
-// 📧 EMAIL RÉSUMÉ CONTACT
-// ─────────────────────────────────────────────
 async function sendEmailSummary(senderInfo, reason, coordinates, clientEmail) {
   const reasonLabels = {
     'partenariat':             '🤝 Demande de partenariat',
@@ -216,12 +187,11 @@ async function sendEmailSummary(senderInfo, reason, coordinates, clientEmail) {
     'question_personnelle':    '👤 Message personnel',
     'plainte_grave':           '⚠️ Réclamation grave',
     'liste_attente':           "🐱 Inscription liste d'attente",
+    'adoption':                "🐱 Demande d'adoption",
     'hors_sujet':              '❓ Demande hors sujet'
   };
   const dest    = clientEmail || process.env.GMAIL_USER;
   const subject = `[SocialAI] ${reasonLabels[reason] || 'Nouvelle demande'} — @${senderInfo.accountName || 'instagram'}`;
-
-  console.log(`📨 Préparation email résumé → ${dest} | raison: ${reason}`);
 
   const html = `
   <div style="font-family:sans-serif;max-width:560px;margin:0 auto;background:#0d0d14;color:#f5f4f0;border-radius:12px;padding:28px">
@@ -256,17 +226,14 @@ async function sendEmailSummary(senderInfo, reason, coordinates, clientEmail) {
   return await sendEmail(dest, subject, html);
 }
 
-// ─────────────────────────────────────────────
-// 🔍 CLASSIFICATION MESSAGE
-// ─────────────────────────────────────────────
 async function classifyMessage(text) {
   const message = await anthropic.messages.create({
     model:      'claude-sonnet-4-20250514',
     max_tokens: 100,
     system: `Tu es un classificateur de messages Instagram. Réponds UNIQUEMENT avec un JSON sur une seule ligne, sans markdown.
-Catégories : "renseignement","compliment","liste_attente","partenariat","opportunite_commerciale","question_personnelle","plainte_grave","hors_sujet","autre"
+Catégories : "renseignement","compliment","adoption","liste_attente","partenariat","opportunite_commerciale","question_personnelle","plainte_grave","hors_sujet","autre"
 Format : {"categorie":"...","besoin_humain":true/false}
-besoin_humain=true pour : partenariat, opportunite_commerciale, question_personnelle, plainte_grave, liste_attente`,
+besoin_humain=true pour : partenariat, opportunite_commerciale, question_personnelle, plainte_grave, liste_attente, adoption`,
     messages: [{ role:'user', content:`Classifie : "${text}"` }]
   });
   try {
@@ -276,9 +243,6 @@ besoin_humain=true pour : partenariat, opportunite_commerciale, question_personn
   }
 }
 
-// ─────────────────────────────────────────────
-// 💬 RÉPONSE COMMENTAIRES
-// ─────────────────────────────────────────────
 async function generateCommentReply(commentText, accountName = '', accountDescription = '') {
   const response = await anthropic.messages.create({
     model:       'claude-sonnet-4-20250514',
@@ -300,9 +264,10 @@ Retourne UNIQUEMENT la réponse.`,
   return response.content[0].text.trim();
 }
 
-// ─────────────────────────────────────────────
-// 🤖 RÉPONSE DM PRINCIPALE
-// ─────────────────────────────────────────────
+function detectAdoptionInterest(text) {
+  return /\b(adopt|chaton|chatons|ragdoll|disponible|disponibles|liste|attente|réserver|réservation|prix|tarif|combien|acheter|acquérir|bébé|portée)\b/i.test(text);
+}
+
 async function generateReply(
   messageText,
   accountName        = '',
@@ -317,22 +282,18 @@ async function generateReply(
 ) {
   const memory = await getMemory(senderId, supabase);
 
-  // Stocker le vrai nom si disponible et prénom pas encore connu
   if (senderName && !memory.firstName) {
     const firstName = senderName.split(' ')[0];
     if (firstName && firstName.length >= 2) {
       memory.firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
-      memory.firstNameConfirmed = true; // vrai nom = confirmé automatiquement
+      memory.firstNameConfirmed = true;
       memory.knownFacts.push(`prénom_réel:${memory.firstName}`);
-      console.log(`✅ Prénom réel enregistré : ${memory.firstName}`);
     }
   }
 
-  // Vouvoiement/tutoiement
   if (/\b(tu|toi|ton|ta|tes|t'|t'as|t'es|vas-y|fais)\b/i.test(messageText))
     memory.vouvoiement = false;
 
-  // Confirmation prénom
   if (memory.firstName && !memory.firstNameConfirmed) {
     if (/\b(oui|c'est ça|exact|tout à fait|effectivement|bien sûr|yes)\b/i.test(messageText)) {
       memory.firstNameConfirmed = true;
@@ -340,42 +301,34 @@ async function generateReply(
     }
   }
 
-  // Détecter téléphone
   const phoneMatch = messageText.match(/(?:(?:\+|00)33|0)[1-9](?:[.\-\s]?\d{2}){4}/);
   if (phoneMatch && !memory.phoneNumber) {
     memory.phoneNumber = phoneMatch[0];
     memory.knownFacts.push(`téléphone:${phoneMatch[0]}`);
   }
 
-  // ── STATUT : attente coordonnées → email résumé
   if (memory.status === 'waiting_coordinates') {
     memory.status = 'coordinates_received';
     const historyText = memory.history
       .map(m => `${m.role === 'user' ? 'Contact' : 'Aria'}: ${m.content}`)
       .join('\n');
-    console.log(`📨 Coordonnées reçues de ${senderId} — envoi email résumé`);
     await sendEmailSummary(
       { senderId, firstName:memory.firstName, originalMessage:memory.originalMessage, accountName, conversationHistory:historyText, knownFacts:memory.knownFacts },
       memory.reason, messageText, clientEmail
     );
     const v   = memory.vouvoiement !== false;
-    const rep = isSoloEntrepreneur
-      ? `Merci beaucoup ! 😊\n\nJe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`
-      : `Merci beaucoup ! 😊\n\nNotre équipe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`;
+    const rep = `Merci beaucoup ! 😊\n\nJe ${v ? 'vous' : 'te'} recontacte très prochainement.\n\nÀ très vite ! ✨`;
     memory.history.push({ role:'user', content:messageText });
     memory.history.push({ role:'assistant', content:rep });
     await saveMemory(memory);
-    await delay(2000);
+    await delay(20000 + Math.random() * 10000);
     return rep;
   }
 
-  // ── STATUT : coordonnées déjà reçues → silence
   if (memory.status === 'coordinates_received') {
-    console.log(`🔕 Coordonnées déjà reçues pour ${senderId} — message ignoré`);
     return null;
   }
 
-  // ── STATUT : gathering_info — collecte d'infos
   if (memory.status === 'gathering_info') {
     memory.gatheringTurns++;
     memory.history.push({ role:'user', content:messageText });
@@ -383,16 +336,12 @@ async function generateReply(
     if (memory.gatheringTurns >= 2) {
       memory.status = 'waiting_coordinates';
       const v = memory.vouvoiement !== false;
-      const phoneRequest = v
-        ? `C'est super intéressant ! Pour qu'on puisse en discuter plus en détail, pourriez-vous m'envoyer votre numéro de téléphone ? Ce sera bien plus simple d'échanger de vive voix 😊`
-        : `C'est super intéressant ! Pour qu'on puisse en discuter plus en détail, pourrais-tu m'envoyer ton numéro ? Ce sera bien plus simple de vive voix 😊`;
-      const suite = isSoloEntrepreneur
-        ? `Je reviendrai vers ${v ? 'vous' : 'toi'} au plus vite.`
-        : `Notre équipe reviendra vers ${v ? 'vous' : 'toi'} au plus vite.`;
-      const rep = `${phoneRequest}\n\n${suite}`;
+      const rep = v
+        ? `Pour qu'on puisse en discuter directement, pourriez-vous m'envoyer votre numéro de téléphone ? Je reviendrai vers vous au plus vite 😊`
+        : `Pour qu'on puisse en discuter directement, pourrais-tu m'envoyer ton numéro ? Je reviendrai vers toi au plus vite 😊`;
       memory.history.push({ role:'assistant', content:rep });
       await saveMemory(memory);
-      await delay(2000);
+      await delay(20000 + Math.random() * 10000);
       return rep;
     }
 
@@ -401,7 +350,6 @@ async function generateReply(
     return rep;
   }
 
-  // ── Génération normale ──────────────────────────────────────────────────────
   const timing   = getContactTiming(memory);
   const greeting = buildGreeting(timing, memory, senderUsername, senderName);
   const v        = memory.vouvoiement !== false;
@@ -411,36 +359,50 @@ async function generateReply(
   if (memory.phoneNumber) knownInfo.push(`Téléphone : ${memory.phoneNumber}`);
   const knownInfoText = knownInfo.length ? `\nINFOS DÉJÀ CONNUES :\n${knownInfo.join('\n')}\n` : '';
 
-  const systemPrompt = `Tu es la community manager du compte Instagram @${accountName}.
-${isSoloEntrepreneur ? 'Entreprise individuelle. Utilise "je", jamais "notre équipe".' : 'Cette entreprise a une équipe.'}
-Contexte : ${accountDescription || 'Compte Instagram professionnel'}
+  const adoptionInterest = detectAdoptionInterest(messageText);
+
+  const systemPrompt = `Tu ES ${accountName}, tu gères ce compte Instagram en ton nom propre.
+Tu es une personne réelle — jamais un robot, jamais une assistante.
+${isSoloEntrepreneur ? `Tu parles en ton nom : "je", jamais "notre équipe".` : ''}
+Contexte de ton activité : ${accountDescription || 'Compte Instagram professionnel'}
 ${knownInfoText}
-RÈGLES :
-- Ce compte parle EXCLUSIVEMENT de chats Ragdoll.
+
+TON COMPORTEMENT :
+- Tu réponds UNIQUEMENT à ce qui est demandé. Pas plus.
+- Tu es naturelle, chaleureuse, authentique — comme si tu tapais depuis ton téléphone.
+- Tu ne poses JAMAIS de question en retour.
+- Tu n'es JAMAIS dans la vente ou la promotion.
 - ${v ? 'Vouvoiement' : 'Tutoiement'}
+- 1 emoji max, ton décontracté et humain.
+- Réponse courte et directe.
 - Ne redemande JAMAIS une info déjà donnée.
-- Ton chaleureux, humain, naturel. 2 émojis max.
-- Varie toujours les formulations.
-IMPORTANT : Ne commence JAMAIS par une salutation ni "Merci pour votre message" — déjà géré.`;
+${adoptionInterest ? `
+IMPORTANT : Cette personne semble intéressée par une adoption. À la fin de ta réponse, propose-lui naturellement d'échanger directement — dis-lui qu'elle peut t'envoyer son numéro pour qu'on puisse en parler de vive voix. Formule-le très naturellement, sans pression.` : ''}
+IMPORTANT : Ne commence JAMAIS par une salutation — déjà gérée séparément.`;
 
   const msgs = [...memory.history.slice(-10), { role:'user', content:messageText }];
   const response = await anthropic.messages.create({
-    model:'claude-sonnet-4-20250514', max_tokens:350, temperature:1,
+    model:'claude-sonnet-4-20250514', max_tokens:300, temperature:0.8,
     system:systemPrompt, messages:msgs
   });
 
   const body = response.content[0].text;
   memory.history.push({ role:'user', content:messageText });
   memory.history.push({ role:'assistant', content:body });
+
+  if (adoptionInterest && memory.status === 'normal') {
+    memory.status          = 'waiting_coordinates';
+    memory.reason          = 'adoption';
+    memory.originalMessage = messageText;
+  }
+
   await saveMemory(memory);
 
-  await delay(body.length > 200 ? 3000 : Math.random() > 0.5 ? 2000 : 1000);
+  const isLongMessage = body.split('\n').length > 5 || body.length > 300;
+  await delay(isLongMessage ? 45000 : 20000 + Math.random() * 10000);
   return greeting + body;
 }
 
-// ─────────────────────────────────────────────
-// 🔍 COLLECTE D'INFOS — réponse pendant gathering_info
-// ─────────────────────────────────────────────
 async function generateGatheringReply(memory, messageText, accountName, accountDescription, isSoloEntrepreneur) {
   const v = memory.vouvoiement !== false;
   const reason = memory.reason;
@@ -449,6 +411,10 @@ async function generateGatheringReply(memory, messageText, accountName, accountD
     partenariat: [
       `Pourriez-${v ? 'vous' : 'tu'} me parler un peu plus de ${v ? 'votre' : 'ton'} concept ?`,
       `Et ${v ? 'votre' : 'ton'} audience, elle ressemble à quoi ?`
+    ],
+    adoption: [
+      `${v ? 'Vous cherchez' : 'Tu cherches'} un chaton pour quelle période environ ?`,
+      `${v ? 'Vous avez' : 'As-tu'} déjà eu des Ragdoll ou ce serait une première ?`
     ],
     liste_attente: [
       `${v ? 'Vous souhaitez' : 'Tu souhaites'} un chaton pour quelle période environ ?`,
@@ -467,15 +433,11 @@ async function generateGatheringReply(memory, messageText, accountName, accountD
   const questions = questionsByReason[reason] || questionsByReason.default;
   const question  = questions[memory.gatheringTurns % questions.length];
 
-  const systemPrompt = `Tu es la community manager d'@${accountName}.
+  const systemPrompt = `Tu ES ${accountName}, tu parles en ton nom propre sur Instagram.
 ${isSoloEntrepreneur ? 'Utilise "je", jamais "notre équipe".' : ''}
 Contexte : ${accountDescription || 'Compte professionnel'}
 
-Tu collectes des informations avant de demander des coordonnées.
-Raison du contact : ${reason}
-Tour actuel : ${memory.gatheringTurns + 1}/2
-
-Réponds de façon naturelle et chaleureuse au message, puis pose cette question de manière fluide (intègre-la naturellement) :
+Réponds naturellement au message, puis pose cette question de façon très fluide et humaine :
 "${question}"
 
 RÈGLES :
@@ -483,26 +445,25 @@ RÈGLES :
 - Court et naturel (2-3 phrases max)
 - 1 emoji max
 - Ne demande PAS le téléphone — pas encore
+- Tu es une personne réelle, pas un robot
 IMPORTANT : Ne commence pas par une salutation.`;
 
   const response = await anthropic.messages.create({
     model:       'claude-sonnet-4-20250514',
     max_tokens:  200,
-    temperature: 0.9,
+    temperature: 0.85,
     system:      systemPrompt,
     messages:    [...memory.history.slice(-8), { role:'user', content:messageText }]
   });
 
   const body = response.content[0].text;
   memory.history.push({ role:'assistant', content:body });
-  await delay(2000);
+
+  const isLongMessage = body.split('\n').length > 5 || body.length > 300;
+  await delay(isLongMessage ? 45000 : 20000 + Math.random() * 10000);
   return body;
 }
 
-// ─────────────────────────────────────────────
-// 🙋 DÉCLENCHEMENT INTERVENTION HUMAINE
-// Nouveau flow : greeting → question → question → coordonnées
-// ─────────────────────────────────────────────
 async function generateHumanNeededReply(
   accountName        = '',
   accessToken        = '',
@@ -527,14 +488,15 @@ async function generateHumanNeededReply(
   const greeting = buildGreeting(timing, memory, senderUsername, senderName);
   const v        = memory.vouvoiement !== false;
 
-  await delay(2000);
+  await delay(20000 + Math.random() * 10000);
 
   const firstQuestionByReason = {
-    partenariat:             `C'est avec plaisir que j'écoute ${v?'votre':'ta'} proposition ! ✨\n\nQuel type de collaboration ${v?'avez-vous':'as-tu'} en tête ?`,
-    liste_attente:           `Bien sûr, je serais ravie de ${v?'vous':'te'} mettre sur la liste ! 🐱\n\n${v?'Vous cherchez':'Tu cherches'} un chaton pour quelle période environ ?`,
-    opportunite_commerciale: `Merci beaucoup pour ce contact ! ✨\n\nEst-ce que ${v?'vous pouvez':'tu peux'} m'en dire un peu plus sur ${v?'votre':'ton'} projet ?`,
-    question_personnelle:    `Bien sûr, je suis là ! 😊\n\nDe quoi s'agit-il ?`,
-    plainte_grave:           `Je suis vraiment désolée d'entendre ça. 😔\n\nEst-ce que ${v?'vous pouvez':'tu peux'} me donner plus de détails ?`,
+    partenariat:             `Super, j'adore les projets de collaboration ! ✨\n\nQuel type de partenariat ${v?'avez-vous':'as-tu'} en tête ?`,
+    adoption:                `Oh, ${v?'vous êtes':'tu es'} intéressé${v?'':'(e)'} par un de nos chatons ? 🐱\n\n${v?'Vous cherchez':'Tu cherches'} pour quelle période environ ?`,
+    liste_attente:           `Avec plaisir ! 🐱\n\n${v?'Vous souhaitez':'Tu souhaites'} un chaton pour quelle période ?`,
+    opportunite_commerciale: `Merci pour ce message ! ✨\n\n${v?'Vous pouvez':'Tu peux'} m'en dire plus sur ${v?'votre':'ton'} projet ?`,
+    question_personnelle:    `Bien sûr, je suis là 😊\n\nDe quoi s'agit-il ?`,
+    plainte_grave:           `Je suis vraiment désolée d'entendre ça 😔\n\n${v?'Vous pouvez':'Tu peux'} me donner plus de détails ?`,
     default:                 `Avec plaisir ! ✨\n\n${v?'Vous pouvez':'Tu peux'} m'en dire plus ?`
   };
 
@@ -547,9 +509,6 @@ async function generateHumanNeededReply(
   return reponse;
 }
 
-// ─────────────────────────────────────────────
-// ⏰ RELANCES
-// ─────────────────────────────────────────────
 async function scheduleFollowUp(supabase, senderId, accountId, accessToken) {
   try {
     const scheduledAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -560,7 +519,6 @@ async function scheduleFollowUp(supabase, senderId, accountId, accessToken) {
       scheduled_at: scheduledAt,
       sent:         false
     }, { onConflict:'sender_id' });
-    console.log(`⏰ Relance programmée pour ${senderId}`);
   } catch (err) { console.error('❌ Relance:', err.message); }
 }
 
@@ -591,9 +549,6 @@ async function processFollowUps(supabase) {
   } catch (err) { console.error('❌ Relances:', err.message); }
 }
 
-// ─────────────────────────────────────────────
-// 📤 ENVOI DES MESSAGES
-// ─────────────────────────────────────────────
 async function replyToComment(commentId, reply, accessToken) {
   try {
     const response = await axios.post(
@@ -601,7 +556,6 @@ async function replyToComment(commentId, reply, accessToken) {
       { message: reply },
       { params: { access_token: accessToken } }
     );
-    console.log(`✅ Commentaire : "${reply}"`);
     return response.data;
   } catch (error) {
     console.error(`❌ Commentaire ${commentId}:`, error.response?.data || error.message);
@@ -616,7 +570,6 @@ async function replyToDM(recipientId, reply, accessToken) {
       { recipient:{ id:recipientId }, message:{ text:reply } },
       { params:{ access_token:accessToken } }
     );
-    console.log(`✅ DM envoyé à ${recipientId}`);
     return response.data;
   } catch (error) {
     console.error(`❌ DM ${recipientId}:`, error.response?.data || error.message);
@@ -634,5 +587,5 @@ module.exports = {
   processFollowUps,
   replyToComment,
   replyToDM,
-  getMemory   // ← exporté pour meta.js
+  getMemory
 };
