@@ -144,18 +144,19 @@ router.post('/migrate-from-instagram/:clientId', async (req, res) => {
 
   try {
     // Récupérer le token Meta du client
-    const { data: client, error: clientErr } = await supabase
-      .from('clients')
-      .select('meta_access_token, instagram_account_id')
-      .eq('id', clientId)
+    const { data: account, error: accountErr } = await supabase
+      .from('social_accounts')
+      .select('access_token, account_id')
+      .eq('client_id', clientId)
+      .eq('platform', 'instagram')
       .single();
 
-    if (clientErr || !client?.meta_access_token) {
+    if (accountErr || !account?.access_token) {
       return res.status(400).json({ error: 'Token Meta introuvable pour ce client' });
     }
 
-    const token = client.meta_access_token;
-    const igAccountId = client.instagram_account_id;
+    const token = account.access_token;
+    const igAccountId = account.account_id;
 
     // Récupérer tous les médias via l'API Meta (jusqu'à 100)
     const metaUrl = `https://graph.facebook.com/v18.0/${igAccountId}/media?fields=id,media_type,media_url,thumbnail_url,timestamp&limit=100&access_token=${token}`;
