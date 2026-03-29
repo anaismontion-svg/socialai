@@ -1160,7 +1160,7 @@ async function openStoryEditor(clientId, type, clientName){
   try {
     const mr = await fetch(`/api/media/${clientId}`);
     const medias = await mr.json();
-    const photos = medias.filter(m => m.type==='photo' && m.url);
+const photos = medias.filter(m => m.type==='photo' && m.url && m.url.includes('supabase'));
     if(photos.length === 0){
       photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Aucune photo disponible dans la médiathèque</div>';
     } else {
