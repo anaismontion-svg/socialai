@@ -135,7 +135,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
 // ─────────────────────────────────────────────
 // POST /api/media/migrate-from-instagram/:clientId
-// Récupère les photos via l'API Meta (URLs fraîches)
+// Récupère les photos via l'API Instagram Graph (URLs fraîches)
 // et les stocke définitivement dans Supabase Storage
 // ─────────────────────────────────────────────
 router.post('/migrate-from-instagram/:clientId', async (req, res) => {
@@ -143,7 +143,7 @@ router.post('/migrate-from-instagram/:clientId', async (req, res) => {
   console.log(`📸 Migration Instagram API → Supabase pour client ${clientId}`);
 
   try {
-    // Récupérer le token Meta du client
+    // Récupérer le token depuis social_accounts
     const { data: account, error: accountErr } = await supabase
       .from('social_accounts')
       .select('access_token, account_id')
@@ -155,26 +155,34 @@ router.post('/migrate-from-instagram/:clientId', async (req, res) => {
       return res.status(400).json({ error: 'Token Meta introuvable pour ce client' });
     }
 
-    const token = account.access_token;
+    const token       = account.access_token;
     const igAccountId = account.account_id;
 
-    // Récupérer tous les médias via l'API Meta (jusqu'à 100)
-    const metaUrl = `https://graph.facebook.com/v18.0/${igAccountId}/media?fields=id,media_type,media_url,thumbnail_url,timestamp&limit=100&access_token=${token}`;
-    const metaRes = await axios.get(metaUrl, { timeout: 15000 });
-    const igMedias = metaRes.data?.data || [];
+    // Récupérer les médias via l'API Instagram Graph (même endpoint que instagram-sync.js)
+    const igPhotos = [];
+    let url = `https://graph.instagram.com/${igAccountId}/media?fields=id,media_type,media_url,timestamp&access_token=${token}&limit=100`;
 
-    const photos = igMedias.filter(m => m.media_type === 'IMAGE' && m.media_url);
-    console.log(`📸 ${photos.length} photos trouvées via API Meta`);
+    while (url) {
+      const res2 = await axios.get(url, { timeout: 15000 });
+      const data = res2.data;
+      if (data.error) throw new Error(data.error.message);
+      const photos = (data.data || []).filter(m => m.media_type === 'IMAGE' && m.media_url);
+      igPhotos.push(...photos);
+      url = data.paging?.next || null;
+      if (igPhotos.length >= 200) break; // limite de sécurité
+    }
+
+    console.log(`📸 ${igPhotos.length} photos trouvées via API Instagram`);
 
     // Réponse immédiate, migration en arrière-plan
-    res.json({ success: true, total: photos.length, message: `Migration de ${photos.length} photos lancée en arrière-plan` });
+    res.json({ success: true, total: igPhotos.length, message: `Migration de ${igPhotos.length} photos lancée en arrière-plan` });
 
     let migrated = 0;
     let failed   = 0;
 
-    for (const igMedia of photos) {
+    for (const igMedia of igPhotos) {
       try {
-        // Télécharger la photo depuis l'URL fraîche Meta
+        // Télécharger la photo depuis l'URL fraîche
         const imgRes = await axios.get(igMedia.media_url, {
           responseType: 'arraybuffer',
           timeout: 20000,
@@ -186,7 +194,7 @@ router.post('/migrate-from-instagram/:clientId', async (req, res) => {
         const ext      = mimeType.includes('png') ? 'png' : 'jpg';
         const filename = `${clientId}/instagram_${igMedia.id}.${ext}`;
 
-        // Upload Supabase Storage
+        // Upload dans Supabase Storage
         const { error: uploadErr } = await supabaseAdmin.storage
           .from('media')
           .upload(filename, buffer, { contentType: mimeType, upsert: true });
@@ -196,42 +204,38 @@ router.post('/migrate-from-instagram/:clientId', async (req, res) => {
         const { data: urlData } = supabaseAdmin.storage.from('media').getPublicUrl(filename);
         const permanentUrl = urlData.publicUrl;
 
-        // Mettre à jour ou insérer dans la table media
+        // Chercher le média existant par instagram_post_id
         const { data: existing } = await supabase
           .from('media')
           .select('id')
           .eq('client_id', clientId)
-          .eq('instagram_id', igMedia.id)
+          .eq('instagram_post_id', igMedia.id)
           .single();
 
         if (existing) {
-          // Mettre à jour l'URL
           await supabase
             .from('media')
             .update({ url: permanentUrl, type: 'photo' })
             .eq('id', existing.id);
         } else {
-          // Insérer nouveau média
           await supabase
             .from('media')
             .insert([{
-              client_id:    clientId,
-              instagram_id: igMedia.id,
-              filename:     `instagram_${igMedia.id}.${ext}`,
-              type:         'photo',
-              url:          permanentUrl,
-              statut:       'importe',
-              qualite:      70,
-              potentiel_viral: 60,
-              used:         false,
+              client_id:          clientId,
+              instagram_post_id:  igMedia.id,
+              filename:           `instagram_${igMedia.id}.${ext}`,
+              type:               'photo',
+              url:                permanentUrl,
+              statut:             'importe',
+              qualite:            70,
+              potentiel_viral:    60,
+              used:               false,
               original_post_date: igMedia.timestamp
             }]);
         }
 
         migrated++;
-        console.log(`✅ ${migrated}/${photos.length} — ${igMedia.id}`);
-
-        // Pause légère
+        console.log(`✅ ${migrated}/${igPhotos.length} — ${igMedia.id}`);
         await new Promise(r => setTimeout(r, 300));
 
       } catch(e) {
