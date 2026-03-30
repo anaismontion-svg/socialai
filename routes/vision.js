@@ -92,10 +92,6 @@ function diversify(sortedMedia, count) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Détermine automatiquement le meilleur format selon le stock disponible
-// Règles :
-//   - 1 vidéo dispo avec bon score → reel
-//   - 3+ photos dispos              → carousel
-//   - sinon                         → single
 // ─────────────────────────────────────────────────────────────────────────────
 async function decideFormat(clientId) {
   const { data: videos } = await supabase
@@ -128,11 +124,15 @@ async function decideFormat(clientId) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Marque les médias comme utilisés après publication
+// Enregistre used_at = maintenant pour permettre le recyclage automatique
 // ─────────────────────────────────────────────────────────────────────────────
 async function markAsUsed(mediaIds) {
   const { error } = await supabase
     .from('media')
-    .update({ used: true })
+    .update({
+      used:    true,
+      used_at: new Date().toISOString()
+    })
     .in('id', mediaIds);
 
   if (error) throw new Error(`Erreur markAsUsed : ${error.message}`);
