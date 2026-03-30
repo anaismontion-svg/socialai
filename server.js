@@ -23,6 +23,10 @@ app.use('/api/reports',         require('./routes/reports'));
 app.use('/api/branding',        require('./routes/branding'));
 app.use('/api/pipeline',        require('./routes/pipeline'));
 app.use('/api/story-templates', require('./routes/story-templates'));
+app.use('/api/romi', require('./routes/romi'));
+app.use('/api/romi-auth', require('./routes/romi-auth').router);
+app.get('/romi.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi.html')));
+app.get('/romi-login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi-login.html')));
 app.use('/',                    require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
