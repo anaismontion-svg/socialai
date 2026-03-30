@@ -1,6 +1,7 @@
 // routes/pipeline.js — Orchestrateur génération automatique de contenu IA
 // Gère : single, story, carousel, citation
 // Feed pattern dynamique basé sur les performances réelles
+// Recyclage automatique des médias selon l'ancienneté du compte
 
 const express  = require('express');
 const router   = express.Router();
@@ -14,13 +15,68 @@ const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KE
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Calcule l'intervalle de recyclage selon l'ancienneté du compte client
+// < 3 mois  → 60 jours
+// < 1 an    → 120 jours
+// ≥ 3 ans   → 180 jours (6 mois)
+// ─────────────────────────────────────────────────────────────────────────────
+function getRecycleInterval(client) {
+  const createdAt = client.created_at ? new Date(client.created_at) : new Date();
+  const ageMs     = Date.now() - createdAt.getTime();
+  const ageDays   = ageMs / (1000 * 60 * 60 * 24);
+
+  if (ageDays < 90)  return 60;   // < 3 mois  → 60 jours
+  if (ageDays < 365) return 120;  // < 1 an    → 120 jours
+  return 180;                     // ≥ 1 an    → 180 jours (6 mois)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Recycle automatiquement les médias dont used_at est plus vieux
+// que l'intervalle calculé pour ce client
+// Retourne le nombre de médias recyclés
+// ─────────────────────────────────────────────────────────────────────────────
+async function autoRecycleIfNeeded(client) {
+  const intervalDays = getRecycleInterval(client);
+  const cutoff = new Date(Date.now() - intervalDays * 24 * 60 * 60 * 1000).toISOString();
+
+  // Compter combien de médias sont disponibles AVANT recyclage
+  const stock = await countAvailableMedia(client.id);
+
+  // Seuil bas : si moins de 5 médias disponibles → déclencher le recyclage
+  if (stock >= 5) return 0;
+
+  console.log(`♻️  ${client.name} — stock faible (${stock}), recyclage médias > ${intervalDays}j...`);
+
+  const { data, error } = await supabase
+    .from('media')
+    .update({ used: false, used_at: null })
+    .eq('client_id', client.id)
+    .eq('used', true)
+    .lt('used_at', cutoff)
+    .select('id');
+
+  if (error) {
+    console.error(`❌ Erreur recyclage ${client.name}: ${error.message}`);
+    return 0;
+  }
+
+  const count = data?.length || 0;
+  if (count > 0) {
+    console.log(`✅ ${count} médias recyclés pour ${client.name} (intervalle ${intervalDays}j)`);
+  } else {
+    console.warn(`⚠️ Aucun média recyclable pour ${client.name} — tous utilisés récemment`);
+  }
+
+  return count;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Analyse les performances récentes pour décider du prochain format
 // Logique : on regarde les 10 derniers posts publiés, on calcule
 // l'engagement moyen par format, et on choisit ce qui performe le mieux
 // tout en respectant la règle : pas 2 citations consécutives
 // ─────────────────────────────────────────────────────────────────────────────
 async function decideNextFormat(clientId) {
-  // Récupérer les 10 derniers posts publiés avec leurs stats
   const { data: recentPosts } = await supabase
     .from('queue')
     .select('type, likes, comments, reach, saves, source')
@@ -29,19 +85,15 @@ async function decideNextFormat(clientId) {
     .order('published_at', { ascending: false })
     .limit(10);
 
-  // Récupérer le dernier post pour éviter les répétitions
   const lastPost = recentPosts?.[0];
   const lastType = lastPost?.type || null;
 
-  // Si pas assez d'historique → pattern par défaut
   if (!recentPosts || recentPosts.length < 3) {
     const defaults = ['single', 'citation', 'single', 'carousel', 'citation', 'story'];
     const idx      = (recentPosts?.length || 0) % defaults.length;
     return defaults[idx];
   }
 
-  // Calculer le score d'engagement par format
-  // Score = (likes * 1) + (comments * 3) + (saves * 5) + (reach * 0.01)
   const scores = {};
   const counts = {};
 
@@ -57,24 +109,19 @@ async function decideNextFormat(clientId) {
     counts[type] += 1;
   }
 
-  // Moyennes
   const averages = {};
   for (const type of Object.keys(scores)) {
     averages[type] = scores[type] / counts[type];
   }
 
-  // Formats disponibles (hors citation si le dernier était une citation)
   const allFormats = ['single', 'story', 'carousel', 'citation'];
   const available  = allFormats.filter(f => {
-    if (f === 'citation' && lastType === 'citation') return false; // pas 2 citations consécutives
-    if (f === 'carousel') return true; // toujours proposer le carousel
+    if (f === 'citation' && lastType === 'citation') return false;
     return true;
   });
 
-  // Trier par performance (les formats inconnus reçoivent un score neutre de 50)
   available.sort((a, b) => (averages[b] || 50) - (averages[a] || 50));
 
-  // Introduire un peu d'aléatoire pour varier (80% meilleur format, 20% 2ème)
   if (available.length > 1 && Math.random() < 0.2) {
     return available[1];
   }
@@ -84,8 +131,6 @@ async function decideNextFormat(clientId) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Génère une citation adaptée à l'univers du client
-// Règle éditoriale : jamais "achetez chez nous"
-// Toujours : inspiration, savoir-faire, invitation douce
 // ─────────────────────────────────────────────────────────────────────────────
 async function generateCitation(client, topPosts) {
   const topCtx = topPosts.slice(0, 3).length > 0
@@ -201,7 +246,6 @@ function computeScheduledAt(mediaAnalyse, client) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Compte combien de citations ont été publiées ce mois
-// Pour ne pas en faire trop (max 30% des posts)
 // ─────────────────────────────────────────────────────────────────────────────
 async function getCitationRatioThisMonth(clientId) {
   const startOfMonth = new Date();
@@ -254,7 +298,6 @@ async function generateForClient(client) {
   if (format === 'citation') {
     const citationData = await generateCitation(client, topPosts);
 
-    // Compter les citations précédentes pour varier les variantes visuelles
     const { count: citCount } = await supabase
       .from('queue')
       .select('*', { count: 'exact', head: true })
@@ -296,13 +339,21 @@ async function generateForClient(client) {
 
   // ── CAS PHOTO (single, story, carousel) ───────────────────────────────────
   } else {
+
+    // ✨ RECYCLAGE AUTOMATIQUE si stock faible
+    await autoRecycleIfNeeded(client);
+
     const stock = await countAvailableMedia(client.id);
     if (stock === 0) {
-      console.warn(`⚠️ Stock vide pour ${client.name}`);
+      const intervalDays = getRecycleInterval(client);
+      console.warn(`⚠️ Contenu faible pour ${client.name} (0 médias restants) — tous utilisés dans les ${intervalDays}j`);
       return { skipped: true, reason: 'stock_vide' };
     }
 
-    // Adapter le count selon le format
+    if (stock <= 2) {
+      console.warn(`⚠️ Contenu faible pour ${client.name} (${stock} médias restants)`);
+    }
+
     const countMap = { single: 1, story: 1, carousel: 3 };
     const count    = countMap[format] || 1;
 
@@ -340,7 +391,6 @@ async function generateForClient(client) {
       console.warn(`⚠️ Assembleur indisponible — utilisation des URLs média originales`);
     }
 
-    // ── Fallback robuste : si pas de visuels assemblés, utiliser les URLs originales
     const finalMediaUrl  = visualUrls?.[0]  || primaryMedia.url || null;
     const finalMediaUrls = visualUrls        || mediaList.map(m => m.url).filter(Boolean);
 
@@ -442,15 +492,39 @@ router.post('/run', async (req, res) => {
 
 router.get('/stock/:clientId', async (req, res) => {
   try {
-    const count = await countAvailableMedia(req.params.clientId);
-    const format = await decideNextFormat(req.params.clientId).catch(() => 'unknown');
-    res.json({ available: count, next_format: format });
+    const { data: client } = await supabase
+      .from('clients').select('*').eq('id', req.params.clientId).single();
+    if (!client) return res.status(404).json({ error: 'Client introuvable' });
+    const count    = await countAvailableMedia(client.id);
+    const format   = await decideNextFormat(client.id).catch(() => 'unknown');
+    const interval = getRecycleInterval(client);
+    res.json({ available: count, next_format: format, recycle_interval_days: interval });
   } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
 router.get('/health', async (req, res) => {
   const assemblerOk = await checkAssemblerHealth();
   res.json({ pipeline: 'ok', assembler: assemblerOk ? 'ok' : 'unavailable' });
+});
+
+// Route pour forcer le recyclage manuel d'un client
+router.post('/recycle/:clientId', async (req, res) => {
+  try {
+    const { data: client } = await supabase
+      .from('clients').select('*').eq('id', req.params.clientId).single();
+    if (!client) return res.status(404).json({ error: 'Client introuvable' });
+    const intervalDays = getRecycleInterval(client);
+    const cutoff = new Date(Date.now() - intervalDays * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('media')
+      .update({ used: false, used_at: null })
+      .eq('client_id', client.id)
+      .eq('used', true)
+      .lt('used_at', cutoff)
+      .select('id');
+    if (error) throw new Error(error.message);
+    res.json({ recycled: data?.length || 0, interval_days: intervalDays });
+  } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
 module.exports = router;
