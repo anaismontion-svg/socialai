@@ -14,7 +14,7 @@
   --text:#f0f0fa;--text2:#9090b8;--text3:#5a5a7a;
   --accent:#ff5f7e;--accent2:#cc3a58;
   --green:#2dd4a0;--yellow:#f5c842;--blue:#5b8fff;--purple:#a78bfa;
-  --orange:#fb923c;
+  --orange:#fb923c;--red:#f87171;
   --r:10px;--r2:16px;--shadow:0 8px 32px rgba(0,0,0,.4);
 }
 html{scroll-behavior:smooth}
@@ -55,6 +55,10 @@ input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
 .btn-green:hover{background:rgba(45,212,160,.2)}
 .btn-blue{background:rgba(91,143,255,.12);color:var(--blue);border-color:rgba(91,143,255,.25)}
 .btn-blue:hover{background:rgba(91,143,255,.2)}
+.btn-red{background:rgba(248,113,113,.12);color:var(--red);border-color:rgba(248,113,113,.25)}
+.btn-red:hover{background:rgba(248,113,113,.2)}
+.btn-yellow{background:rgba(245,200,66,.12);color:var(--yellow);border-color:rgba(245,200,66,.25)}
+.btn-yellow:hover{background:rgba(245,200,66,.2)}
 .btn-sm{padding:4px 10px;font-size:12px}
 .panel{display:none}.panel.active{display:block}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
@@ -85,6 +89,7 @@ input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
 .prospect-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
 .prospect-table tr:hover td{background:var(--bg3);cursor:pointer}
 .prospect-table tr:last-child td{border-bottom:none}
+.prospect-table tr.banni td{opacity:.4}
 .company-name{font-weight:500;font-size:13px}
 .phone-mobile{color:var(--green);font-size:13px;font-weight:500}
 .phone-fixed{color:var(--text3);font-size:13px}
@@ -96,6 +101,7 @@ input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
 .badge-noint{background:rgba(90,90,122,.12);color:var(--text3)}
 .badge-client{background:rgba(255,95,126,.12);color:var(--accent)}
 .badge-hot{background:rgba(251,146,60,.12);color:var(--orange)}
+.badge-banni{background:rgba(248,113,113,.12);color:var(--red)}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
@@ -135,7 +141,6 @@ select.form-input{appearance:none}
 .cal-day.other-month .day-num{color:var(--text3);opacity:.4}
 .cal-event{width:90%;font-size:9px;padding:2px 4px;border-radius:3px;margin-bottom:1px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev-rdv{background:rgba(45,212,160,.2);color:var(--green)}
-.ev-relance{background:rgba(245,200,66,.2);color:var(--yellow)}
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:11px 15px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);min-width:260px;animation:slideInRight .3s ease}
 @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
@@ -156,8 +161,6 @@ select.form-input{appearance:none}
 .history-date{color:var(--text3);flex-shrink:0;width:80px}
 .history-text{color:var(--text2);flex:1}
 .divider{height:1px;background:var(--border);margin:16px 0}
-.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,95,126,.2);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .insta-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:10px}
 .insta-yes{background:rgba(45,212,160,.1);color:var(--green)}
@@ -165,8 +168,6 @@ select.form-input{appearance:none}
 .insta-maybe{background:rgba(245,200,66,.1);color:var(--yellow)}
 .section-title{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.5px}
 .section-sub{font-size:13px;color:var(--text3);margin-bottom:20px}
-
-/* RECHERCHE */
 .sector-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
 .sector-btn{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;text-align:center}
 .sector-btn:hover{border-color:var(--blue);color:var(--blue)}
@@ -181,9 +182,9 @@ select.form-input{appearance:none}
 .result-info{flex:1}
 .result-name{font-size:13px;font-weight:500;margin-bottom:2px}
 .result-sub{font-size:11px;color:var(--text3)}
-.result-phone{font-size:12px;font-weight:600;color:var(--green)}
-.result-added{background:rgba(45,212,160,.1);border-color:rgba(45,212,160,.2)}
-.result-added .result-name{color:var(--text3)}
+.result-phone{font-size:12px;font-weight:600}
+.result-added{background:rgba(45,212,160,.05);border-color:rgba(45,212,160,.15)}
+.danger-zone{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -224,9 +225,9 @@ select.form-input{appearance:none}
       <div>
         <label class="form-label">Sur Instagram ?</label>
         <div class="check-group" style="margin-top:8px">
-          <label class="check-pill" id="insta-oui-pill"><input type="radio" name="insta" value="oui"><span class="dot"></span>✅ Actif</label>
-          <label class="check-pill" id="insta-inactif-pill"><input type="radio" name="insta" value="inactif"><span class="dot"></span>😴 Inactif</label>
-          <label class="check-pill" id="insta-non-pill"><input type="radio" name="insta" value="non"><span class="dot"></span>❌ Non</label>
+          <label class="check-pill"><input type="radio" name="insta" value="oui"><span class="dot"></span>✅ Actif</label>
+          <label class="check-pill"><input type="radio" name="insta" value="inactif"><span class="dot"></span>😴 Inactif</label>
+          <label class="check-pill"><input type="radio" name="insta" value="non"><span class="dot"></span>❌ Non</label>
         </div>
       </div>
     </div>
@@ -279,7 +280,6 @@ select.form-input{appearance:none}
 </div>
 </div>
 
-<!-- APP -->
 <div class="app">
   <div class="sidebar">
     <div class="logo">
@@ -352,11 +352,10 @@ select.form-input{appearance:none}
         </div>
       </div>
 
-      <!-- RECHERCHE PROSPECTS -->
+      <!-- RECHERCHE -->
       <div class="panel" id="panel-recherche">
         <div class="section-title">🔍 Recherche de prospects</div>
         <div class="section-sub">Trouvez des artisans locaux et ajoutez-les en un clic</div>
-
         <div class="card" style="margin-bottom:16px">
           <div class="card-header"><div class="card-title">🏗️ Secteur d'activité</div></div>
           <div class="sector-grid">
@@ -369,7 +368,6 @@ select.form-input{appearance:none}
             <button class="sector-btn selected" data-sector="Menuisier" onclick="toggleSector(this)">🪚 Menuisier</button>
             <button class="sector-btn" data-sector="Couvreur" onclick="toggleSector(this)">🏠 Couvreur</button>
           </div>
-
           <div class="card-header" style="margin-top:8px"><div class="card-title">📍 Zone géographique</div></div>
           <div class="city-grid">
             <button class="city-btn selected" data-city="Pertuis" onclick="toggleCity(this)">📍 Pertuis</button>
@@ -382,13 +380,11 @@ select.form-input{appearance:none}
             <button class="city-btn" data-city="Arles" onclick="toggleCity(this)">📍 Arles</button>
             <button class="city-btn" data-city="Avignon" onclick="toggleCity(this)">📍 Avignon</button>
           </div>
-
           <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
             <button class="btn btn-accent" id="btn-search" onclick="searchProspects()" style="flex:1">🔍 Lancer la recherche Google Maps</button>
             <div id="search-status" style="font-size:12px;color:var(--text3)"></div>
           </div>
         </div>
-
         <div id="search-results" style="display:none">
           <div class="card-header" style="margin-bottom:12px">
             <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:600" id="results-title">Résultats</div>
@@ -409,6 +405,7 @@ select.form-input{appearance:none}
           <button class="filter-btn" onclick="setFilter(this,'rdv')">RDV</button>
           <button class="filter-btn" onclick="setFilter(this,'relance')">À relancer</button>
           <button class="filter-btn" onclick="setFilter(this,'noint')">Pas intéressés</button>
+          <button class="filter-btn" onclick="setFilter(this,'banni')">🚫 Bannis</button>
         </div>
         <div class="card" style="padding:0;overflow:hidden">
           <table class="prospect-table">
@@ -462,21 +459,15 @@ select.form-input{appearance:none}
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ============================================================
-// AUTH
-// ============================================================
 const token = localStorage.getItem('romi_token');
 const userName = localStorage.getItem('romi_user_name') || 'Commercial';
 if (!token) { window.location.href = '/romi-login.html'; }
-
 document.getElementById('user-name-display').textContent = userName;
 document.getElementById('user-av-initials').textContent = userName.slice(0,2).toUpperCase();
 
 function logout() {
   fetch('/api/romi-auth/logout', { method:'POST', headers:{ Authorization:`Bearer ${token}` } });
-  localStorage.removeItem('romi_token');
-  localStorage.removeItem('romi_user_name');
-  localStorage.removeItem('romi_user_role');
+  ['romi_token','romi_user_name','romi_user_role'].forEach(k => localStorage.removeItem(k));
   window.location.href = '/romi-login.html';
 }
 
@@ -489,306 +480,190 @@ async function api(path, opts={}) {
   return r.json();
 }
 
-// ============================================================
-// DATA
-// ============================================================
-let prospects = [];
-let rdvs = [];
-let currentFilter = 'all';
-let currentRDVProspectId = null;
-let calendarDate = new Date();
-let searchResults = [];
-let addedIds = new Set();
-let selectedSectors = new Set(['Électricien','Plombier','Maçon','Chauffagiste','Carreleur','Peintre','Menuisier']);
-let selectedCities = new Set(['Pertuis','Aix-en-Provence','Manosque','Apt','Cavaillon','Salon-de-Provence']);
+let prospects=[], rdvs=[], currentFilter='all', currentRDVProspectId=null, calendarDate=new Date();
+let searchResults=[], addedIds=new Set();
+let selectedSectors=new Set(['Électricien','Plombier','Maçon','Chauffagiste','Carreleur','Peintre','Menuisier']);
+let selectedCities=new Set(['Pertuis','Aix-en-Provence','Manosque','Apt','Cavaillon','Salon-de-Provence']);
 
 async function loadData() {
-  const [p, r] = await Promise.all([
-    api('/prospects'),
-    api('/rdv')
-  ]);
+  const [p, r] = await Promise.all([api('/prospects'), api('/rdv')]);
   if (p) prospects = p;
-  if (r) rdvs = r.map(rdv => ({
-    id: rdv.id,
-    prospect_id: rdv.prospect_id,
-    date: rdv.scheduled_at,
-    type: rdv.type,
-    notes: rdv.notes
-  }));
-  updateCounts();
-  renderDashboard();
-  renderProspects();
-  updateScriptSelect();
+  if (r) rdvs = r.map(rdv => ({ id:rdv.id, prospect_id:rdv.prospect_id, date:rdv.scheduled_at, type:rdv.type, notes:rdv.notes }));
+  updateCounts(); renderDashboard(); renderProspects(); updateScriptSelect();
 }
 
-// ============================================================
-// NAV
-// ============================================================
 const titles = { dashboard:'Tableau de bord', recherche:'Recherche prospects', prospects:'Mes prospects', agenda:'Agenda RDV', script:'Script d\'appel' };
-
 function nav(page) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('panel-' + page).classList.add('active');
   document.getElementById('topbar-title').textContent = titles[page];
   const order = ['dashboard','recherche','prospects','agenda','script'];
-  const idx = order.indexOf(page);
-  document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
-  if (page === 'dashboard') renderDashboard();
-  if (page === 'prospects') renderProspects();
-  if (page === 'agenda') renderAgenda();
-  if (page === 'script') renderScript();
+  document.querySelectorAll('.nav-item')[order.indexOf(page)]?.classList.add('active');
+  if (page==='dashboard') renderDashboard();
+  if (page==='prospects') renderProspects();
+  if (page==='agenda') renderAgenda();
+  if (page==='script') renderScript();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open') }
 function closeModal(id) { document.getElementById(id).classList.remove('open') }
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open') }));
 
-// ============================================================
-// RECHERCHE GOOGLE MAPS
-// ============================================================
+// RECHERCHE
 function toggleSector(btn) {
-  const s = btn.dataset.sector;
-  if (selectedSectors.has(s)) { selectedSectors.delete(s); btn.classList.remove('selected'); }
-  else { selectedSectors.add(s); btn.classList.add('selected'); }
+  const s=btn.dataset.sector;
+  if(selectedSectors.has(s)){selectedSectors.delete(s);btn.classList.remove('selected');}
+  else{selectedSectors.add(s);btn.classList.add('selected');}
 }
-
 function toggleCity(btn) {
-  const c = btn.dataset.city;
-  if (selectedCities.has(c)) { selectedCities.delete(c); btn.classList.remove('selected'); }
-  else { selectedCities.add(c); btn.classList.add('selected'); }
+  const c=btn.dataset.city;
+  if(selectedCities.has(c)){selectedCities.delete(c);btn.classList.remove('selected');}
+  else{selectedCities.add(c);btn.classList.add('selected');}
 }
 
 async function searchProspects() {
-  if (!selectedSectors.size || !selectedCities.size) { toast('Sélectionnez au moins un secteur et une ville','warn'); return; }
-  const btn = document.getElementById('btn-search');
-  const status = document.getElementById('search-status');
-  btn.disabled = true; btn.textContent = '⏳ Recherche en cours...';
-  searchResults = [];
-
-  for (const sector of selectedSectors) {
-    for (const city of selectedCities) {
-      status.textContent = `${sector} à ${city}...`;
-      const data = await api('/search/google', {
-        method: 'POST',
-        body: JSON.stringify({ query: sector, city })
-      });
-      if (data && !data.error) {
-        data.forEach(p => {
-          if (!searchResults.find(r => r.company_name === p.company_name)) {
-            searchResults.push({ ...p, sector, city });
-          }
-        });
-      }
-      await new Promise(r => setTimeout(r, 200));
+  if(!selectedSectors.size||!selectedCities.size){toast('Sélectionnez au moins un secteur et une ville','warn');return;}
+  const btn=document.getElementById('btn-search'), status=document.getElementById('search-status');
+  btn.disabled=true; btn.textContent='⏳ Recherche en cours...'; searchResults=[];
+  for(const sector of selectedSectors){
+    for(const city of selectedCities){
+      status.textContent=`${sector} à ${city}...`;
+      const data=await api('/search/google',{method:'POST',body:JSON.stringify({query:sector,city})});
+      if(data&&!data.error) data.forEach(p=>{if(!searchResults.find(r=>r.company_name===p.company_name))searchResults.push({...p,sector,city});});
+      await new Promise(r=>setTimeout(r,200));
     }
   }
-
-  btn.disabled = false; btn.textContent = '🔍 Lancer la recherche Google Maps';
-  status.textContent = '';
-
-  if (!searchResults.length) { toast('Aucun résultat trouvé','warn'); return; }
-
-  document.getElementById('search-results').style.display = 'block';
-  document.getElementById('results-title').textContent = `${searchResults.length} prospects trouvés`;
-  document.getElementById('nav-results-count').style.display = 'flex';
-  document.getElementById('nav-results-count').textContent = searchResults.length;
-  renderResults();
-  toast(`${searchResults.length} prospects trouvés !`, 'success');
+  btn.disabled=false; btn.textContent='🔍 Lancer la recherche Google Maps'; status.textContent='';
+  if(!searchResults.length){toast('Aucun résultat trouvé','warn');return;}
+  document.getElementById('search-results').style.display='block';
+  document.getElementById('results-title').textContent=`${searchResults.length} prospects trouvés`;
+  document.getElementById('nav-results-count').style.display='flex';
+  document.getElementById('nav-results-count').textContent=searchResults.length;
+  renderResults(); toast(`${searchResults.length} prospects trouvés !`,'success');
 }
 
 function renderResults() {
-  const existingNames = new Set(prospects.map(p => (p.company_name||'').toLowerCase()));
-  document.getElementById('results-list').innerHTML = searchResults.map((p, idx) => {
-    const alreadyExists = existingNames.has((p.company_name||'').toLowerCase());
-    const isAdded = addedIds.has(idx);
-    const isMobile = /^(06|07)/.test((p.phone||'').replace(/\s/g,''));
-    return `<div class="result-item${alreadyExists||isAdded?' result-added':''}" id="result-${idx}">
+  const existingNames=new Set(prospects.map(p=>(p.company_name||'').toLowerCase()));
+  document.getElementById('results-list').innerHTML=searchResults.map((p,idx)=>{
+    const exists=existingNames.has((p.company_name||'').toLowerCase()), added=addedIds.has(idx);
+    const isMob=/^(06|07)/.test((p.phone||'').replace(/\s/g,''));
+    return `<div class="result-item${exists||added?' result-added':''}" id="result-${idx}">
       <div class="result-avatar">${(p.company_name||'?').charAt(0)}</div>
       <div class="result-info">
         <div class="result-name">${p.company_name}</div>
-        <div class="result-sub">${p.sector} · ${p.city}${alreadyExists?' · <span style="color:var(--green)">✓ Déjà dans la base</span>':''}</div>
-        ${p.phone ? `<div class="result-phone" style="color:${isMobile?'var(--green)':'var(--text3)'}">${p.phone} ${isMobile?'📱':'☎️'}</div>` : ''}
+        <div class="result-sub">${p.sector} · ${p.city}${exists?' · <span style="color:var(--green)">✓ Déjà dans la base</span>':''}</div>
+        ${p.phone?`<div class="result-phone" style="color:${isMob?'var(--green)':'var(--text3)'}">${p.phone} ${isMob?'📱':'☎️'}</div>`:'<div class="result-phone" style="color:var(--text3)">Pas de téléphone</div>'}
       </div>
-      ${!alreadyExists && !isAdded
-        ? `<button class="btn btn-green btn-sm" onclick="addResult(${idx})">+ Ajouter</button>`
-        : `<span style="font-size:11px;color:var(--green)">✓ ${isAdded?'Ajouté':'Existant'}</span>`}
+      ${!exists&&!added?`<button class="btn btn-green btn-sm" onclick="addResult(${idx})">+ Ajouter</button>`:`<span style="font-size:11px;color:var(--green)">✓ ${added?'Ajouté':'Existant'}</span>`}
     </div>`;
   }).join('');
 }
 
 async function addResult(idx) {
-  const p = searchResults[idx];
-  const data = await api('/prospects', {
-    method: 'POST',
-    body: JSON.stringify({
-      company_name: p.company_name,
-      sector: p.sector,
-      phone: p.phone || '',
-      city: p.city,
-      source: 'Google Maps',
-      status: 'new',
-      instagram: 'non',
-      history: []
-    })
-  });
-  if (data && !data.error) {
-    addedIds.add(idx);
-    prospects.unshift({ ...data, company: data.company_name });
-    updateCounts();
-    renderResults();
-    toast(`${p.company_name} ajouté !`, 'success');
-  } else {
-    toast('Erreur lors de l\'ajout', 'warn');
-  }
+  const p=searchResults[idx];
+  const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:p.company_name,sector:p.sector,phone:p.phone||'',city:p.city,source:'Google Maps',status:'new',instagram:'non',history:[]})});
+  if(data&&!data.error){addedIds.add(idx);prospects.unshift({...data});updateCounts();renderResults();toast(`${p.company_name} ajouté !`,'success');}
+  else toast('Erreur lors de l\'ajout','warn');
 }
 
 async function addAllResults() {
-  const existingNames = new Set(prospects.map(p => (p.company_name||'').toLowerCase()));
-  const toAdd = searchResults.filter((p, idx) =>
-    !existingNames.has((p.company_name||'').toLowerCase()) && !addedIds.has(idx)
-  );
-  if (!toAdd.length) { toast('Tous les prospects sont déjà ajoutés', 'info'); return; }
-  let count = 0;
-  for (const [idx, p] of toAdd.entries()) {
-    const data = await api('/prospects', {
-      method: 'POST',
-      body: JSON.stringify({
-        company_name: p.company_name, sector: p.sector,
-        phone: p.phone||'', city: p.city,
-        source: 'Google Maps', status: 'new', instagram: 'non', history: []
-      })
-    });
-    if (data && !data.error) {
-      const realIdx = searchResults.indexOf(p);
-      addedIds.add(realIdx);
-      prospects.unshift({ ...data, company: data.company_name });
-      count++;
-    }
+  const existingNames=new Set(prospects.map(p=>(p.company_name||'').toLowerCase()));
+  const toAdd=searchResults.filter((p,idx)=>!existingNames.has((p.company_name||'').toLowerCase())&&!addedIds.has(idx));
+  if(!toAdd.length){toast('Tous les prospects sont déjà ajoutés','info');return;}
+  let count=0;
+  for(const p of toAdd){
+    const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:p.company_name,sector:p.sector,phone:p.phone||'',city:p.city,source:'Google Maps',status:'new',instagram:'non',history:[]})});
+    if(data&&!data.error){addedIds.add(searchResults.indexOf(p));prospects.unshift({...data});count++;}
   }
-  updateCounts(); renderResults();
-  toast(`${count} prospects ajoutés !`, 'success');
+  updateCounts();renderResults();toast(`${count} prospects ajoutés !`,'success');
 }
 
-// ============================================================
 // PROSPECTS
-// ============================================================
-const statusLabels = {
-  new:['badge-new','Nouveau'], called:['badge-called','Appelé'], rdv:['badge-rdv','RDV 📅'],
-  relance:['badge-relance','À relancer'], noint:['badge-noint','Pas intéressé'],
-  client:['badge-client','Client ✨'], hot:['badge-hot','🔥 Chaud']
+const statusLabels={
+  new:['badge-new','Nouveau'],called:['badge-called','Appelé'],rdv:['badge-rdv','RDV 📅'],
+  relance:['badge-relance','À relancer'],noint:['badge-noint','Pas intéressé'],
+  client:['badge-client','Client ✨'],hot:['badge-hot','🔥 Chaud'],banni:['badge-banni','🚫 Banni']
 };
-const instaLabels = { oui:['insta-yes','✅ Actif'], inactif:['insta-maybe','😴 Inactif'], non:['insta-no','❌ Non'] };
-
-function isMobile(phone) { return /^(06|07)/.test((phone||'').replace(/\s/g,'')); }
-function daysSince(d) { if(!d) return 999; return Math.floor((Date.now()-new Date(d))/864e5); }
-
-function getName(p) { return p.company_name || p.company || '?'; }
-function getPhone(p) { return p.phone || ''; }
-function getCity(p) { return p.city || ''; }
-function getSector(p) { return p.sector || ''; }
-function getInsta(p) { return p.instagram || 'non'; }
-function getStatus(p) { return p.status || 'new'; }
-function getLastContact(p) { return p.last_contact_at || p.last_contact || null; }
-function getHistory(p) { return p.history || []; }
-function getManager(p) { return p.manager_name || p.manager || ''; }
+const instaLabels={oui:['insta-yes','✅ Actif'],inactif:['insta-maybe','😴 Inactif'],non:['insta-no','❌ Non']};
+function isMobile(phone){return /^(06|07)/.test((phone||'').replace(/\s/g,''));}
+function daysSince(d){if(!d)return 999;return Math.floor((Date.now()-new Date(d))/864e5);}
+function getName(p){return p.company_name||p.company||'?';}
+function getPhone(p){return p.phone||'';}
+function getCity(p){return p.city||'';}
+function getSector(p){return p.sector||'';}
+function getInsta(p){return p.instagram||'non';}
+function getStatus(p){return p.status||'new';}
+function getLastContact(p){return p.last_contact_at||p.last_contact||null;}
+function getHistory(p){return p.history||[];}
+function getManager(p){return p.manager_name||p.manager||'';}
 
 function renderProspects() {
-  const tbody = document.getElementById('prospects-tbody');
-  const search = document.getElementById('search-input').value.toLowerCase();
-  let list = prospects.filter(p => {
-    const s = getStatus(p);
-    if (currentFilter !== 'all' && s !== currentFilter) return false;
-    const n = getName(p).toLowerCase();
-    const m = getManager(p).toLowerCase();
-    if (search && !n.includes(search) && !m.includes(search)) return false;
+  const tbody=document.getElementById('prospects-tbody');
+  const search=document.getElementById('search-input').value.toLowerCase();
+  let list=prospects.filter(p=>{
+    const s=getStatus(p);
+    if(currentFilter==='all'&&s==='banni')return false;
+    if(currentFilter!=='all'&&s!==currentFilter)return false;
+    const n=getName(p).toLowerCase(), m=getManager(p).toLowerCase();
+    if(search&&!n.includes(search)&&!m.includes(search))return false;
     return true;
   });
-  if (!list.length) { tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Aucun prospect trouvé</td></tr>`; return; }
-  tbody.innerHTML = list.map(p => {
-    const [sc,sl] = statusLabels[getStatus(p)] || ['badge-new','Nouveau'];
-    const [ic,il] = instaLabels[getInsta(p)] || ['insta-no','?'];
-    const ds = daysSince(getLastContact(p));
-    const dateStr = getLastContact(p) ? `il y a ${ds}j` : 'Jamais';
-    return `<tr onclick="openFiche('${p.id}')">
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Aucun prospect trouvé</td></tr>`;return;}
+  tbody.innerHTML=list.map(p=>{
+    const[sc,sl]=statusLabels[getStatus(p)]||['badge-new','Nouveau'];
+    const[ic,il]=instaLabels[getInsta(p)]||['insta-no','?'];
+    const ds=daysSince(getLastContact(p));
+    return `<tr onclick="openFiche('${p.id}')" class="${getStatus(p)==='banni'?'banni':''}">
       <td><div class="company-name">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getCity(p)}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getManager(p)||'—'}</div></td>
       <td><div class="${isMobile(getPhone(p))?'phone-mobile':'phone-fixed'}">${getPhone(p)||'—'}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getSector(p)}</div></td>
       <td><span class="insta-tag ${ic}">${il}</span></td>
       <td><span class="badge ${sc}">${sl}</span></td>
-      <td style="font-size:11px;color:var(--text3)">${dateStr}</td>
+      <td style="font-size:11px;color:var(--text3)">${getLastContact(p)?`il y a ${ds}j`:'Jamais'}</td>
     </tr>`;
   }).join('');
 }
 
-function filterProspects() { renderProspects() }
-function setFilter(el, filter) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active'); currentFilter = filter; renderProspects();
-}
+function filterProspects(){renderProspects();}
+function setFilter(el,filter){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');currentFilter=filter;renderProspects();}
 
 function updateCounts() {
-  document.getElementById('nav-count').textContent = prospects.length;
-  document.getElementById('stat-total').textContent = prospects.length;
-  document.getElementById('stat-new').textContent = prospects.filter(p => getStatus(p)==='new').length;
-  const upcoming = rdvs.filter(r => new Date(r.date) > new Date());
-  document.getElementById('stat-rdv').textContent = upcoming.length;
-  document.getElementById('rdv-count').textContent = upcoming.length;
-  document.getElementById('stat-relance').textContent = prospects.filter(p =>
-    getStatus(p)==='relance' || (getLastContact(p) && daysSince(getLastContact(p))>=7 && getStatus(p)==='called')
-  ).length;
+  const active=prospects.filter(p=>getStatus(p)!=='banni');
+  document.getElementById('nav-count').textContent=active.length;
+  document.getElementById('stat-total').textContent=active.length;
+  document.getElementById('stat-new').textContent=active.filter(p=>getStatus(p)==='new').length;
+  const upcoming=rdvs.filter(r=>new Date(r.date)>new Date());
+  document.getElementById('stat-rdv').textContent=upcoming.length;
+  document.getElementById('rdv-count').textContent=upcoming.length;
+  document.getElementById('stat-relance').textContent=active.filter(p=>getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&getStatus(p)==='called')).length;
 }
 
-// ============================================================
-// ADD PROSPECT MANUEL
-// ============================================================
 async function addProspect() {
-  const company = document.getElementById('np-company').value.trim();
-  if (!company) { toast('Nom de l\'entreprise requis','warn'); return; }
-  const insta = document.querySelector('input[name="insta"]:checked')?.value || 'non';
-  const data = await api('/prospects', {
-    method: 'POST',
-    body: JSON.stringify({
-      company_name: company,
-      sector: document.getElementById('np-sector').value,
-      manager_name: document.getElementById('np-manager').value.trim(),
-      phone: document.getElementById('np-phone').value.trim(),
-      email: document.getElementById('np-email').value.trim(),
-      city: document.getElementById('np-city').value.trim() || 'Pertuis',
-      source: document.getElementById('np-source').value,
-      instagram: insta,
-      status: 'new',
-      notes: document.getElementById('np-notes').value.trim(),
-      history: []
-    })
-  });
-  if (data && !data.error) {
-    prospects.unshift(data);
-    closeModal('modal-prospect');
-    ['np-company','np-manager','np-phone','np-email','np-notes'].forEach(id => document.getElementById(id).value='');
-    renderProspects(); updateCounts();
-    toast(`${company} ajouté !`,'success');
-  } else { toast('Erreur: '+(data?.error||'inconnue'),'warn'); }
+  const company=document.getElementById('np-company').value.trim();
+  if(!company){toast('Nom de l\'entreprise requis','warn');return;}
+  const insta=document.querySelector('input[name="insta"]:checked')?.value||'non';
+  const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:company,sector:document.getElementById('np-sector').value,manager_name:document.getElementById('np-manager').value.trim(),phone:document.getElementById('np-phone').value.trim(),email:document.getElementById('np-email').value.trim(),city:document.getElementById('np-city').value.trim()||'Pertuis',source:document.getElementById('np-source').value,instagram:insta,status:'new',notes:document.getElementById('np-notes').value.trim(),history:[]})});
+  if(data&&!data.error){prospects.unshift(data);closeModal('modal-prospect');['np-company','np-manager','np-phone','np-email','np-notes'].forEach(id=>document.getElementById(id).value='');renderProspects();updateCounts();toast(`${company} ajouté !`,'success');}
+  else toast('Erreur: '+(data?.error||'inconnue'),'warn');
 }
 
-// ============================================================
-// FICHE PROSPECT
-// ============================================================
 function openFiche(id) {
-  const p = prospects.find(x => x.id===id);
-  if (!p) return;
-  document.getElementById('fiche-title').textContent = getName(p);
-  const [sc,sl] = statusLabels[getStatus(p)] || ['badge-new','Nouveau'];
-  const [ic,il] = instaLabels[getInsta(p)] || ['insta-no','?'];
-  const history = getHistory(p);
-  const pRdvs = rdvs.filter(r => r.prospect_id===id && new Date(r.date)>new Date());
+  const p=prospects.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('fiche-title').textContent=getName(p);
+  const[sc,sl]=statusLabels[getStatus(p)]||['badge-new','Nouveau'];
+  const[ic,il]=instaLabels[getInsta(p)]||['insta-no','?'];
+  const history=getHistory(p);
+  const pRdvs=rdvs.filter(r=>r.prospect_id===id&&new Date(r.date)>new Date());
+  const isBanni=getStatus(p)==='banni';
 
-  document.getElementById('fiche-content').innerHTML = `
+  document.getElementById('fiche-content').innerHTML=`
     <div class="fiche-header">
-      <div class="fiche-avatar">${getName(p).charAt(0)}</div>
+      <div class="fiche-avatar" style="${isBanni?'opacity:.4':''}">${getName(p).charAt(0)}</div>
       <div class="fiche-info">
-        <div class="fiche-name">${getName(p)}</div>
+        <div class="fiche-name">${getName(p)} ${isBanni?'<span style="font-size:12px;color:var(--red)">🚫 Banni</span>':''}</div>
         <div class="fiche-sub">${getSector(p)} · ${getCity(p)}</div>
         <div class="fiche-phone">${getPhone(p)||'Pas de téléphone'} ${isMobile(getPhone(p))?'📱':'☎️'}</div>
       </div>
@@ -798,10 +673,11 @@ function openFiche(id) {
       </div>
     </div>
 
+    ${!isBanni?`
     <div class="fiche-section">
       <div class="fiche-section-title">Statut</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${Object.entries(statusLabels).map(([k,[cls,lbl]]) =>
+        ${Object.entries(statusLabels).filter(([k])=>k!=='banni').map(([k,[cls,lbl]])=>
           `<button onclick="updateStatus('${id}','${k}')" class="btn btn-sm ${getStatus(p)===k?'btn-accent':''}" style="${getStatus(p)===k?'':'opacity:.6'}">${lbl}</button>`
         ).join('')}
       </div>
@@ -813,7 +689,7 @@ function openFiche(id) {
         ${[['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],['deja_quelquun','👥 A déjà quelqu\'un'],
            ['pas_instagram','📵 Pas sur Instagram'],['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
            ['rappeler','📞 Rappeler plus tard'],['demande_devis','📋 Demande démo']
-        ].map(([v,l]) => `<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('')}
+        ].map(([v,l])=>`<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('')}
       </div>
     </div>
 
@@ -831,123 +707,133 @@ function openFiche(id) {
       <button class="btn" onclick="closeModal('modal-fiche');nav('script');setTimeout(()=>{document.getElementById('script-prospect-select').value='${id}';updateScript()},100)">📋 Voir le script</button>
     </div>
 
-    ${pRdvs.length > 0 ? `<div class="fiche-section">
+    ${pRdvs.length>0?`<div class="fiche-section">
       <div class="fiche-section-title">RDV à venir</div>
-      ${pRdvs.map(r => `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.2);border-radius:8px;margin-bottom:6px">
+      ${pRdvs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.2);border-radius:8px;margin-bottom:6px">
         <span style="color:var(--green);font-size:18px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span>
         <div><div style="font-size:13px;font-weight:500;color:var(--green)">${new Date(r.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(r.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>${r.notes?`<div style="font-size:12px;color:var(--text3)">${r.notes}</div>`:''}</div>
       </div>`).join('')}
-    </div>` : ''}
+    </div>`:''}`:``}
 
     <div class="fiche-section">
       <div class="fiche-section-title">Historique</div>
-      ${!history.length ? '<div style="color:var(--text3);font-size:13px">Aucun contact</div>' :
-        [...history].reverse().map(h => `<div class="history-item"><div class="history-date">${new Date(h.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}</div><div class="history-text">${h.text}</div></div>`).join('')}
+      ${!history.length?'<div style="color:var(--text3);font-size:13px">Aucun contact</div>':
+        [...history].reverse().map(h=>`<div class="history-item"><div class="history-date">${new Date(h.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}</div><div class="history-text">${h.text}</div></div>`).join('')}
+    </div>
+
+    <div class="divider"></div>
+    <div class="danger-zone">
+      <span style="font-size:18px">⚠️</span>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:4px">Zone danger</div>
+        <div style="font-size:11px;color:var(--text3)">Ces actions sont irréversibles</div>
+      </div>
+      ${!isBanni
+        ?`<button class="btn btn-yellow btn-sm" onclick="banProspect('${id}')">🚫 Bannir</button>`
+        :`<button class="btn btn-green btn-sm" onclick="unbanProspect('${id}')">✅ Débannir</button>`}
+      <button class="btn btn-red btn-sm" onclick="deleteProspect('${id}')">🗑 Supprimer</button>
     </div>
   `;
   openModal('modal-fiche');
 }
 
-async function updateStatus(id, status) {
-  const p = prospects.find(x => x.id===id);
-  if (!p) return;
-  const history = [...getHistory(p), { date: new Date().toISOString(), text: `Statut : ${statusLabels[status]?.[1]||status}` }];
-  const data = await api(`/prospects/${id}`, { method:'PUT', body: JSON.stringify({ status, history }) });
-  if (data) { Object.assign(p, data); openFiche(id); renderProspects(); toast('Statut mis à jour','info'); }
+async function updateStatus(id,status) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:`Statut : ${statusLabels[status]?.[1]||status}`}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();toast('Statut mis à jour','info');}
 }
 
-async function toggleTag(id, tag, el) {
-  const p = prospects.find(x => x.id===id);
-  if (!p) return;
-  const tags = p.tags || [];
-  const newTags = tags.includes(tag) ? tags.filter(t=>t!==tag) : [...tags, tag];
-  el.classList.toggle('checked', !tags.includes(tag));
-  await api(`/prospects/${id}`, { method:'PUT', body: JSON.stringify({ tags: newTags }) });
-  p.tags = newTags;
+async function toggleTag(id,tag,el) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const tags=p.tags||[];
+  const newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
+  el.classList.toggle('checked',!tags.includes(tag));
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});
+  p.tags=newTags;
 }
 
 async function saveNotes(id) {
-  const p = prospects.find(x => x.id===id);
-  if (!p) return;
-  const notes = document.getElementById(`fiche-notes-${id}`).value;
-  await api(`/prospects/${id}`, { method:'PUT', body: JSON.stringify({ notes }) });
-  p.notes = notes; toast('Notes sauvegardées ✓','success');
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const notes=document.getElementById(`fiche-notes-${id}`).value;
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes})});
+  p.notes=notes;toast('Notes sauvegardées ✓','success');
 }
 
 async function markCalled(id) {
-  const p = prospects.find(x => x.id===id);
-  if (!p) return;
-  const history = [...getHistory(p), { date: new Date().toISOString(), text: 'Appel effectué' }];
-  const status = getStatus(p)==='new' ? 'called' : getStatus(p);
-  const data = await api(`/prospects/${id}`, { method:'PUT', body: JSON.stringify({ status, history }) });
-  if (data) { Object.assign(p, data); openFiche(id); renderProspects(); }
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'Appel effectué'}];
+  const status=getStatus(p)==='new'?'called':getStatus(p);
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();}
 }
 
-// ============================================================
-// RDV
-// ============================================================
+async function banProspect(id) {
+  if(!confirm('Bannir ce prospect ? Il ne sera plus jamais contacté.'))return;
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'🚫 Prospect banni'}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'banni',history})});
+  if(data){Object.assign(p,data);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect banni — ne sera plus affiché','warn');}
+}
+
+async function unbanProspect(id) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'✅ Prospect débanni'}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'new',history})});
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();updateCounts();toast('Prospect débanni ✓','success');}
+}
+
+async function deleteProspect(id) {
+  if(!confirm('Supprimer définitivement ce prospect ? Cette action est irréversible.'))return;
+  const data=await api(`/prospects/${id}`,{method:'DELETE'});
+  if(data&&!data.error){prospects=prospects.filter(x=>x.id!==id);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect supprimé ✓','success');}
+  else toast('Erreur suppression','warn');
+}
+
 function planRDV(prospectId) {
-  currentRDVProspectId = prospectId;
-  const p = prospects.find(x => x.id===prospectId);
-  document.getElementById('rdv-prospect-name').textContent = `Prospect : ${getName(p)||''}`;
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-  document.getElementById('rdv-date').value = tomorrow.toISOString().split('T')[0];
-  closeModal('modal-fiche'); openModal('modal-rdv');
+  currentRDVProspectId=prospectId;
+  const p=prospects.find(x=>x.id===prospectId);
+  document.getElementById('rdv-prospect-name').textContent=`Prospect : ${getName(p)||''}`;
+  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('rdv-date').value=tomorrow.toISOString().split('T')[0];
+  closeModal('modal-fiche');openModal('modal-rdv');
 }
 
 async function saveRDV() {
-  const date = document.getElementById('rdv-date').value;
-  const time = document.getElementById('rdv-time').value;
-  if (!date) { toast('Date requise','warn'); return; }
-  const dt = new Date(`${date}T${time}`);
-  const data = await api('/rdv', {
-    method: 'POST',
-    body: JSON.stringify({
-      prospect_id: currentRDVProspectId,
-      scheduled_at: dt.toISOString(),
-      type: document.getElementById('rdv-type').value,
-      notes: document.getElementById('rdv-notes').value,
-      status: 'planifie'
-    })
-  });
-  if (data && !data.error) {
-    rdvs.push({ id: data.id, prospect_id: currentRDVProspectId, date: dt.toISOString(), type: document.getElementById('rdv-type').value, notes: document.getElementById('rdv-notes').value });
-    const p = prospects.find(x => x.id===currentRDVProspectId);
-    if (p) { p.status='rdv'; const h=getHistory(p); h.push({date:new Date().toISOString(),text:`RDV planifié le ${dt.toLocaleDateString('fr-FR')}`}); p.history=h; }
-    closeModal('modal-rdv'); renderProspects(); updateCounts(); renderAgenda();
+  const date=document.getElementById('rdv-date').value,time=document.getElementById('rdv-time').value;
+  if(!date){toast('Date requise','warn');return;}
+  const dt=new Date(`${date}T${time}`);
+  const data=await api('/rdv',{method:'POST',body:JSON.stringify({prospect_id:currentRDVProspectId,scheduled_at:dt.toISOString(),type:document.getElementById('rdv-type').value,notes:document.getElementById('rdv-notes').value,status:'planifie'})});
+  if(data&&!data.error){
+    rdvs.push({id:data.id,prospect_id:currentRDVProspectId,date:dt.toISOString(),type:document.getElementById('rdv-type').value,notes:document.getElementById('rdv-notes').value});
+    const p=prospects.find(x=>x.id===currentRDVProspectId);
+    if(p){p.status='rdv';const h=getHistory(p);h.push({date:new Date().toISOString(),text:`RDV planifié le ${dt.toLocaleDateString('fr-FR')}`});p.history=h;}
+    closeModal('modal-rdv');renderProspects();updateCounts();renderAgenda();
     toast(`RDV planifié pour ${dt.toLocaleDateString('fr-FR')} 📅`,'success');
-  } else { toast('Erreur RDV','warn'); }
+  }else toast('Erreur RDV','warn');
 }
 
-// ============================================================
-// AGENDA
-// ============================================================
 function renderAgenda() {
-  const heads = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-  document.getElementById('cal-heads').innerHTML = heads.map(h=>`<div class="cal-day-head">${h}</div>`).join('');
-  const year=calendarDate.getFullYear(), month=calendarDate.getMonth();
-  document.getElementById('cal-month-title').textContent = new Date(year,month).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
-  let startDow=new Date(year,month,1).getDay(); if(startDow===0) startDow=7;
-  const lastDay=new Date(year,month+1,0).getDate();
-  const cells=[];
-  for(let i=1;i<startDow;i++) cells.push({date:new Date(year,month,1-(startDow-i)),other:true});
-  for(let d=1;d<=lastDay;d++) cells.push({date:new Date(year,month,d),other:false});
-  while(cells.length%7!==0) cells.push({date:new Date(cells[cells.length-1].date.getTime()+864e5),other:true});
-  const today=new Date(); today.setHours(0,0,0,0);
+  const heads=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  document.getElementById('cal-heads').innerHTML=heads.map(h=>`<div class="cal-day-head">${h}</div>`).join('');
+  const year=calendarDate.getFullYear(),month=calendarDate.getMonth();
+  document.getElementById('cal-month-title').textContent=new Date(year,month).toLocaleDateString('fr-FR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  let startDow=new Date(year,month,1).getDay();if(startDow===0)startDow=7;
+  const lastDay=new Date(year,month+1,0).getDate(),cells=[];
+  for(let i=1;i<startDow;i++)cells.push({date:new Date(year,month,1-(startDow-i)),other:true});
+  for(let d=1;d<=lastDay;d++)cells.push({date:new Date(year,month,d),other:false});
+  while(cells.length%7!==0)cells.push({date:new Date(cells[cells.length-1].date.getTime()+864e5),other:true});
+  const today=new Date();today.setHours(0,0,0,0);
   document.getElementById('cal-grid').innerHTML=cells.map(({date,other})=>{
     const isToday=date.getTime()===today.getTime();
     const dayRDVs=rdvs.filter(r=>{const rd=new Date(r.date);rd.setHours(0,0,0,0);return rd.getTime()===date.getTime();});
-    return `<div class="cal-day${isToday?' today':''}${other?' other-month':''}">
-      <div class="day-num">${date.getDate()}</div>
-      ${dayRDVs.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id);return `<div class="cal-event ev-rdv">${getName(p||{}).split(' ')[0]||'RDV'}</div>`;}).join('')}
-    </div>`;
+    return `<div class="cal-day${isToday?' today':''}${other?' other-month':''}"><div class="day-num">${date.getDate()}</div>${dayRDVs.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id);return `<div class="cal-event ev-rdv">${getName(p||{}).split(' ')[0]||'RDV'}</div>`;}).join('')}</div>`;
   }).join('');
   const upcoming=rdvs.filter(r=>new Date(r.date)>new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date));
   document.getElementById('rdv-list-full').innerHTML=upcoming.length===0
     ?'<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucun RDV à venir</div>'
     :upcoming.map(r=>{
-      const p=prospects.find(x=>x.id===r.prospect_id);
-      const d=new Date(r.date);
+      const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);
       const diff=Math.ceil((d-new Date())/36e5);
       const urgency=diff<2?'var(--accent)':diff<24?'var(--yellow)':'var(--green)';
       return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer">
@@ -957,44 +843,30 @@ function renderAgenda() {
       </div>`;
     }).join('');
 }
+function changeMonth(delta){calendarDate.setMonth(calendarDate.getMonth()+delta);renderAgenda();}
 
-function changeMonth(delta) { calendarDate.setMonth(calendarDate.getMonth()+delta); renderAgenda(); }
-
-// ============================================================
-// DASHBOARD
-// ============================================================
 function renderDashboard() {
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  updateCounts(); checkAlerts();
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  updateCounts();checkAlerts();
   const upcoming=rdvs.filter(r=>new Date(r.date)>new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,4);
-  document.getElementById('rdv-today-list').innerHTML=upcoming.length===0
-    ?'<div style="color:var(--text3);font-size:13px">Aucun RDV à venir</div>'
-    :upcoming.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id);const d=new Date(r.date);return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p||{})}</div></div><div style="font-size:12px;color:var(--green);font-weight:500">${d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`;}).join('');
-  const relances=prospects.filter(p=>getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','hot'].includes(getStatus(p))));
-  document.getElementById('relance-list').innerHTML=relances.length===0
-    ?'<div style="color:var(--text3);font-size:13px">Rien à relancer 🎉</div>'
-    :relances.slice(0,4).map(p=>`<div onclick="openFiche('${p.id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>🔁</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getSector(p)}</div></div><div style="font-size:11px;color:var(--yellow)">${daysSince(getLastContact(p))}j</div></div>`).join('');
+  document.getElementById('rdv-today-list').innerHTML=upcoming.length===0?'<div style="color:var(--text3);font-size:13px">Aucun RDV à venir</div>':upcoming.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p||{})}</div></div><div style="font-size:12px;color:var(--green);font-weight:500">${d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`;}).join('');
+  const relances=prospects.filter(p=>getStatus(p)!=='banni'&&(getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','hot'].includes(getStatus(p)))));
+  document.getElementById('relance-list').innerHTML=relances.length===0?'<div style="color:var(--text3);font-size:13px">Rien à relancer 🎉</div>':relances.slice(0,4).map(p=>`<div onclick="openFiche('${p.id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>🔁</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getSector(p)}</div></div><div style="font-size:11px;color:var(--yellow)">${daysSince(getLastContact(p))}j</div></div>`).join('');
 }
 
 function checkAlerts() {
-  const container=document.getElementById('alerts-container');
-  if(!container) return;
-  const alerts=[], now=new Date();
-  rdvs.forEach(r=>{const d=new Date(r.date);const diffMin=(d-now)/60000;if(diffMin>0&&diffMin<=30){const p=prospects.find(x=>x.id===r.prospect_id);alerts.push({type:'urgent',icon:'⏰',text:`RDV dans ${Math.round(diffMin)} minutes avec <strong>${getName(p||{})}</strong>`});}});
-  prospects.filter(p=>getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','relance','hot'].includes(getStatus(p))).forEach(p=>{alerts.push({type:'relance',icon:'🔁',text:`<strong>${getName(p)}</strong> n'a pas été contacté depuis ${daysSince(getLastContact(p))} jours`});});
-  rdvs.filter(r=>{const d=new Date(r.date);const diff=(d-now)/36e5;return diff>0.5&&diff<=8;}).forEach(r=>{const p=prospects.find(x=>x.id===r.prospect_id);const d=new Date(r.date);alerts.push({type:'rdv',icon:'📅',text:`RDV aujourd'hui à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} avec <strong>${getName(p||{})}</strong>`});});
+  const container=document.getElementById('alerts-container');if(!container)return;
+  const alerts=[],now=new Date();
+  rdvs.forEach(r=>{const d=new Date(r.date),diffMin=(d-now)/60000;if(diffMin>0&&diffMin<=30){const p=prospects.find(x=>x.id===r.prospect_id);alerts.push({type:'urgent',icon:'⏰',text:`RDV dans ${Math.round(diffMin)} minutes avec <strong>${getName(p||{})}</strong>`});}});
+  prospects.filter(p=>getStatus(p)!=='banni'&&getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','relance','hot'].includes(getStatus(p))).forEach(p=>{alerts.push({type:'relance',icon:'🔁',text:`<strong>${getName(p)}</strong> n'a pas été contacté depuis ${daysSince(getLastContact(p))} jours`});});
+  rdvs.filter(r=>{const d=new Date(r.date),diff=(d-now)/36e5;return diff>0.5&&diff<=8;}).forEach(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);alerts.push({type:'rdv',icon:'📅',text:`RDV aujourd'hui à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} avec <strong>${getName(p||{})}</strong>`});});
   container.innerHTML=alerts.slice(0,4).map(a=>`<div class="alert-item alert-${a.type==='urgent'?'urgent':a.type==='rdv'?'rdv':'info'}"><span class="alert-icon">${a.icon}</span><span class="alert-text">${a.text}</span><button class="alert-close" onclick="this.parentElement.remove()">✕</button></div>`).join('');
 }
 
-// ============================================================
-// SCRIPT
-// ============================================================
 function updateScriptSelect() {
-  const sel=document.getElementById('script-prospect-select');
-  if(!sel) return;
+  const sel=document.getElementById('script-prospect-select');if(!sel)return;
   const cur=sel.value;
-  sel.innerHTML='<option value="">— Appel générique —</option>'+
-    prospects.map(p=>`<option value="${p.id}" ${cur===p.id?'selected':''}>${getName(p)} (${getManager(p)||'?'})</option>`).join('');
+  sel.innerHTML='<option value="">— Appel générique —</option>'+prospects.filter(p=>getStatus(p)!=='banni').map(p=>`<option value="${p.id}" ${cur===p.id?'selected':''}>${getName(p)} (${getManager(p)||'?'})</option>`).join('');
 }
 
 function updateScript() {
@@ -1007,17 +879,14 @@ function updateScript() {
 }
 
 function renderScript(p) {
-  const el=document.getElementById('script-content');
-  if(!el) return;
-  const name=getManager(p)?.split(' ')[0]||'[Prénom]';
-  const sector=getSector(p)||'artisan';
-  const insta=getInsta(p)||'non';
+  const el=document.getElementById('script-content');if(!el)return;
+  const name=getManager(p)?.split(' ')[0]||'[Prénom]',sector=getSector(p)||'artisan',insta=getInsta(p)||'non';
   const versionLabel=insta==='non'?'Version A — Pas sur Instagram':insta==='inactif'?'Version B — Sur Instagram mais inactif':'Version C — Déjà actif';
   const accroche=insta==='non'
-    ?`"Bonjour, je cherche <span class='script-var'>${name}</span> ?<br>Je m'appelle [Prénom], SocialAI à Pertuis.<br>Est-ce que vous savez que de plus en plus de clients cherchent leur <span class='script-var'>${sector}</span> sur Instagram avant même d'appeler ?<br>Ceux qui ne sont pas dessus perdent des chantiers sans le savoir. J'ai 2 minutes ?"`
+    ?`"Bonjour, je cherche <span class='script-var'>${name}</span> ?<br>Je m'appelle [Prénom], SocialAI à Pertuis.<br>De plus en plus de clients cherchent leur <span class='script-var'>${sector}</span> sur Instagram avant d'appeler.<br>Ceux qui n'y sont pas perdent des chantiers sans le savoir. J'ai 2 minutes ?"`
     :insta==='inactif'
-    ?`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>J'ai vu votre Instagram — vous avez fait l'effort d'y être, c'est bien.<br>Mais vous postez irrégulièrement et ça pénalise votre visibilité.<br>On s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
-    :`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>On accompagne des <span class='script-var'>${sector.toLowerCase()}s</span> locaux pour booster leur Instagram avec l'IA.<br>On pense pouvoir faire mieux, en automatique. 2 minutes ?"`;
+    ?`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>J'ai vu votre Instagram — vous avez fait l'effort d'y être, c'est bien.<br>Mais vous postez irrégulièrement, ça pénalise votre visibilité.<br>On s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
+    :`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>On accompagne des <span class='script-var'>${sector.toLowerCase()}s</span> locaux pour booster leur Instagram avec l'IA.<br>On pense pouvoir faire mieux, automatiquement. 2 minutes ?"`;
   el.innerHTML=`
     <div class="script-section"><div class="script-section-title">🎯 ${versionLabel}</div></div>
     <div class="script-section"><div class="script-section-title">📞 Accroche</div><div class="script-line highlight">${accroche}</div></div>
@@ -1025,7 +894,7 @@ function renderScript(p) {
       <div class="script-line highlight">"Aria, c'est notre IA — développée ici, à Pertuis.<br>Elle gère votre Instagram 7j/7, 24h/24.<br><br>Vous envoyez des photos de chantiers sur WhatsApp — c'est tout.<br>Elle crée les visuels, écrit les textes, publie au bon moment.<br>Elle apprend chaque jour, fait de la veille sur les <span class='script-var'>${sector.toLowerCase()}s</span>,<br>et construit une vraie stratégie commerciale pour vous.<br><br>Quand un client vous écrit à 22h — Aria répond, récupère son numéro,<br>et vous envoie un email récap. Le lendemain, contact qualifié dans votre boîte."</div>
     </div>
     <div class="script-section"><div class="script-section-title">📍 Argument local</div>
-      <div class="script-line">"On est à Pertuis. On connaît les artisans du coin.<br>Si vous avez un souci, vous appelez — on est là."</div>
+      <div class="script-line">"On est à Pertuis. On connaît les artisans du coin. Si vous avez un souci, vous appelez — on est là."</div>
     </div>
     <div class="script-section"><div class="script-section-title">💬 Objections</div>
       <div class="script-line"><strong style="color:var(--yellow)">"J'ai pas le temps"</strong><br>"Une photo sur WhatsApp. C'est tout."</div>
@@ -1040,31 +909,22 @@ function renderScript(p) {
   updateScriptSelect();
 }
 
-// ============================================================
-// TOAST
-// ============================================================
-function toast(msg, type='info') {
+function toast(msg,type='info'){
   const icons={success:'✅',info:'💡',warn:'⚠️',urgent:'🚨'};
-  const el=document.createElement('div');
-  el.className=`toast ${type}`;
+  const el=document.createElement('div');el.className=`toast ${type}`;
   el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
   document.getElementById('toast-container').appendChild(el);
   setTimeout(()=>el.remove(),3500);
 }
 
-// ============================================================
-// INIT
-// ============================================================
 document.querySelectorAll('.check-pill input[type=radio]').forEach(input=>{
   input.addEventListener('change',function(){
     document.querySelectorAll(`.check-pill input[name="${this.name}"]`).forEach(r=>{r.closest('.check-pill').classList.toggle('checked',r.checked);});
   });
 });
 
-renderDashboard();
-renderScript(null);
-loadData();
-setInterval(checkAlerts, 60000);
+renderDashboard();renderScript(null);loadData();
+setInterval(checkAlerts,60000);
 </script>
 </body>
 </html>
