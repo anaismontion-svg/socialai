@@ -1,4 +1,4 @@
-// routes/romi.js v2
+// routes/romi.js v3
 const express  = require('express');
 const router   = express.Router();
 const { createClient } = require('@supabase/supabase-js');
@@ -9,9 +9,6 @@ const axios = require('axios');
 const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// ─────────────────────────────────────────────
-// UTILITAIRES
-// ─────────────────────────────────────────────
 async function sendEmail(to, subject, html) {
   try {
     const transporter = nodemailer.createTransport({
@@ -26,68 +23,33 @@ async function sendEmail(to, subject, html) {
 async function sendBrevoSMS(to, message) {
   try {
     await axios.post('https://api.brevo.com/v3/transactionalSMS/sms', {
-      sender: 'SocialAI',
-      recipient: to.replace(/\s/g,''),
-      content: message
-    }, {
-      headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' }
-    });
-    console.log(`📱 SMS envoyé à ${to}`);
+      sender: 'SocialAI', recipient: to.replace(/\s/g,''), content: message
+    }, { headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' } });
   } catch(err) { console.error('❌ SMS:', err.message); }
 }
 
-// ─────────────────────────────────────────────
-// TEMPLATES EMAIL
-// ─────────────────────────────────────────────
 function emailPresentation(prospect) {
-  return `
-  <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#0d0d14;color:#f5f4f0;border-radius:16px">
+  return `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#0d0d14;color:#f5f4f0;border-radius:16px">
     <div style="font-size:22px;font-weight:700;margin-bottom:4px">✦ Aria — Community Manager IA</div>
-    <div style="font-size:12px;color:#7a7870;margin-bottom:28px;text-transform:uppercase;letter-spacing:1px">Votre présence Instagram, automatisée</div>
-    <p style="color:#c8c6be;line-height:1.7;margin-bottom:20px">
-      Bonjour ${prospect.manager_name || ''},<br><br>
-      Je me permets de vous contacter au sujet de <strong style="color:#f5f4f0">${prospect.company_name}</strong>.
-      J'ai remarqué votre activité dans le secteur <strong style="color:#f5f4f0">${prospect.sector || 'de votre domaine'}</strong>
-      et je pense qu'Aria pourrait vous faire gagner un temps précieux.
-    </p>
+    <p style="color:#c8c6be;line-height:1.7;margin-bottom:20px">Bonjour ${prospect.manager_name || ''},<br><br>
+    Je me permets de vous contacter au sujet de <strong>${prospect.company_name}</strong>. Aria pourrait vous faire gagner un temps précieux sur votre présence Instagram.</p>
     <div style="background:#1a1a26;border:1px solid #3a3a50;border-radius:12px;padding:20px;margin-bottom:24px">
-      <div style="font-size:13px;font-weight:600;color:#ff4d6d;margin-bottom:12px">🤖 Aria s'occupe de tout :</div>
-      <div style="font-size:13px;color:#c8c6be;line-height:2">
-        ✅ Publications Instagram automatiques (photos, vidéos, carousels)<br>
-        ✅ Réponses aux commentaires et messages privés<br>
-        ✅ Analyse de vos meilleures performances<br>
-        ✅ Tendances du secteur en temps réel<br>
-        ✅ Zéro intervention de votre part
-      </div>
+      <div style="font-size:13px;color:#c8c6be;line-height:2">✅ Publications automatiques · ✅ Réponses DM · ✅ Stratégie commerciale · ✅ Zéro effort de votre part</div>
     </div>
-    <p style="color:#c8c6be;font-size:13px;margin-bottom:24px">
-      Seriez-vous disponible pour un appel de 15 minutes cette semaine ?
-    </p>
-    <a href="mailto:${process.env.GMAIL_USER}" style="display:inline-block;background:linear-gradient(135deg,#ff4d6d,#cc2244);color:white;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:600;font-size:14px">Répondre →</a>
-    <div style="margin-top:28px;padding-top:20px;border-top:1px solid #3a3a50;font-size:11px;color:#7a7870">
-      Cet email vous a été envoyé par Aria — Community Manager IA
-    </div>
+    <a href="mailto:${process.env.GMAIL_USER}" style="display:inline-block;background:linear-gradient(135deg,#ff4d6d,#cc2244);color:white;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:600">Répondre →</a>
   </div>`;
 }
 
 function emailRelance(prospect) {
-  return `
-  <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#0d0d14;color:#f5f4f0;border-radius:16px">
+  return `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px;background:#0d0d14;color:#f5f4f0;border-radius:16px">
     <div style="font-size:22px;font-weight:700;margin-bottom:28px">✦ Une petite relance 👋</div>
-    <p style="color:#c8c6be;line-height:1.7;margin-bottom:20px">
-      Bonjour ${prospect.manager_name || ''},<br><br>
-      Je reviens vers vous suite à mon précédent message concernant <strong style="color:#f5f4f0">${prospect.company_name}</strong>.
-    </p>
-    <p style="color:#c8c6be;font-size:13px;margin-bottom:24px">
-      Un simple appel de 10 minutes suffit pour voir si Aria peut vous aider.
-    </p>
-    <a href="mailto:${process.env.GMAIL_USER}" style="display:inline-block;background:linear-gradient(135deg,#ff4d6d,#cc2244);color:white;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:600;font-size:14px">Répondre →</a>
+    <p style="color:#c8c6be;line-height:1.7;margin-bottom:20px">Bonjour ${prospect.manager_name || ''},<br><br>
+    Je reviens vers vous concernant <strong>${prospect.company_name}</strong>. Un appel de 10 minutes suffit pour voir si Aria peut vous aider.</p>
+    <a href="mailto:${process.env.GMAIL_USER}" style="display:inline-block;background:linear-gradient(135deg,#ff4d6d,#cc2244);color:white;text-decoration:none;padding:12px 24px;border-radius:10px;font-weight:600">Répondre →</a>
   </div>`;
 }
 
-// ─────────────────────────────────────────────
-// PROSPECTS — CRUD
-// ─────────────────────────────────────────────
+// ── PROSPECTS CRUD ────────────────────────────────────────────────────────────
 router.get('/prospects', async (req, res) => {
   const { status, sector, search, limit = 100, offset = 0 } = req.query;
   let query = supabase.from('prospects').select('*').order('created_at', { ascending: false });
@@ -109,9 +71,7 @@ router.get('/prospects/:id', async (req, res) => {
 router.post('/prospects', async (req, res) => {
   try {
     const body = { ...req.body };
-    // S'assurer que history est bien un tableau JSON valide
     if (!body.history || !Array.isArray(body.history)) body.history = [];
-    // Nettoyer les champs undefined
     Object.keys(body).forEach(k => { if (body[k] === undefined) delete body[k]; });
     const { data, error } = await supabase.from('prospects').insert([body]).select().single();
     if (error) return res.status(500).json({ error: error.message });
@@ -129,9 +89,7 @@ router.put('/prospects/:id', async (req, res) => {
     const { data, error } = await supabase.from('prospects').update(updates).eq('id', req.params.id).select().single();
     if (error) return res.status(500).json({ error: error.message });
     res.json(data);
-  } catch(err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
 router.delete('/prospects/:id', async (req, res) => {
@@ -140,26 +98,25 @@ router.delete('/prospects/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// ─────────────────────────────────────────────
-// STATS DASHBOARD
-// ─────────────────────────────────────────────
+// ── STATS ─────────────────────────────────────────────────────────────────────
 router.get('/stats', async (req, res) => {
   try {
     const { data: all } = await supabase.from('prospects').select('status, interest_level, created_at, email_sent_at');
     const { data: rdvs } = await supabase.from('rdv').select('*').gte('scheduled_at', new Date().toISOString()).eq('status', 'planifie');
-    const total          = all?.length || 0;
-    const chauds         = all?.filter(p => p.interest_level === 'chaud').length || 0;
-    const rdvPlanifies   = all?.filter(p => p.status === 'rdv').length || 0;
-    const clients        = all?.filter(p => p.status === 'client').length || 0;
-    const emailsEnvoyes  = all?.filter(p => p.email_sent_at).length || 0;
-    const tauxConversion = total > 0 ? ((clients / total) * 100).toFixed(1) : 0;
-    res.json({ total, chauds, rdvPlanifies, clients, emailsEnvoyes, tauxConversion, prochainsRdv: rdvs || [] });
+    const total = all?.length || 0;
+    res.json({
+      total,
+      chauds:         all?.filter(p => p.interest_level === 'chaud').length || 0,
+      rdvPlanifies:   all?.filter(p => p.status === 'rdv').length || 0,
+      clients:        all?.filter(p => p.status === 'client').length || 0,
+      emailsEnvoyes:  all?.filter(p => p.email_sent_at).length || 0,
+      tauxConversion: total > 0 ? ((all.filter(p => p.status === 'client').length / total) * 100).toFixed(1) : 0,
+      prochainsRdv:   rdvs || []
+    });
   } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
-// ─────────────────────────────────────────────
-// RDV
-// ─────────────────────────────────────────────
+// ── RDV ───────────────────────────────────────────────────────────────────────
 router.get('/rdv', async (req, res) => {
   const { data, error } = await supabase
     .from('rdv').select('*, prospects(company_name, manager_name, phone, sector)')
@@ -187,9 +144,7 @@ router.delete('/rdv/:id', async (req, res) => {
   res.json({ success: true });
 });
 
-// ─────────────────────────────────────────────
-// ENVOI EMAIL
-// ─────────────────────────────────────────────
+// ── EMAIL ─────────────────────────────────────────────────────────────────────
 router.post('/prospects/:id/send-email', async (req, res) => {
   const { type = 'presentation' } = req.body;
   const { data: prospect } = await supabase.from('prospects').select('*').eq('id', req.params.id).single();
@@ -198,36 +153,56 @@ router.post('/prospects/:id/send-email', async (req, res) => {
   const subject = type === 'relance'
     ? `Relance — Aria, votre Community Manager IA 🤖`
     : `${prospect.company_name} — Et si l'IA gérait votre Instagram ? 🚀`;
-  const html = type === 'relance' ? emailRelance(prospect) : emailPresentation(prospect);
-  await sendEmail(prospect.email, subject, html);
-  const update = type === 'relance'
-    ? { relance_sent_at: new Date().toISOString(), status: 'contacté' }
-    : { email_sent_at: new Date().toISOString(), status: 'contacté' };
-  await supabase.from('prospects').update(update).eq('id', req.params.id);
+  await sendEmail(prospect.email, subject, type === 'relance' ? emailRelance(prospect) : emailPresentation(prospect));
+  await supabase.from('prospects').update(
+    type === 'relance'
+      ? { relance_sent_at: new Date().toISOString(), status: 'contacté' }
+      : { email_sent_at: new Date().toISOString(), status: 'contacté' }
+  ).eq('id', req.params.id);
   res.json({ success: true });
 });
 
-// ─────────────────────────────────────────────
-// RECHERCHE GOOGLE PLACES
-// ─────────────────────────────────────────────
+// ── RECHERCHE GOOGLE PLACES avec téléphones ───────────────────────────────────
 router.post('/search/google', async (req, res) => {
   const { query, city } = req.body;
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     return res.status(400).json({ error: 'Clé Google Places non configurée' });
   }
   try {
-    const searchQuery = `${query} ${city || ''}`;
-    const response = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
-      params: { query: searchQuery, key: process.env.GOOGLE_PLACES_API_KEY, language: 'fr' }
+    const searchResponse = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
+      params: { query: `${query} ${city || ''}`, key: process.env.GOOGLE_PLACES_API_KEY, language: 'fr' }
     });
-    const results = (response.data.results || []).slice(0, 20).map(p => ({
-      company_name: p.name,
-      city: p.formatted_address?.split(',').slice(-2, -1)[0]?.trim() || city || '',
-      sector: query,
-      phone: p.formatted_phone_number || '',
-      source: 'Google Maps',
-      status: 'new'
+
+    const places = (searchResponse.data.results || []).slice(0, 10);
+
+    // Récupérer les détails (téléphone) pour chaque lieu
+    const results = await Promise.all(places.map(async (p) => {
+      let phone = '';
+      try {
+        const detailResponse = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
+          params: {
+            place_id: p.place_id,
+            fields: 'formatted_phone_number,international_phone_number',
+            key: process.env.GOOGLE_PLACES_API_KEY,
+            language: 'fr'
+          }
+        });
+        phone = detailResponse.data.result?.formatted_phone_number ||
+                detailResponse.data.result?.international_phone_number || '';
+      } catch(e) {
+        console.error('❌ Place details:', e.message);
+      }
+
+      return {
+        company_name: p.name,
+        city: p.formatted_address?.split(',').slice(-2, -1)[0]?.trim() || city || '',
+        sector: query,
+        phone,
+        source: 'Google Maps',
+        status: 'new'
+      };
     }));
+
     res.json(results);
   } catch(err) {
     console.error('❌ Google Places:', err.message);
@@ -235,9 +210,7 @@ router.post('/search/google', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// IMPORT CSV
-// ─────────────────────────────────────────────
+// ── IMPORT CSV ────────────────────────────────────────────────────────────────
 router.post('/import/csv', async (req, res) => {
   const { prospects } = req.body;
   if (!prospects?.length) return res.status(400).json({ error: 'Aucun prospect à importer' });
@@ -248,40 +221,46 @@ router.post('/import/csv', async (req, res) => {
     email:        p.email || p['Email'] || '',
     sector:       p.sector || p['Secteur'] || '',
     city:         p.city || p['Ville'] || '',
-    source:       'csv',
-    status:       'new',
-    history:      []
+    source: 'csv', status: 'new', history: []
   })).filter(p => p.company_name);
   const { data, error } = await supabase.from('prospects').insert(toInsert).select();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, imported: data.length });
 });
 
-// ─────────────────────────────────────────────
-// RAPPELS AUTOMATIQUES
-// ─────────────────────────────────────────────
+// ── SCRIPT IA ─────────────────────────────────────────────────────────────────
+router.get('/prospects/:id/script', async (req, res) => {
+  const { data: prospect } = await supabase.from('prospects').select('*').eq('id', req.params.id).single();
+  if (!prospect) return res.status(404).json({ error: 'Prospect introuvable' });
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514', max_tokens: 600,
+      messages: [{ role: 'user', content: `Tu es Romi, assistant de prospection d'Aria (community management IA, Pertuis).
+Script d'appel pour : ${prospect.company_name} · ${prospect.sector||''} · ${prospect.city||''} · Instagram: ${prospect.instagram||'non'} · Intérêt: ${prospect.interest_level||'nouveau'} · Notes: ${prospect.notes||'aucune'}
+Inclus: accroche 10s, présentation Aria 30s, qualification, objections, demande RDV. Argument local Pertuis. Tarif 149€/3 mois puis 199€. 300 mots max.` }]
+    });
+    res.json({ script: response.content[0].text });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── RAPPELS AUTO ──────────────────────────────────────────────────────────────
 async function checkReminders() {
   try {
     const in30 = new Date(Date.now() + 30 * 60 * 1000);
     const now  = new Date();
-    const { data: upcoming } = await supabase
-      .from('rdv').select('*, prospects(*)')
+    const { data: upcoming } = await supabase.from('rdv').select('*, prospects(*)')
       .eq('reminder_sent', false).eq('status', 'planifie')
-      .gte('scheduled_at', now.toISOString())
-      .lte('scheduled_at', in30.toISOString());
+      .gte('scheduled_at', now.toISOString()).lte('scheduled_at', in30.toISOString());
     for (const rdv of upcoming || []) {
       if (rdv.prospects?.phone) {
         const dateStr = new Date(rdv.scheduled_at).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-        await sendBrevoSMS(rdv.prospects.phone, `Rappel : votre RDV avec Aria est dans 30 minutes (${dateStr}). À tout de suite !`);
+        await sendBrevoSMS(rdv.prospects.phone, `Rappel RDV Aria dans 30 minutes (${dateStr}). À tout de suite !`);
         await supabase.from('rdv').update({ reminder_sent: true }).eq('id', rdv.id);
       }
     }
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: toRelance } = await supabase
-      .from('prospects').select('*')
-      .eq('status', 'contacté')
-      .is('relance_sent_at', null)
-      .lte('email_sent_at', sevenDaysAgo);
+    const { data: toRelance } = await supabase.from('prospects').select('*')
+      .eq('status', 'contacté').is('relance_sent_at', null).lte('email_sent_at', sevenDaysAgo);
     for (const p of toRelance || []) {
       if (p.email) await sendEmail(p.email, `Relance — Aria, votre Community Manager IA 🤖`, emailRelance(p));
       await supabase.from('prospects').update({ relance_sent_at: new Date().toISOString() }).eq('id', p.id);
