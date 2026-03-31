@@ -17,11 +17,11 @@
   --orange:#fb923c;--red:#f87171;
   --r:10px;--r2:16px;--shadow:0 8px 32px rgba(0,0,0,.4);
 }
-html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;overflow-x:hidden}
 h1,h2,h3,h4{font-family:'Clash Display',sans-serif}
 button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
+*{box-sizing:border-box}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -59,6 +59,8 @@ input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
 .btn-red:hover{background:rgba(248,113,113,.2)}
 .btn-yellow{background:rgba(245,200,66,.12);color:var(--yellow);border-color:rgba(245,200,66,.25)}
 .btn-yellow:hover{background:rgba(245,200,66,.2)}
+.btn-orange{background:rgba(251,146,60,.15);color:var(--orange);border-color:rgba(251,146,60,.3)}
+.btn-orange:hover{background:rgba(251,146,60,.25)}
 .btn-sm{padding:4px 10px;font-size:12px}
 .panel{display:none}.panel.active{display:block}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
@@ -70,8 +72,7 @@ input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
 .stat-value{font-family:'Clash Display',sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px;margin-bottom:3px}
 .stat-sub{font-size:11px;color:var(--text3)}
 .alerts-bar{margin-bottom:20px;display:flex;flex-direction:column;gap:8px}
-.alert-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);border:1px solid;font-size:13px;cursor:pointer;transition:all .15s}
-.alert-item:hover{transform:translateX(3px)}
+.alert-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r);border:1px solid;font-size:13px;transition:all .15s}
 .alert-urgent{background:rgba(245,200,66,.06);border-color:rgba(245,200,66,.25);color:var(--yellow)}
 .alert-info{background:rgba(91,143,255,.06);border-color:rgba(91,143,255,.25);color:var(--blue)}
 .alert-rdv{background:rgba(255,95,126,.06);border-color:rgba(255,95,126,.25);color:var(--accent)}
@@ -123,9 +124,9 @@ select.form-input{appearance:none}
 .check-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;transition:all .15s;user-select:none}
 .check-pill input{display:none}
 .check-pill.checked{border-color:var(--accent);background:rgba(255,95,126,.1);color:var(--accent)}
-.check-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;transition:all .15s;opacity:0}
+.check-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0}
 .check-pill.checked .dot{opacity:1}
-.script-container{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;max-height:380px;overflow-y:auto}
+.script-container{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;max-height:420px;overflow-y:auto}
 .script-section{margin-bottom:16px}
 .script-section-title{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
 .script-line{font-size:13px;color:var(--text2);line-height:1.7;padding:6px 10px;border-radius:6px;border-left:2px solid var(--border);margin-bottom:4px}
@@ -133,8 +134,8 @@ select.form-input{appearance:none}
 .script-var{color:var(--yellow);font-weight:600}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:12px}
 .cal-day-head{font-size:10px;color:var(--text3);text-align:center;padding:4px;text-transform:uppercase;letter-spacing:.5px}
-.cal-day{border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:5px 2px;cursor:pointer;transition:background .15s;min-height:52px;position:relative}
-.cal-day:hover{background:var(--surface)}
+.cal-day{border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:5px 2px;min-height:52px}
+.cal-day:hover{background:var(--surface);cursor:pointer}
 .cal-day.today{background:rgba(255,95,126,.1)}
 .cal-day .day-num{font-size:12px;font-weight:500;margin-bottom:3px}
 .cal-day.today .day-num{color:var(--accent);font-weight:700}
@@ -161,6 +162,8 @@ select.form-input{appearance:none}
 .history-date{color:var(--text3);flex-shrink:0;width:80px}
 .history-text{color:var(--text2);flex:1}
 .divider{height:1px;background:var(--border);margin:16px 0}
+.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,95,126,.2);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .insta-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:10px}
 .insta-yes{background:rgba(45,212,160,.1);color:var(--green)}
@@ -172,19 +175,26 @@ select.form-input{appearance:none}
 .sector-btn{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;text-align:center}
 .sector-btn:hover{border-color:var(--blue);color:var(--blue)}
 .sector-btn.selected{border-color:var(--blue);background:rgba(91,143,255,.1);color:var(--blue);font-weight:600}
-.city-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.city-btn{padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;text-align:center}
-.city-btn:hover{border-color:var(--purple);color:var(--purple)}
-.city-btn.selected{border-color:var(--purple);background:rgba(167,139,250,.1);color:var(--purple);font-weight:600}
 .result-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px;transition:all .15s}
-.result-item:hover{border-color:var(--border2)}
+.result-added{background:rgba(45,212,160,.05);border-color:rgba(45,212,160,.15)}
 .result-avatar{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
 .result-info{flex:1}
 .result-name{font-size:13px;font-weight:500;margin-bottom:2px}
 .result-sub{font-size:11px;color:var(--text3)}
-.result-phone{font-size:12px;font-weight:600}
-.result-added{background:rgba(45,212,160,.05);border-color:rgba(45,212,160,.15)}
 .danger-zone{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
+.prospection-bar{background:linear-gradient(135deg,rgba(91,143,255,.08),rgba(167,139,250,.08));border:1px solid rgba(91,143,255,.2);border-radius:var(--r2);padding:16px;margin-bottom:20px}
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px;transition:width .5s ease}
+/* APPEL EN COURS */
+.appel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;display:none;align-items:stretch}
+.appel-overlay.open{display:flex}
+.appel-left{width:380px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.appel-right{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:24px}
+.appel-header{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.appel-timer{font-family:'Clash Display',sans-serif;font-size:32px;font-weight:700;color:var(--accent);letter-spacing:-1px}
+.appel-body{flex:1;padding:20px;overflow-y:auto}
+/* SUGGESTION EMAIL */
+.email-suggestion{background:linear-gradient(135deg,rgba(45,212,160,.08),rgba(91,143,255,.08));border:1px solid rgba(45,212,160,.25);border-radius:var(--r2);padding:16px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -192,18 +202,15 @@ select.form-input{appearance:none}
 <!-- MODAL NOUVEAU PROSPECT -->
 <div class="overlay" id="modal-prospect">
 <div class="modal">
-  <div class="modal-header">
-    <div class="modal-title">➕ Nouveau prospect</div>
-    <button class="modal-close" onclick="closeModal('modal-prospect')">✕</button>
-  </div>
+  <div class="modal-header"><div class="modal-title">➕ Nouveau prospect</div><button class="modal-close" onclick="closeModal('modal-prospect')">✕</button></div>
   <div class="modal-body">
     <div class="form-row">
       <div><label class="form-label">Nom de l'entreprise *</label><input class="form-input" id="np-company" placeholder="Dupont Électricité"></div>
       <div><label class="form-label">Secteur *</label>
         <select class="form-input" id="np-sector">
+          <option>Peintre</option><option>Carreleur</option><option>Menuisier</option>
           <option>Électricien</option><option>Plombier</option><option>Maçon</option>
-          <option>Chauffagiste</option><option>Carreleur</option><option>Peintre</option>
-          <option>Menuisier</option><option>Autre artisan</option>
+          <option>Chauffagiste</option><option>Couvreur</option><option>Autre artisan</option>
         </select>
       </div>
     </div>
@@ -213,15 +220,10 @@ select.form-input{appearance:none}
     </div>
     <div class="form-row">
       <div><label class="form-label">Email</label><input class="form-input" id="np-email" placeholder="contact@entreprise.fr" type="email"></div>
-      <div><label class="form-label">Ville</label><input class="form-input" id="np-city" placeholder="Pertuis"></div>
+      <div><label class="form-label">Site web</label><input class="form-input" id="np-website" placeholder="https://..."></div>
     </div>
     <div class="form-row">
-      <div><label class="form-label">Source</label>
-        <select class="form-input" id="np-source">
-          <option>Pages Jaunes</option><option>Google Maps</option>
-          <option>Recommandation</option><option>Prospection terrain</option><option>Autre</option>
-        </select>
-      </div>
+      <div><label class="form-label">Ville</label><input class="form-input" id="np-city" placeholder="Pertuis"></div>
       <div>
         <label class="form-label">Sur Instagram ?</label>
         <div class="check-group" style="margin-top:8px">
@@ -231,10 +233,10 @@ select.form-input{appearance:none}
         </div>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="np-notes" placeholder="Infos utiles, contexte..."></textarea></div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="np-notes" placeholder="Infos utiles..."></textarea></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
       <button class="btn" onclick="closeModal('modal-prospect')">Annuler</button>
-      <button class="btn btn-accent" onclick="addProspect()">Ajouter le prospect →</button>
+      <button class="btn btn-accent" onclick="addProspect()">Ajouter →</button>
     </div>
   </div>
 </div>
@@ -242,11 +244,8 @@ select.form-input{appearance:none}
 
 <!-- MODAL FICHE -->
 <div class="overlay" id="modal-fiche">
-<div class="modal" style="max-width:760px">
-  <div class="modal-header">
-    <div class="modal-title" id="fiche-title">Fiche prospect</div>
-    <button class="modal-close" onclick="closeModal('modal-fiche')">✕</button>
-  </div>
+<div class="modal" style="max-width:780px">
+  <div class="modal-header"><div class="modal-title" id="fiche-title">Fiche prospect</div><button class="modal-close" onclick="closeModal('modal-fiche')">✕</button></div>
   <div class="modal-body"><div id="fiche-content"></div></div>
 </div>
 </div>
@@ -254,27 +253,98 @@ select.form-input{appearance:none}
 <!-- MODAL RDV -->
 <div class="overlay" id="modal-rdv">
 <div class="modal" style="max-width:480px">
-  <div class="modal-header">
-    <div class="modal-title">📅 Planifier un RDV</div>
-    <button class="modal-close" onclick="closeModal('modal-rdv')">✕</button>
-  </div>
+  <div class="modal-header"><div class="modal-title">📅 Planifier un RDV</div><button class="modal-close" onclick="closeModal('modal-rdv')">✕</button></div>
   <div class="modal-body">
     <div id="rdv-prospect-name" style="font-size:13px;color:var(--text2);margin-bottom:14px"></div>
     <div class="form-row">
       <div><label class="form-label">Date</label><input class="form-input" id="rdv-date" type="date"></div>
       <div><label class="form-label">Heure</label><input class="form-input" id="rdv-time" type="time" value="10:00"></div>
     </div>
-    <div class="form-group"><label class="form-label">Type de RDV</label>
+    <div class="form-group"><label class="form-label">Type</label>
       <select class="form-input" id="rdv-type">
         <option value="tel">📞 Appel téléphonique</option>
         <option value="visio">💻 Visioconférence</option>
         <option value="physique">🤝 Présentiel</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="rdv-notes" placeholder="Rappeler les points clés..."></textarea></div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea class="form-input" id="rdv-notes" placeholder="Points clés..."></textarea></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
       <button class="btn" onclick="closeModal('modal-rdv')">Annuler</button>
-      <button class="btn btn-accent" onclick="saveRDV()">Planifier le RDV →</button>
+      <button class="btn btn-accent" onclick="saveRDV()">Planifier →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL EMAIL -->
+<div class="overlay" id="modal-email">
+<div class="modal" style="max-width:620px">
+  <div class="modal-header"><div class="modal-title">📧 Envoyer un email</div><button class="modal-close" onclick="closeModal('modal-email')">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">Destinataire</label><input class="form-input" id="email-to" readonly style="opacity:.7"></div>
+    <div class="form-group"><label class="form-label">Objet</label><input class="form-input" id="email-subject"></div>
+    <div class="form-group"><label class="form-label">Corps de l'email (modifiable)</label><textarea class="form-input" id="email-body" style="min-height:200px"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn" onclick="closeModal('modal-email')">Annuler</button>
+      <button class="btn btn-accent" onclick="sendEmailNow()" id="btn-send-email">📤 Envoyer</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- APPEL EN COURS (plein écran) -->
+<div class="appel-overlay" id="appel-overlay">
+  <div class="appel-left">
+    <div class="appel-header">
+      <div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Appel en cours</div>
+        <div class="appel-timer" id="appel-timer">00:00</div>
+        <div style="font-size:13px;color:var(--text2)" id="appel-company-name">—</div>
+      </div>
+      <button class="btn btn-red btn-sm" style="margin-left:auto" onclick="endCall()">🔴 Fin d'appel</button>
+    </div>
+    <div class="appel-body">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">Observations en temps réel</div>
+      <div class="check-group" id="appel-checkboxes" style="flex-direction:column;gap:6px"></div>
+      <div style="margin-top:16px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Notes rapides</div>
+        <textarea class="form-input" id="appel-notes" placeholder="Notez ce qu'il dit..." style="min-height:120px;width:100%"></textarea>
+      </div>
+      <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="saveCallNotes()">💾 Sauvegarder les notes</button>
+    </div>
+  </div>
+  <div class="appel-right">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700">📋 Script personnalisé</div>
+      <div id="script-loading" style="font-size:12px;color:var(--text3)"></div>
+    </div>
+    <div class="script-container" id="appel-script" style="max-height:none;flex:1"></div>
+  </div>
+</div>
+
+<!-- RAPPEL FIN APPEL -->
+<div class="overlay" id="modal-rappel">
+<div class="modal" style="max-width:480px">
+  <div class="modal-header"><div class="modal-title">✍️ Résumé d'appel</div><button class="modal-close" onclick="closeModal('modal-rappel')">✕</button></div>
+  <div class="modal-body">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">📝 Prenez 2 minutes pour résumer l'appel. Romi analysera automatiquement si le prospect est intéressé.</div>
+    <div class="form-group">
+      <label class="form-label">Résumé de l'appel *</label>
+      <textarea class="form-input" id="rappel-notes" placeholder="Ex: M. Dupont est intéressé par une démo. Il veut plus d'infos sur le prix. Rappeler mardi..." style="min-height:120px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Statut après appel</label>
+      <select class="form-input" id="rappel-status">
+        <option value="called">Appelé</option>
+        <option value="relance">À relancer</option>
+        <option value="rdv">RDV planifié</option>
+        <option value="noint">Pas intéressé</option>
+        <option value="hot">🔥 Très chaud</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn" onclick="closeModal('modal-rappel')">Plus tard</button>
+      <button class="btn btn-accent" onclick="saveRappel()">Enregistrer & analyser →</button>
     </div>
   </div>
 </div>
@@ -293,7 +363,7 @@ select.form-input{appearance:none}
       </div>
       <div class="nav-item" onclick="nav('recherche')">
         <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg>
-        Recherche prospects
+        Prospection
         <div class="nav-badge" id="nav-results-count" style="display:none">0</div>
       </div>
       <div class="nav-item" onclick="nav('prospects')">
@@ -306,18 +376,11 @@ select.form-input{appearance:none}
         Agenda RDV
         <div class="nav-badge" id="rdv-count">0</div>
       </div>
-      <div class="nav-item" onclick="nav('script')">
-        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
-        Script d'appel
-      </div>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-av" id="user-av-initials">RC</div>
-        <div>
-          <div style="font-size:12px;font-weight:500" id="user-name-display">Commercial</div>
-          <div style="font-size:10px;color:var(--text3)">SocialAI Pertuis</div>
-        </div>
+        <div><div style="font-size:12px;font-weight:500" id="user-name-display">Commercial</div><div style="font-size:10px;color:var(--text3)">SocialAI Pertuis</div></div>
         <button onclick="logout()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;margin-left:auto" title="Déconnexion">⬡</button>
       </div>
     </div>
@@ -327,8 +390,7 @@ select.form-input{appearance:none}
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Tableau de bord</div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-blue" onclick="nav('recherche')">🔍 Chercher des prospects</button>
-        <button class="btn" onclick="nav('script')">📞 Script</button>
+        <button class="btn btn-blue" onclick="nav('recherche')">🔍 Prospection</button>
         <button class="btn btn-accent" onclick="openModal('modal-prospect')">+ Prospect</button>
       </div>
     </div>
@@ -341,7 +403,7 @@ select.form-input{appearance:none}
         <div class="section-sub" id="dash-date"></div>
         <div id="alerts-container" class="alerts-bar"></div>
         <div class="stats-row">
-          <div class="stat-card"><div class="stat-label">Prospects total</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">dans la base</div></div>
+          <div class="stat-card"><div class="stat-label">Prospects</div><div class="stat-value" id="stat-total">0</div><div class="stat-sub">dans la base</div></div>
           <div class="stat-card"><div class="stat-label">À appeler</div><div class="stat-value" id="stat-new" style="color:var(--blue)">0</div><div class="stat-sub">nouveaux</div></div>
           <div class="stat-card"><div class="stat-label">RDV planifiés</div><div class="stat-value" id="stat-rdv" style="color:var(--green)">0</div><div class="stat-sub">à venir</div></div>
           <div class="stat-card"><div class="stat-label">À relancer</div><div class="stat-value" id="stat-relance" style="color:var(--yellow)">0</div><div class="stat-sub">depuis +7 jours</div></div>
@@ -352,43 +414,57 @@ select.form-input{appearance:none}
         </div>
       </div>
 
-      <!-- RECHERCHE -->
+      <!-- PROSPECTION -->
       <div class="panel" id="panel-recherche">
-        <div class="section-title">🔍 Recherche de prospects</div>
-        <div class="section-sub">Trouvez des artisans locaux et ajoutez-les en un clic</div>
+        <div class="section-title">🔍 Prospection automatique</div>
+        <div class="section-sub">Romi trouve et ajoute les artisans de votre zone automatiquement</div>
+
+        <!-- Zone de chalandise -->
         <div class="card" style="margin-bottom:16px">
-          <div class="card-header"><div class="card-title">🏗️ Secteur d'activité</div></div>
+          <div class="card-header"><div class="card-title">📍 Zone de chalandise</div></div>
+          <div class="form-row" style="margin-bottom:12px">
+            <div>
+              <label class="form-label">Ville centrale</label>
+              <input class="form-input" id="zone-city" value="Pertuis" placeholder="Ex: Pertuis">
+            </div>
+            <div>
+              <label class="form-label">Rayon (km)</label>
+              <input class="form-input" id="zone-radius" type="number" value="30" min="5" max="100">
+            </div>
+          </div>
+
+          <div class="card-header" style="margin-top:4px"><div class="card-title">🏗️ Secteurs (par priorité)</div></div>
           <div class="sector-grid">
-            <button class="sector-btn selected" data-sector="Électricien" onclick="toggleSector(this)">⚡ Électricien</button>
-            <button class="sector-btn selected" data-sector="Plombier" onclick="toggleSector(this)">🔧 Plombier</button>
-            <button class="sector-btn selected" data-sector="Maçon" onclick="toggleSector(this)">🧱 Maçon</button>
-            <button class="sector-btn selected" data-sector="Chauffagiste" onclick="toggleSector(this)">🔥 Chauffagiste</button>
-            <button class="sector-btn selected" data-sector="Carreleur" onclick="toggleSector(this)">🪟 Carreleur</button>
-            <button class="sector-btn selected" data-sector="Peintre" onclick="toggleSector(this)">🎨 Peintre</button>
-            <button class="sector-btn selected" data-sector="Menuisier" onclick="toggleSector(this)">🪚 Menuisier</button>
-            <button class="sector-btn" data-sector="Couvreur" onclick="toggleSector(this)">🏠 Couvreur</button>
+            <button class="sector-btn selected" data-sector="peintre bâtiment" onclick="toggleSector(this)">🎨 Peintre</button>
+            <button class="sector-btn selected" data-sector="carreleur" onclick="toggleSector(this)">🪟 Carreleur</button>
+            <button class="sector-btn selected" data-sector="menuisier" onclick="toggleSector(this)">🪚 Menuisier</button>
+            <button class="sector-btn selected" data-sector="électricien" onclick="toggleSector(this)">⚡ Électricien</button>
+            <button class="sector-btn selected" data-sector="plombier" onclick="toggleSector(this)">🔧 Plombier</button>
+            <button class="sector-btn selected" data-sector="maçon" onclick="toggleSector(this)">🧱 Maçon</button>
+            <button class="sector-btn selected" data-sector="chauffagiste" onclick="toggleSector(this)">🔥 Chauffagiste</button>
+            <button class="sector-btn" data-sector="couvreur" onclick="toggleSector(this)">🏠 Couvreur</button>
           </div>
-          <div class="card-header" style="margin-top:8px"><div class="card-title">📍 Zone géographique</div></div>
-          <div class="city-grid">
-            <button class="city-btn selected" data-city="Pertuis" onclick="toggleCity(this)">📍 Pertuis</button>
-            <button class="city-btn selected" data-city="Aix-en-Provence" onclick="toggleCity(this)">📍 Aix-en-Provence</button>
-            <button class="city-btn selected" data-city="Manosque" onclick="toggleCity(this)">📍 Manosque</button>
-            <button class="city-btn selected" data-city="Apt" onclick="toggleCity(this)">📍 Apt</button>
-            <button class="city-btn selected" data-city="Cavaillon" onclick="toggleCity(this)">📍 Cavaillon</button>
-            <button class="city-btn selected" data-city="Salon-de-Provence" onclick="toggleCity(this)">📍 Salon-de-Provence</button>
-            <button class="city-btn" data-city="Aubagne" onclick="toggleCity(this)">📍 Aubagne</button>
-            <button class="city-btn" data-city="Arles" onclick="toggleCity(this)">📍 Arles</button>
-            <button class="city-btn" data-city="Avignon" onclick="toggleCity(this)">📍 Avignon</button>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-accent" id="btn-search" onclick="startProspection()" style="flex:1">🚀 Lancer la prospection</button>
+            <button class="btn btn-blue" id="btn-stop" onclick="stopProspection()" style="display:none">⏹ Arrêter</button>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-            <button class="btn btn-accent" id="btn-search" onclick="searchProspects()" style="flex:1">🔍 Lancer la recherche Google Maps</button>
-            <div id="search-status" style="font-size:12px;color:var(--text3)"></div>
+
+          <!-- Barre de progression -->
+          <div id="prospection-progress" style="display:none;margin-top:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:12px;color:var(--text2)" id="progress-label">En cours...</div>
+              <div style="font-size:12px;color:var(--green);font-weight:600" id="progress-added">0 ajoutés</div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
           </div>
         </div>
+
+        <!-- Résultats -->
         <div id="search-results" style="display:none">
           <div class="card-header" style="margin-bottom:12px">
             <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:600" id="results-title">Résultats</div>
-            <button class="btn btn-green btn-sm" onclick="addAllResults()">✅ Tout ajouter</button>
+            <div style="font-size:12px;color:var(--green);font-weight:600" id="results-summary"></div>
           </div>
           <div id="results-list"></div>
         </div>
@@ -397,11 +473,12 @@ select.form-input{appearance:none}
       <!-- PROSPECTS -->
       <div class="panel" id="panel-prospects">
         <div class="section-title">Mes prospects</div>
-        <div class="section-sub">Cliquez sur une ligne pour ouvrir la fiche complète</div>
+        <div class="section-sub">Cliquez → fiche complète · 📞 Appel en cours → script + chrono</div>
         <div class="prospect-filters">
           <input class="search-input" id="search-input" placeholder="🔍 Rechercher..." oninput="filterProspects()">
           <button class="filter-btn active" onclick="setFilter(this,'all')">Tous</button>
           <button class="filter-btn" onclick="setFilter(this,'new')">Nouveaux</button>
+          <button class="filter-btn" onclick="setFilter(this,'hot')">🔥 Chauds</button>
           <button class="filter-btn" onclick="setFilter(this,'rdv')">RDV</button>
           <button class="filter-btn" onclick="setFilter(this,'relance')">À relancer</button>
           <button class="filter-btn" onclick="setFilter(this,'noint')">Pas intéressés</button>
@@ -411,7 +488,7 @@ select.form-input{appearance:none}
           <table class="prospect-table">
             <thead><tr>
               <th>Entreprise</th><th>Gérant</th><th>Téléphone</th>
-              <th>Secteur</th><th>Instagram</th><th>Statut</th><th>Dernière action</th>
+              <th>Secteur</th><th>Statut</th><th>Dernière action</th><th></th>
             </tr></thead>
             <tbody id="prospects-tbody"></tbody>
           </table>
@@ -439,19 +516,6 @@ select.form-input{appearance:none}
         </div>
       </div>
 
-      <!-- SCRIPT -->
-      <div class="panel" id="panel-script">
-        <div class="section-title">Script d'appel</div>
-        <div class="section-sub">Sélectionnez un prospect pour personnaliser le script</div>
-        <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center">
-          <select class="form-input" id="script-prospect-select" onchange="updateScript()" style="max-width:300px">
-            <option value="">— Appel générique —</option>
-          </select>
-          <span id="script-insta-tag"></span>
-        </div>
-        <div class="script-container" id="script-content"></div>
-      </div>
-
     </div>
   </div>
 </div>
@@ -459,6 +523,7 @@ select.form-input{appearance:none}
 <div class="toast-container" id="toast-container"></div>
 
 <script>
+// ── AUTH ──────────────────────────────────────────────────────────────────────
 const token = localStorage.getItem('romi_token');
 const userName = localStorage.getItem('romi_user_name') || 'Commercial';
 if (!token) { window.location.href = '/romi-login.html'; }
@@ -480,123 +545,176 @@ async function api(path, opts={}) {
   return r.json();
 }
 
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let prospects=[], rdvs=[], currentFilter='all', currentRDVProspectId=null, calendarDate=new Date();
-let searchResults=[], addedIds=new Set();
-let selectedSectors=new Set(['Électricien','Plombier','Maçon','Chauffagiste','Carreleur','Peintre','Menuisier']);
-let selectedCities=new Set(['Pertuis','Aix-en-Provence','Manosque','Apt','Cavaillon','Salon-de-Provence']);
+let searchResults=[], prospectionRunning=false, prospectionStop=false;
+let selectedSectors=['peintre bâtiment','carreleur','menuisier','électricien','plombier','maçon','chauffagiste'];
+let currentCallProspectId=null, callTimerInterval=null, callSeconds=0;
+let currentEmailProspectId=null;
 
 async function loadData() {
   const [p, r] = await Promise.all([api('/prospects'), api('/rdv')]);
   if (p) prospects = p;
   if (r) rdvs = r.map(rdv => ({ id:rdv.id, prospect_id:rdv.prospect_id, date:rdv.scheduled_at, type:rdv.type, notes:rdv.notes }));
-  updateCounts(); renderDashboard(); renderProspects(); updateScriptSelect();
+  updateCounts(); renderDashboard(); renderProspects(); 
 }
 
-const titles = { dashboard:'Tableau de bord', recherche:'Recherche prospects', prospects:'Mes prospects', agenda:'Agenda RDV', script:'Script d\'appel' };
+// ── NAV ───────────────────────────────────────────────────────────────────────
+const titles = { dashboard:'Tableau de bord', recherche:'Prospection automatique', prospects:'Mes prospects', agenda:'Agenda RDV' };
 function nav(page) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('panel-' + page).classList.add('active');
   document.getElementById('topbar-title').textContent = titles[page];
-  const order = ['dashboard','recherche','prospects','agenda','script'];
+  const order = ['dashboard','recherche','prospects','agenda'];
   document.querySelectorAll('.nav-item')[order.indexOf(page)]?.classList.add('active');
   if (page==='dashboard') renderDashboard();
   if (page==='prospects') renderProspects();
   if (page==='agenda') renderAgenda();
-  if (page==='script') renderScript();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open') }
 function closeModal(id) { document.getElementById(id).classList.remove('open') }
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open') }));
 
-// RECHERCHE
+// ── PROSPECTION AUTOMATIQUE ───────────────────────────────────────────────────
 function toggleSector(btn) {
-  const s=btn.dataset.sector;
-  if(selectedSectors.has(s)){selectedSectors.delete(s);btn.classList.remove('selected');}
-  else{selectedSectors.add(s);btn.classList.add('selected');}
-}
-function toggleCity(btn) {
-  const c=btn.dataset.city;
-  if(selectedCities.has(c)){selectedCities.delete(c);btn.classList.remove('selected');}
-  else{selectedCities.add(c);btn.classList.add('selected');}
+  const s = btn.dataset.sector;
+  const idx = selectedSectors.indexOf(s);
+  if (idx >= 0) { selectedSectors.splice(idx,1); btn.classList.remove('selected'); }
+  else { selectedSectors.push(s); btn.classList.add('selected'); }
 }
 
-async function searchProspects() {
-  if(!selectedSectors.size||!selectedCities.size){toast('Sélectionnez au moins un secteur et une ville','warn');return;}
-  const btn=document.getElementById('btn-search'), status=document.getElementById('search-status');
-  btn.disabled=true; btn.textContent='⏳ Recherche en cours...'; searchResults=[];
-  for(const sector of selectedSectors){
-    for(const city of selectedCities){
-      status.textContent=`${sector} à ${city}...`;
-      const data=await api('/search/google',{method:'POST',body:JSON.stringify({query:sector,city})});
-      if(data&&!data.error) data.forEach(p=>{if(!searchResults.find(r=>r.company_name===p.company_name))searchResults.push({...p,sector,city});});
-      await new Promise(r=>setTimeout(r,200));
+async function geocodeCity(city) {
+  const data = await api(`/geocode?city=${encodeURIComponent(city)}`);
+  return data?.lat ? data : null;
+}
+
+async function startProspection() {
+  if (prospectionRunning) return;
+  const city = document.getElementById('zone-city').value.trim() || 'Pertuis';
+  const radiusKm = parseInt(document.getElementById('zone-radius').value) || 30;
+  const radiusM = radiusKm * 1000;
+  if (!selectedSectors.length) { toast('Sélectionnez au moins un secteur','warn'); return; }
+
+  prospectionRunning = true; prospectionStop = false;
+  document.getElementById('btn-search').disabled = true;
+  document.getElementById('btn-search').textContent = '⏳ Prospection en cours...';
+  document.getElementById('btn-stop').style.display = 'block';
+  document.getElementById('prospection-progress').style.display = 'block';
+  document.getElementById('search-results').style.display = 'block';
+
+  // Géocoder la ville
+  toast(`📍 Géolocalisation de ${city}...`, 'info');
+  const geo = await geocodeCity(city);
+  if (!geo) { toast(`Ville "${city}" introuvable`, 'warn'); stopProspection(); return; }
+  toast(`✅ ${city} localisée — rayon ${radiusKm}km`, 'success');
+
+  searchResults = [];
+  let totalAdded = 0, idx = 0;
+
+  for (const sector of selectedSectors) {
+    if (prospectionStop) break;
+    idx++;
+    const pct = Math.round((idx / selectedSectors.length) * 100);
+    document.getElementById('progress-label').textContent = `🔍 ${sector} dans ${radiusKm}km autour de ${city}...`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+
+    // Google Places
+    const googleResults = await api('/search/google', {
+      method:'POST',
+      body: JSON.stringify({ query: sector, lat: geo.lat, lng: geo.lng, radius: radiusM })
+    });
+
+    // Pages Jaunes
+    const pjResults = await api('/search/pagesjaunesearch', {
+      method:'POST',
+      body: JSON.stringify({ query: sector, city })
+    });
+
+    const allResults = [...(googleResults||[]), ...(pjResults||[])];
+
+    for (const p of allResults) {
+      if (prospectionStop) break;
+      if (!p.company_name) continue;
+      // Ajouter automatiquement (sans confirmation)
+      const data = await api('/prospects', {
+        method:'POST',
+        body: JSON.stringify({
+          company_name: p.company_name,
+          sector: sector,
+          phone: p.phone||'',
+          city: p.city||city,
+          website: p.website||'',
+          source: p.source||'Google Maps',
+          status: 'new',
+          instagram: 'non',
+          history: []
+        })
+      });
+      if (data && !data.error && !data._duplicate) {
+        totalAdded++;
+        prospects.unshift(data);
+        searchResults.push({ ...p, _added: true });
+        document.getElementById('progress-added').textContent = `${totalAdded} ajoutés`;
+        updateCounts();
+      } else if (data?._duplicate) {
+        searchResults.push({ ...p, _duplicate: true });
+      }
     }
+
+    renderResultsList();
+    await new Promise(r => setTimeout(r, 500));
   }
-  btn.disabled=false; btn.textContent='🔍 Lancer la recherche Google Maps'; status.textContent='';
-  if(!searchResults.length){toast('Aucun résultat trouvé','warn');return;}
-  document.getElementById('search-results').style.display='block';
-  document.getElementById('results-title').textContent=`${searchResults.length} prospects trouvés`;
-  document.getElementById('nav-results-count').style.display='flex';
-  document.getElementById('nav-results-count').textContent=searchResults.length;
-  renderResults(); toast(`${searchResults.length} prospects trouvés !`,'success');
+
+  document.getElementById('progress-label').textContent = `✅ Prospection terminée`;
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('results-title').textContent = `${searchResults.length} entreprises trouvées`;
+  document.getElementById('results-summary').textContent = `${totalAdded} nouveaux ajoutés`;
+  stopProspection(false);
+  toast(`🎉 ${totalAdded} nouveaux prospects ajoutés !`, 'success');
+  renderProspects();
 }
 
-function renderResults() {
-  const existingNames=new Set(prospects.map(p=>(p.company_name||'').toLowerCase()));
-  document.getElementById('results-list').innerHTML=searchResults.map((p,idx)=>{
-    const exists=existingNames.has((p.company_name||'').toLowerCase()), added=addedIds.has(idx);
-    const isMob=/^(06|07)/.test((p.phone||'').replace(/\s/g,''));
-    return `<div class="result-item${exists||added?' result-added':''}" id="result-${idx}">
+function stopProspection(reset=true) {
+  prospectionStop = true; prospectionRunning = false;
+  document.getElementById('btn-search').disabled = false;
+  document.getElementById('btn-search').textContent = '🚀 Lancer la prospection';
+  document.getElementById('btn-stop').style.display = 'none';
+  if (reset) document.getElementById('prospection-progress').style.display = 'none';
+}
+
+function renderResultsList() {
+  document.getElementById('results-list').innerHTML = searchResults.slice(-30).map(p => `
+    <div class="result-item ${p._added?'result-added':''}" style="opacity:${p._duplicate?'.5':'1'}">
       <div class="result-avatar">${(p.company_name||'?').charAt(0)}</div>
       <div class="result-info">
         <div class="result-name">${p.company_name}</div>
-        <div class="result-sub">${p.sector} · ${p.city}${exists?' · <span style="color:var(--green)">✓ Déjà dans la base</span>':''}</div>
-        ${p.phone?`<div class="result-phone" style="color:${isMob?'var(--green)':'var(--text3)'}">${p.phone} ${isMob?'📱':'☎️'}</div>`:'<div class="result-phone" style="color:var(--text3)">Pas de téléphone</div>'}
+        <div class="result-sub">${p.sector||''} · ${p.city||''} · <span style="color:${p.source==='Pages Jaunes'?'var(--yellow)':'var(--blue)'}">${p.source||''}</span></div>
+        ${p.phone?`<div style="font-size:12px;font-weight:600;color:${/^(06|07)/.test((p.phone||'').replace(/\s/g,''))?'var(--green)':'var(--text3)'}">${p.phone} ${/^(06|07)/.test((p.phone||'').replace(/\s/g,''))?'📱':'☎️'}</div>`:''}
       </div>
-      ${!exists&&!added?`<button class="btn btn-green btn-sm" onclick="addResult(${idx})">+ Ajouter</button>`:`<span style="font-size:11px;color:var(--green)">✓ ${added?'Ajouté':'Existant'}</span>`}
-    </div>`;
-  }).join('');
+      <span style="font-size:11px;color:${p._added?'var(--green)':p._duplicate?'var(--text3)':'var(--text2)'}">${p._added?'✅ Ajouté':p._duplicate?'Déjà dans la base':'—'}</span>
+    </div>`).join('');
 }
 
-async function addResult(idx) {
-  const p=searchResults[idx];
-  const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:p.company_name,sector:p.sector,phone:p.phone||'',city:p.city,source:'Google Maps',status:'new',instagram:'non',history:[]})});
-  if(data&&!data.error){addedIds.add(idx);prospects.unshift({...data});updateCounts();renderResults();toast(`${p.company_name} ajouté !`,'success');}
-  else toast('Erreur lors de l\'ajout','warn');
-}
-
-async function addAllResults() {
-  const existingNames=new Set(prospects.map(p=>(p.company_name||'').toLowerCase()));
-  const toAdd=searchResults.filter((p,idx)=>!existingNames.has((p.company_name||'').toLowerCase())&&!addedIds.has(idx));
-  if(!toAdd.length){toast('Tous les prospects sont déjà ajoutés','info');return;}
-  let count=0;
-  for(const p of toAdd){
-    const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:p.company_name,sector:p.sector,phone:p.phone||'',city:p.city,source:'Google Maps',status:'new',instagram:'non',history:[]})});
-    if(data&&!data.error){addedIds.add(searchResults.indexOf(p));prospects.unshift({...data});count++;}
-  }
-  updateCounts();renderResults();toast(`${count} prospects ajoutés !`,'success');
-}
-
-// PROSPECTS
+// ── PROSPECTS TABLE ───────────────────────────────────────────────────────────
 const statusLabels={
   new:['badge-new','Nouveau'],called:['badge-called','Appelé'],rdv:['badge-rdv','RDV 📅'],
   relance:['badge-relance','À relancer'],noint:['badge-noint','Pas intéressé'],
   client:['badge-client','Client ✨'],hot:['badge-hot','🔥 Chaud'],banni:['badge-banni','🚫 Banni']
 };
 const instaLabels={oui:['insta-yes','✅ Actif'],inactif:['insta-maybe','😴 Inactif'],non:['insta-no','❌ Non']};
-function isMobile(phone){return /^(06|07)/.test((phone||'').replace(/\s/g,''));}
+function isMob(phone){return /^(06|07)/.test((phone||'').replace(/\s/g,''));}
 function daysSince(d){if(!d)return 999;return Math.floor((Date.now()-new Date(d))/864e5);}
-function getName(p){return p.company_name||p.company||'?';}
+function getName(p){return p.company_name||'?';}
 function getPhone(p){return p.phone||'';}
 function getCity(p){return p.city||'';}
 function getSector(p){return p.sector||'';}
 function getInsta(p){return p.instagram||'non';}
 function getStatus(p){return p.status||'new';}
-function getLastContact(p){return p.last_contact_at||p.last_contact||null;}
+function getLastContact(p){return p.last_contact_at||null;}
 function getHistory(p){return p.history||[];}
-function getManager(p){return p.manager_name||p.manager||'';}
+function getManager(p){return p.manager_name||'';}
 
 function renderProspects() {
   const tbody=document.getElementById('prospects-tbody');
@@ -605,23 +723,22 @@ function renderProspects() {
     const s=getStatus(p);
     if(currentFilter==='all'&&s==='banni')return false;
     if(currentFilter!=='all'&&s!==currentFilter)return false;
-    const n=getName(p).toLowerCase(), m=getManager(p).toLowerCase();
+    const n=getName(p).toLowerCase(),m=getManager(p).toLowerCase();
     if(search&&!n.includes(search)&&!m.includes(search))return false;
     return true;
   });
-  if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Aucun prospect trouvé</td></tr>`;return;}
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Aucun prospect</td></tr>`;return;}
   tbody.innerHTML=list.map(p=>{
     const[sc,sl]=statusLabels[getStatus(p)]||['badge-new','Nouveau'];
-    const[ic,il]=instaLabels[getInsta(p)]||['insta-no','?'];
     const ds=daysSince(getLastContact(p));
     return `<tr onclick="openFiche('${p.id}')" class="${getStatus(p)==='banni'?'banni':''}">
       <td><div class="company-name">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getCity(p)}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getManager(p)||'—'}</div></td>
-      <td><div class="${isMobile(getPhone(p))?'phone-mobile':'phone-fixed'}">${getPhone(p)||'—'}</div></td>
+      <td><div class="${isMob(getPhone(p))?'phone-mobile':'phone-fixed'}">${getPhone(p)||'—'}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getSector(p)}</div></td>
-      <td><span class="insta-tag ${ic}">${il}</span></td>
       <td><span class="badge ${sc}">${sl}</span></td>
       <td style="font-size:11px;color:var(--text3)">${getLastContact(p)?`il y a ${ds}j`:'Jamais'}</td>
+      <td><button class="btn btn-orange btn-sm" onclick="event.stopPropagation();startCall('${p.id}')">📞 Appel</button></td>
     </tr>`;
   }).join('');
 }
@@ -640,18 +757,32 @@ function updateCounts() {
   document.getElementById('stat-relance').textContent=active.filter(p=>getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&getStatus(p)==='called')).length;
 }
 
+// ── ADD PROSPECT MANUEL ───────────────────────────────────────────────────────
 async function addProspect() {
   const company=document.getElementById('np-company').value.trim();
-  if(!company){toast('Nom de l\'entreprise requis','warn');return;}
+  if(!company){toast('Nom requis','warn');return;}
   const insta=document.querySelector('input[name="insta"]:checked')?.value||'non';
-  const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:company,sector:document.getElementById('np-sector').value,manager_name:document.getElementById('np-manager').value.trim(),phone:document.getElementById('np-phone').value.trim(),email:document.getElementById('np-email').value.trim(),city:document.getElementById('np-city').value.trim()||'Pertuis',source:document.getElementById('np-source').value,instagram:insta,status:'new',notes:document.getElementById('np-notes').value.trim(),history:[]})});
-  if(data&&!data.error){prospects.unshift(data);closeModal('modal-prospect');['np-company','np-manager','np-phone','np-email','np-notes'].forEach(id=>document.getElementById(id).value='');renderProspects();updateCounts();toast(`${company} ajouté !`,'success');}
+  const data=await api('/prospects',{method:'POST',body:JSON.stringify({
+    company_name:company,sector:document.getElementById('np-sector').value,
+    manager_name:document.getElementById('np-manager').value.trim(),
+    phone:document.getElementById('np-phone').value.trim(),
+    email:document.getElementById('np-email').value.trim(),
+    website:document.getElementById('np-website').value.trim(),
+    city:document.getElementById('np-city').value.trim()||'Pertuis',
+    instagram:insta,status:'new',
+    notes:document.getElementById('np-notes').value.trim(),history:[]
+  })});
+  if(data&&!data.error&&!data._duplicate){
+    prospects.unshift(data);closeModal('modal-prospect');
+    ['np-company','np-manager','np-phone','np-email','np-website','np-notes'].forEach(id=>document.getElementById(id).value='');
+    renderProspects();updateCounts();toast(`${company} ajouté !`,'success');
+  } else if(data?._duplicate) toast('Ce prospect existe déjà','warn');
   else toast('Erreur: '+(data?.error||'inconnue'),'warn');
 }
 
+// ── FICHE PROSPECT ────────────────────────────────────────────────────────────
 function openFiche(id) {
-  const p=prospects.find(x=>x.id===id);
-  if(!p)return;
+  const p=prospects.find(x=>x.id===id);if(!p)return;
   document.getElementById('fiche-title').textContent=getName(p);
   const[sc,sl]=statusLabels[getStatus(p)]||['badge-new','Nouveau'];
   const[ic,il]=instaLabels[getInsta(p)]||['insta-no','?'];
@@ -663,13 +794,15 @@ function openFiche(id) {
     <div class="fiche-header">
       <div class="fiche-avatar" style="${isBanni?'opacity:.4':''}">${getName(p).charAt(0)}</div>
       <div class="fiche-info">
-        <div class="fiche-name">${getName(p)} ${isBanni?'<span style="font-size:12px;color:var(--red)">🚫 Banni</span>':''}</div>
-        <div class="fiche-sub">${getSector(p)} · ${getCity(p)}</div>
-        <div class="fiche-phone">${getPhone(p)||'Pas de téléphone'} ${isMobile(getPhone(p))?'📱':'☎️'}</div>
+        <div class="fiche-name">${getName(p)}</div>
+        <div class="fiche-sub">${getSector(p)} · ${getCity(p)} ${p.website?`· <a href="${p.website}" target="_blank" style="color:var(--blue);font-size:12px">🌐 Site web</a>`:''}</div>
+        <div class="fiche-phone">${getPhone(p)||'Pas de téléphone'} ${isMob(getPhone(p))?'📱':'☎️'}</div>
+        ${getManager(p)?`<div style="font-size:13px;color:var(--text2);margin-top:3px">👤 ${getManager(p)}</div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         <span class="badge ${sc}">${sl}</span>
         <span class="insta-tag ${ic}">${il}</span>
+        ${p.interest_level?`<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(251,146,60,.1);color:var(--orange)">${p.interest_level==='chaud'?'🔥 Chaud':p.interest_level==='tiede'?'🌡 Tiède':'❄️ Froid'}</span>`:''}
       </div>
     </div>
 
@@ -683,35 +816,36 @@ function openFiche(id) {
       </div>
     </div>
 
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-orange" onclick="closeModal('modal-fiche');startCall('${id}')">📞 Appel en cours</button>
+      <button class="btn btn-green" onclick="planRDV('${id}')">📅 RDV</button>
+      ${p.email?`<button class="btn btn-blue" onclick="openEmailModal('${id}')">📧 Envoyer email</button>`:''}
+    </div>
+
     <div class="fiche-section">
-      <div class="fiche-section-title">Observations après appel</div>
+      <div class="fiche-section-title">Observations</div>
       <div class="check-group">
         ${[['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],['deja_quelquun','👥 A déjà quelqu\'un'],
            ['pas_instagram','📵 Pas sur Instagram'],['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
-           ['rappeler','📞 Rappeler plus tard'],['demande_devis','📋 Demande démo']
+           ['rappeler','📞 Rappeler'],['demande_devis','📋 Veut une démo']
         ].map(([v,l])=>`<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('')}
       </div>
     </div>
 
     <div class="fiche-section">
-      <div class="fiche-section-title">Notes libres</div>
-      <textarea class="form-input" id="fiche-notes-${id}" style="width:100%">${p.notes||''}</textarea>
-      <button class="btn btn-sm" style="margin-top:6px" onclick="saveNotes('${id}')">💾 Sauvegarder</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-      <button class="btn btn-green" onclick="planRDV('${id}')">📅 Planifier un RDV</button>
-      <button class="btn" onclick="markCalled('${id}')">📞 Marquer comme appelé</button>
-      <button class="btn" onclick="closeModal('modal-fiche');nav('script');setTimeout(()=>{document.getElementById('script-prospect-select').value='${id}';updateScript()},100)">📋 Voir le script</button>
+      <div class="fiche-section-title">Notes & résumés d'appels</div>
+      <textarea class="form-input" id="fiche-notes-${id}" style="width:100%;min-height:80px">${p.notes||''}</textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-sm" onclick="saveAndAnalyze('${id}')">💾 Sauvegarder & analyser</button>
+      </div>
+      <div id="ai-suggestion-${id}"></div>
     </div>
 
     ${pRdvs.length>0?`<div class="fiche-section">
       <div class="fiche-section-title">RDV à venir</div>
       ${pRdvs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.2);border-radius:8px;margin-bottom:6px">
         <span style="color:var(--green);font-size:18px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span>
-        <div><div style="font-size:13px;font-weight:500;color:var(--green)">${new Date(r.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(r.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>${r.notes?`<div style="font-size:12px;color:var(--text3)">${r.notes}</div>`:''}</div>
+        <div><div style="font-size:13px;font-weight:500;color:var(--green)">${new Date(r.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(r.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>
       </div>`).join('')}
     </div>`:''}`:``}
 
@@ -724,27 +858,130 @@ function openFiche(id) {
     <div class="divider"></div>
     <div class="danger-zone">
       <span style="font-size:18px">⚠️</span>
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:4px">Zone danger</div>
-        <div style="font-size:11px;color:var(--text3)">Ces actions sont irréversibles</div>
-      </div>
-      ${!isBanni
-        ?`<button class="btn btn-yellow btn-sm" onclick="banProspect('${id}')">🚫 Bannir</button>`
-        :`<button class="btn btn-green btn-sm" onclick="unbanProspect('${id}')">✅ Débannir</button>`}
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--red)">Zone danger</div><div style="font-size:11px;color:var(--text3)">Actions irréversibles</div></div>
+      ${!isBanni?`<button class="btn btn-yellow btn-sm" onclick="banProspect('${id}')">🚫 Bannir</button>`:
+                 `<button class="btn btn-green btn-sm" onclick="unbanProspect('${id}')">✅ Débannir</button>`}
       <button class="btn btn-red btn-sm" onclick="deleteProspect('${id}')">🗑 Supprimer</button>
     </div>
   `;
   openModal('modal-fiche');
 }
 
-async function updateStatus(id,status) {
+// ── SAVE & ANALYZE ────────────────────────────────────────────────────────────
+async function saveAndAnalyze(id) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:`Statut : ${statusLabels[status]?.[1]||status}`}];
-  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
-  if(data){Object.assign(p,data);openFiche(id);renderProspects();toast('Statut mis à jour','info');}
+  const notes=document.getElementById(`fiche-notes-${id}`).value;
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes})});
+  p.notes=notes;
+  toast('Notes sauvegardées — analyse en cours...','info');
+  const result=await api(`/prospects/${id}/analyze`,{method:'POST',body:JSON.stringify({notes})});
+  const container=document.getElementById(`ai-suggestion-${id}`);
+  if(!container)return;
+  if(result?.interested){
+    if(result.level) p.interest_level=result.level;
+    container.innerHTML=`<div class="email-suggestion" style="margin-top:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">🤖</span>
+        <div style="font-weight:600;color:var(--green)">Romi détecte un intérêt !</div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${result.suggestion||'Ce prospect semble intéressé.'} ${result.level==='chaud'?'🔥 Prospect chaud !':''}</div>
+      ${p.email&&result.send_email?`<button class="btn btn-green btn-sm" onclick="openEmailModal('${id}')">📧 Envoyer email de présentation</button>`:''}
+    </div>`;
+    toast(`🤖 ${result.level==='chaud'?'Prospect chaud !':'Intérêt détecté'} ${result.suggestion||''}`, 'success');
+  } else {
+    container.innerHTML=`<div style="font-size:12px;color:var(--text3);margin-top:8px">✓ Analysé — pas d'intérêt fort détecté</div>`;
+    toast('Notes analysées','info');
+  }
 }
 
-async function toggleTag(id,tag,el) {
+// ── EMAIL MODAL ───────────────────────────────────────────────────────────────
+async function openEmailModal(id) {
+  currentEmailProspectId=id;
+  const draft=await api(`/prospects/${id}/email-draft`);
+  if(!draft)return;
+  document.getElementById('email-to').value=draft.prospect?.email||'';
+  document.getElementById('email-subject').value=draft.subject||'';
+  document.getElementById('email-body').value=draft.body||'';
+  closeModal('modal-fiche');
+  openModal('modal-email');
+}
+
+async function sendEmailNow() {
+  const btn=document.getElementById('btn-send-email');
+  btn.disabled=true; btn.textContent='📤 Envoi...';
+  const data=await api(`/prospects/${currentEmailProspectId}/send-email`,{method:'POST',body:JSON.stringify({
+    subject:document.getElementById('email-subject').value,
+    body:document.getElementById('email-body').value
+  })});
+  btn.disabled=false; btn.textContent='📤 Envoyer';
+  if(data?.success){closeModal('modal-email');toast('Email envoyé ✅','success');}
+  else toast('Erreur envoi email','warn');
+}
+
+// ── APPEL EN COURS ────────────────────────────────────────────────────────────
+async function startCall(id) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  currentCallProspectId=id;
+  document.getElementById('appel-company-name').textContent=getName(p)+' · '+getPhone(p);
+  document.getElementById('appel-overlay').classList.add('open');
+
+  // Timer
+  callSeconds=0;
+  clearInterval(callTimerInterval);
+  callTimerInterval=setInterval(()=>{
+    callSeconds++;
+    const m=String(Math.floor(callSeconds/60)).padStart(2,'0');
+    const s=String(callSeconds%60).padStart(2,'0');
+    document.getElementById('appel-timer').textContent=`${m}:${s}`;
+  },1000);
+
+  // Notes existantes
+  document.getElementById('appel-notes').value=p.notes||'';
+
+  // Checkboxes
+  document.getElementById('appel-checkboxes').innerHTML=[
+    ['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],
+    ['deja_quelquun','👥 A déjà quelqu\'un'],['pas_instagram','📵 Pas sur Instagram'],
+    ['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
+    ['rappeler','📞 Rappeler'],['demande_devis','📋 Veut une démo']
+  ].map(([v,l])=>`<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleCallTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('');
+
+  // Charger le script
+  document.getElementById('script-loading').textContent='⏳ Chargement du script...';
+  document.getElementById('appel-script').innerHTML=renderScriptLocal(p);
+
+  // Script IA en arrière-plan
+  api(`/prospects/${id}/script`).then(data=>{
+    document.getElementById('script-loading').textContent='';
+    if(data?.script) document.getElementById('appel-script').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${data.script}</div>`;
+  });
+
+  // Marquer comme "en cours d'appel"
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'📞 Appel en cours'}];
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({history})});
+  p.history=history;
+}
+
+function renderScriptLocal(p) {
+  const name=getManager(p)?.split(' ')[0]||'[Prénom]';
+  const sector=getSector(p)||'artisan';
+  const insta=getInsta(p)||'non';
+  const accroche=insta==='non'
+    ?`"Bonjour, je cherche ${name} ?\nJe m'appelle [Prénom], SocialAI à Pertuis.\nDe plus en plus de clients cherchent leur ${sector} sur Instagram avant d'appeler.\nCeux qui n'y sont pas perdent des chantiers sans le savoir. J'ai 2 minutes ?"`
+    :insta==='inactif'
+    ?`"Bonjour ${name}, SocialAI à Pertuis.\nJ'ai vu votre Instagram — vous avez fait l'effort d'y être.\nMais vous postez irrégulièrement, ça pénalise votre visibilité.\nOn s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
+    :`"Bonjour ${name}, SocialAI à Pertuis.\nOn accompagne des ${sector.toLowerCase()}s locaux pour booster leur Instagram avec l'IA.\nOn pense pouvoir faire mieux, automatiquement. 2 minutes ?"`;
+  return `<div class="script-section"><div class="script-section-title">📞 Accroche</div><div class="script-line highlight" style="white-space:pre-wrap">${accroche}</div></div>
+<div class="script-section"><div class="script-section-title">🤖 Présenter Aria</div><div class="script-line highlight">"Aria gère votre Instagram 7j/7.<br>Vous envoyez vos photos sur WhatsApp — elle publie, répond aux messages, génère des contacts.<br>149€/mois × 3 mois puis 199€. Sans engagement."</div></div>
+<div class="script-section"><div class="script-section-title">💬 Objections</div>
+<div class="script-line"><strong style="color:var(--yellow)">"J'ai pas le temps"</strong> → "Une photo sur WhatsApp. C'est tout."</div>
+<div class="script-line"><strong style="color:var(--yellow)">"C'est combien ?"</strong> → "149€/mois × 3 mois puis 199€. Sans engagement."</div>
+<div class="script-line"><strong style="color:var(--yellow)">"J'ai déjà quelqu'un"</strong> → "Vous payez combien ? Aria travaille 7j/7 en continu."</div>
+<div class="script-line"><strong style="color:var(--yellow)">"Je vais réfléchir"</strong> → "20 min de démo — vous réfléchissez sur du concret."</div></div>
+<div class="script-section"><div class="script-section-title">📅 Prise de RDV</div><div class="script-line highlight">"Démo de 20 minutes — visio ou présentiel, on est à Pertuis.<br>[Jour] à [heure] ou [Jour] à [heure] ?"</div></div>`;
+}
+
+async function toggleCallTag(id, tag, el) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
   const tags=p.tags||[];
   const newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
@@ -753,43 +990,41 @@ async function toggleTag(id,tag,el) {
   p.tags=newTags;
 }
 
-async function saveNotes(id) {
-  const p=prospects.find(x=>x.id===id);if(!p)return;
-  const notes=document.getElementById(`fiche-notes-${id}`).value;
-  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes})});
-  p.notes=notes;toast('Notes sauvegardées ✓','success');
+async function saveCallNotes() {
+  const p=prospects.find(x=>x.id===currentCallProspectId);if(!p)return;
+  const notes=document.getElementById('appel-notes').value;
+  await api(`/prospects/${currentCallProspectId}`,{method:'PUT',body:JSON.stringify({notes})});
+  p.notes=notes;toast('Notes sauvegardées','success');
 }
 
-async function markCalled(id) {
-  const p=prospects.find(x=>x.id===id);if(!p)return;
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:'Appel effectué'}];
-  const status=getStatus(p)==='new'?'called':getStatus(p);
-  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
-  if(data){Object.assign(p,data);openFiche(id);renderProspects();}
+function endCall() {
+  clearInterval(callTimerInterval);
+  document.getElementById('appel-overlay').classList.remove('open');
+  // Ouvrir le rappel résumé
+  document.getElementById('rappel-notes').value=document.getElementById('appel-notes').value||'';
+  openModal('modal-rappel');
 }
 
-async function banProspect(id) {
-  if(!confirm('Bannir ce prospect ? Il ne sera plus jamais contacté.'))return;
-  const p=prospects.find(x=>x.id===id);if(!p)return;
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:'🚫 Prospect banni'}];
-  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'banni',history})});
-  if(data){Object.assign(p,data);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect banni — ne sera plus affiché','warn');}
+async function saveRappel() {
+  const id=currentCallProspectId;const p=prospects.find(x=>x.id===id);if(!p)return;
+  const notes=document.getElementById('rappel-notes').value;
+  const status=document.getElementById('rappel-status').value;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:`📝 Résumé appel (${Math.floor(callSeconds/60)}min) : ${notes.slice(0,80)}...`}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes,status,history})});
+  if(data)Object.assign(p,data);
+  closeModal('modal-rappel');
+  renderProspects();updateCounts();
+  toast('Résumé enregistré — analyse en cours...','info');
+  // Analyser les notes
+  const result=await api(`/prospects/${id}/analyze`,{method:'POST',body:JSON.stringify({notes})});
+  if(result?.interested){
+    if(result.level)p.interest_level=result.level;
+    toast(`🤖 ${result.level==='chaud'?'🔥 Prospect CHAUD !':'Intérêt détecté !'} ${result.suggestion||''}`, 'success');
+    if(p.email&&result.send_email) setTimeout(()=>openEmailModal(id),1000);
+  }
 }
 
-async function unbanProspect(id) {
-  const p=prospects.find(x=>x.id===id);if(!p)return;
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:'✅ Prospect débanni'}];
-  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'new',history})});
-  if(data){Object.assign(p,data);openFiche(id);renderProspects();updateCounts();toast('Prospect débanni ✓','success');}
-}
-
-async function deleteProspect(id) {
-  if(!confirm('Supprimer définitivement ce prospect ? Cette action est irréversible.'))return;
-  const data=await api(`/prospects/${id}`,{method:'DELETE'});
-  if(data&&!data.error){prospects=prospects.filter(x=>x.id!==id);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect supprimé ✓','success');}
-  else toast('Erreur suppression','warn');
-}
-
+// ── RDV ───────────────────────────────────────────────────────────────────────
 function planRDV(prospectId) {
   currentRDVProspectId=prospectId;
   const p=prospects.find(x=>x.id===prospectId);
@@ -809,10 +1044,50 @@ async function saveRDV() {
     const p=prospects.find(x=>x.id===currentRDVProspectId);
     if(p){p.status='rdv';const h=getHistory(p);h.push({date:new Date().toISOString(),text:`RDV planifié le ${dt.toLocaleDateString('fr-FR')}`});p.history=h;}
     closeModal('modal-rdv');renderProspects();updateCounts();renderAgenda();
-    toast(`RDV planifié pour ${dt.toLocaleDateString('fr-FR')} 📅`,'success');
+    toast(`RDV planifié 📅`,'success');
   }else toast('Erreur RDV','warn');
 }
 
+// ── FICHE ACTIONS ─────────────────────────────────────────────────────────────
+async function updateStatus(id,status) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:`Statut : ${statusLabels[status]?.[1]||status}`}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();toast('Statut mis à jour','info');}
+}
+
+async function toggleTag(id,tag,el) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const tags=p.tags||[];
+  const newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
+  el.classList.toggle('checked',!tags.includes(tag));
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});
+  p.tags=newTags;
+}
+
+async function banProspect(id) {
+  if(!confirm('Bannir ce prospect ?'))return;
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'🚫 Banni'}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'banni',history})});
+  if(data){Object.assign(p,data);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect banni','warn');}
+}
+
+async function unbanProspect(id) {
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:'✅ Débanni'}];
+  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'new',history})});
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();updateCounts();toast('Débanni ✓','success');}
+}
+
+async function deleteProspect(id) {
+  if(!confirm('Supprimer définitivement ?'))return;
+  const data=await api(`/prospects/${id}`,{method:'DELETE'});
+  if(data&&!data.error){prospects=prospects.filter(x=>x.id!==id);closeModal('modal-fiche');renderProspects();updateCounts();toast('Supprimé ✓','success');}
+  else toast('Erreur suppression','warn');
+}
+
+// ── AGENDA ────────────────────────────────────────────────────────────────────
 function renderAgenda() {
   const heads=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   document.getElementById('cal-heads').innerHTML=heads.map(h=>`<div class="cal-day-head">${h}</div>`).join('');
@@ -845,6 +1120,7 @@ function renderAgenda() {
 }
 function changeMonth(delta){calendarDate.setMonth(calendarDate.getMonth()+delta);renderAgenda();}
 
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
 function renderDashboard() {
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   updateCounts();checkAlerts();
@@ -857,74 +1133,38 @@ function renderDashboard() {
 function checkAlerts() {
   const container=document.getElementById('alerts-container');if(!container)return;
   const alerts=[],now=new Date();
-  rdvs.forEach(r=>{const d=new Date(r.date),diffMin=(d-now)/60000;if(diffMin>0&&diffMin<=30){const p=prospects.find(x=>x.id===r.prospect_id);alerts.push({type:'urgent',icon:'⏰',text:`RDV dans ${Math.round(diffMin)} minutes avec <strong>${getName(p||{})}</strong>`});}});
-  prospects.filter(p=>getStatus(p)!=='banni'&&getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','relance','hot'].includes(getStatus(p))).forEach(p=>{alerts.push({type:'relance',icon:'🔁',text:`<strong>${getName(p)}</strong> n'a pas été contacté depuis ${daysSince(getLastContact(p))} jours`});});
+  rdvs.forEach(r=>{const d=new Date(r.date),diffMin=(d-now)/60000;if(diffMin>0&&diffMin<=30){const p=prospects.find(x=>x.id===r.prospect_id);alerts.push({type:'urgent',icon:'⏰',text:`RDV dans ${Math.round(diffMin)} min avec <strong>${getName(p||{})}</strong>`});}});
+  prospects.filter(p=>getStatus(p)!=='banni'&&getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','relance','hot'].includes(getStatus(p))).slice(0,3).forEach(p=>{alerts.push({type:'relance',icon:'🔁',text:`<strong>${getName(p)}</strong> non contacté depuis ${daysSince(getLastContact(p))} jours`});});
   rdvs.filter(r=>{const d=new Date(r.date),diff=(d-now)/36e5;return diff>0.5&&diff<=8;}).forEach(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);alerts.push({type:'rdv',icon:'📅',text:`RDV aujourd'hui à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} avec <strong>${getName(p||{})}</strong>`});});
   container.innerHTML=alerts.slice(0,4).map(a=>`<div class="alert-item alert-${a.type==='urgent'?'urgent':a.type==='rdv'?'rdv':'info'}"><span class="alert-icon">${a.icon}</span><span class="alert-text">${a.text}</span><button class="alert-close" onclick="this.parentElement.remove()">✕</button></div>`).join('');
 }
 
-function updateScriptSelect() {
-  const sel=document.getElementById('script-prospect-select');if(!sel)return;
-  const cur=sel.value;
-  sel.innerHTML='<option value="">— Appel générique —</option>'+prospects.filter(p=>getStatus(p)!=='banni').map(p=>`<option value="${p.id}" ${cur===p.id?'selected':''}>${getName(p)} (${getManager(p)||'?'})</option>`).join('');
-}
-
-function updateScript() {
-  const id=document.getElementById('script-prospect-select').value;
-  const p=id?prospects.find(x=>x.id===id):null;
-  const tag=document.getElementById('script-insta-tag');
-  if(p){const[ic,il]=instaLabels[getInsta(p)]||['insta-no','?'];tag.innerHTML=`<span class="insta-tag ${ic}">${il}</span>`;}
-  else tag.innerHTML='';
-  renderScript(p);
-}
-
-function renderScript(p) {
-  const el=document.getElementById('script-content');if(!el)return;
-  const name=getManager(p)?.split(' ')[0]||'[Prénom]',sector=getSector(p)||'artisan',insta=getInsta(p)||'non';
-  const versionLabel=insta==='non'?'Version A — Pas sur Instagram':insta==='inactif'?'Version B — Sur Instagram mais inactif':'Version C — Déjà actif';
-  const accroche=insta==='non'
-    ?`"Bonjour, je cherche <span class='script-var'>${name}</span> ?<br>Je m'appelle [Prénom], SocialAI à Pertuis.<br>De plus en plus de clients cherchent leur <span class='script-var'>${sector}</span> sur Instagram avant d'appeler.<br>Ceux qui n'y sont pas perdent des chantiers sans le savoir. J'ai 2 minutes ?"`
-    :insta==='inactif'
-    ?`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>J'ai vu votre Instagram — vous avez fait l'effort d'y être, c'est bien.<br>Mais vous postez irrégulièrement, ça pénalise votre visibilité.<br>On s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
-    :`"Bonjour <span class='script-var'>${name}</span>, SocialAI à Pertuis.<br>On accompagne des <span class='script-var'>${sector.toLowerCase()}s</span> locaux pour booster leur Instagram avec l'IA.<br>On pense pouvoir faire mieux, automatiquement. 2 minutes ?"`;
-  el.innerHTML=`
-    <div class="script-section"><div class="script-section-title">🎯 ${versionLabel}</div></div>
-    <div class="script-section"><div class="script-section-title">📞 Accroche</div><div class="script-line highlight">${accroche}</div></div>
-    <div class="script-section"><div class="script-section-title">🤖 Présenter Aria</div>
-      <div class="script-line highlight">"Aria, c'est notre IA — développée ici, à Pertuis.<br>Elle gère votre Instagram 7j/7, 24h/24.<br><br>Vous envoyez des photos de chantiers sur WhatsApp — c'est tout.<br>Elle crée les visuels, écrit les textes, publie au bon moment.<br>Elle apprend chaque jour, fait de la veille sur les <span class='script-var'>${sector.toLowerCase()}s</span>,<br>et construit une vraie stratégie commerciale pour vous.<br><br>Quand un client vous écrit à 22h — Aria répond, récupère son numéro,<br>et vous envoie un email récap. Le lendemain, contact qualifié dans votre boîte."</div>
-    </div>
-    <div class="script-section"><div class="script-section-title">📍 Argument local</div>
-      <div class="script-line">"On est à Pertuis. On connaît les artisans du coin. Si vous avez un souci, vous appelez — on est là."</div>
-    </div>
-    <div class="script-section"><div class="script-section-title">💬 Objections</div>
-      <div class="script-line"><strong style="color:var(--yellow)">"J'ai pas le temps"</strong><br>"Une photo sur WhatsApp. C'est tout."</div>
-      <div class="script-line"><strong style="color:var(--yellow)">"C'est combien ?"</strong><br>"149€/mois les 3 premiers mois, puis 199€. Sans engagement."</div>
-      <div class="script-line"><strong style="color:var(--yellow)">"J'ai déjà quelqu'un"</strong><br>"Vous payez combien ? [écouter] — Aria travaille 7j/7 et apprend en continu."</div>
-      <div class="script-line"><strong style="color:var(--yellow)">"Je vais réfléchir"</strong><br>"20 min de démo — vous réfléchissez sur quelque chose de concret."</div>
-    </div>
-    <div class="script-section"><div class="script-section-title">📅 Prise de RDV</div>
-      <div class="script-line highlight">"Démo de 20 minutes — visio ou présentiel, on est locaux.<br>[Jour] à [heure] ou [Jour] à [heure] ?"</div>
-      ${p?`<button class="btn btn-green" style="margin-top:10px" onclick="planRDV('${p.id}')">📅 Planifier le RDV</button>`:''}
-    </div>`;
-  updateScriptSelect();
-}
-
-function toast(msg,type='info'){
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,type='info') {
   const icons={success:'✅',info:'💡',warn:'⚠️',urgent:'🚨'};
   const el=document.createElement('div');el.className=`toast ${type}`;
   el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
   document.getElementById('toast-container').appendChild(el);
-  setTimeout(()=>el.remove(),3500);
+  setTimeout(()=>el.remove(),4000);
 }
 
+// ── INIT ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.check-pill input[type=radio]').forEach(input=>{
   input.addEventListener('change',function(){
     document.querySelectorAll(`.check-pill input[name="${this.name}"]`).forEach(r=>{r.closest('.check-pill').classList.toggle('checked',r.checked);});
   });
 });
 
-renderDashboard();renderScript(null);loadData();
+// Ajouter colonnes manquantes Supabase au démarrage
+async function ensureColumns() {
+  // Tente de mettre à jour un champ website pour vérifier que la colonne existe
+  // Si erreur, c'est géré silencieusement
+}
+
+renderDashboard();
+loadData();
 setInterval(checkAlerts,60000);
+setInterval(()=>{loadData();},5*60*1000); // Refresh toutes les 5 min
 </script>
 </body>
 </html>
