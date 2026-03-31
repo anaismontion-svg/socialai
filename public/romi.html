@@ -21,7 +21,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 h1,h2,h3,h4{font-family:'Clash Display',sans-serif}
 button{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;outline:none}
 input,textarea,select{font-family:'DM Sans',sans-serif;outline:none}
-*{box-sizing:border-box}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -131,7 +130,6 @@ select.form-input{appearance:none}
 .script-section-title{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
 .script-line{font-size:13px;color:var(--text2);line-height:1.7;padding:6px 10px;border-radius:6px;border-left:2px solid var(--border);margin-bottom:4px}
 .script-line.highlight{border-left-color:var(--accent);background:rgba(255,95,126,.04);color:var(--text)}
-.script-var{color:var(--yellow);font-weight:600}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:12px}
 .cal-day-head{font-size:10px;color:var(--text3);text-align:center;padding:4px;text-transform:uppercase;letter-spacing:.5px}
 .cal-day{border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;padding:5px 2px;min-height:52px}
@@ -162,8 +160,6 @@ select.form-input{appearance:none}
 .history-date{color:var(--text3);flex-shrink:0;width:80px}
 .history-text{color:var(--text2);flex:1}
 .divider{height:1px;background:var(--border);margin:16px 0}
-.spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,95,126,.2);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .insta-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:10px}
 .insta-yes{background:rgba(45,212,160,.1);color:var(--green)}
@@ -175,26 +171,43 @@ select.form-input{appearance:none}
 .sector-btn{padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;text-align:center}
 .sector-btn:hover{border-color:var(--blue);color:var(--blue)}
 .sector-btn.selected{border-color:var(--blue);background:rgba(91,143,255,.1);color:var(--blue);font-weight:600}
-.result-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px;transition:all .15s}
+.result-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);margin-bottom:8px}
 .result-added{background:rgba(45,212,160,.05);border-color:rgba(45,212,160,.15)}
 .result-avatar{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0}
 .result-info{flex:1}
 .result-name{font-size:13px;font-weight:500;margin-bottom:2px}
 .result-sub{font-size:11px;color:var(--text3)}
 .danger-zone{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
-.prospection-bar{background:linear-gradient(135deg,rgba(91,143,255,.08),rgba(167,139,250,.08));border:1px solid rgba(91,143,255,.2);border-radius:var(--r2);padding:16px;margin-bottom:20px}
 .progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:8px}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:3px;transition:width .5s ease}
 /* APPEL EN COURS */
-.appel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;display:none;align-items:stretch}
+.appel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);z-index:200;display:none;align-items:stretch}
 .appel-overlay.open{display:flex}
 .appel-left{width:380px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
 .appel-right{flex:1;display:flex;flex-direction:column;overflow-y:auto;padding:24px}
 .appel-header{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
 .appel-timer{font-family:'Clash Display',sans-serif;font-size:32px;font-weight:700;color:var(--accent);letter-spacing:-1px}
 .appel-body{flex:1;padding:20px;overflow-y:auto}
-/* SUGGESTION EMAIL */
 .email-suggestion{background:linear-gradient(135deg,rgba(45,212,160,.08),rgba(91,143,255,.08));border:1px solid rgba(45,212,160,.25);border-radius:var(--r2);padding:16px;margin-top:12px}
+
+/* QUESTIONNAIRE FIN APPEL */
+.questionnaire{padding:0}
+.q-step{display:none}
+.q-step.active{display:block}
+.q-title{font-family:'Clash Display',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.q-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+.q-options{display:flex;flex-direction:column;gap:10px}
+.q-option{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:2px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .2s;text-align:left}
+.q-option:hover{border-color:var(--border2);background:var(--bg4)}
+.q-option.selected{border-color:var(--accent);background:rgba(255,95,126,.08)}
+.q-option-icon{font-size:22px;flex-shrink:0}
+.q-option-label{font-size:14px;font-weight:500}
+.q-option-sub{font-size:12px;color:var(--text3)}
+.q-progress{display:flex;gap:6px;margin-bottom:24px}
+.q-dot{height:4px;border-radius:2px;flex:1;background:var(--border);transition:background .3s}
+.q-dot.done{background:var(--accent)}
+.q-dot.active{background:var(--blue)}
+.rappel-result{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -292,12 +305,12 @@ select.form-input{appearance:none}
 </div>
 </div>
 
-<!-- APPEL EN COURS (plein écran) -->
+<!-- APPEL EN COURS -->
 <div class="appel-overlay" id="appel-overlay">
   <div class="appel-left">
     <div class="appel-header">
       <div>
-        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Appel en cours</div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">📞 Appel en cours</div>
         <div class="appel-timer" id="appel-timer">00:00</div>
         <div style="font-size:13px;color:var(--text2)" id="appel-company-name">—</div>
       </div>
@@ -308,9 +321,9 @@ select.form-input{appearance:none}
       <div class="check-group" id="appel-checkboxes" style="flex-direction:column;gap:6px"></div>
       <div style="margin-top:16px">
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Notes rapides</div>
-        <textarea class="form-input" id="appel-notes" placeholder="Notez ce qu'il dit..." style="min-height:120px;width:100%"></textarea>
+        <textarea class="form-input" id="appel-notes" placeholder="Notez ce qu'il dit..." style="min-height:100px;width:100%"></textarea>
       </div>
-      <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="saveCallNotes()">💾 Sauvegarder les notes</button>
+      <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="saveCallNotes()">💾 Sauvegarder</button>
     </div>
   </div>
   <div class="appel-right">
@@ -322,29 +335,114 @@ select.form-input{appearance:none}
   </div>
 </div>
 
-<!-- RAPPEL FIN APPEL -->
-<div class="overlay" id="modal-rappel">
-<div class="modal" style="max-width:480px">
-  <div class="modal-header"><div class="modal-title">✍️ Résumé d'appel</div><button class="modal-close" onclick="closeModal('modal-rappel')">✕</button></div>
+<!-- QUESTIONNAIRE FIN D'APPEL -->
+<div class="overlay" id="modal-questionnaire">
+<div class="modal" style="max-width:520px">
+  <div class="modal-header">
+    <div class="modal-title">✍️ Debriefing appel</div>
+    <button class="modal-close" onclick="skipQuestionnaire()">✕</button>
+  </div>
   <div class="modal-body">
-    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">📝 Prenez 2 minutes pour résumer l'appel. Romi analysera automatiquement si le prospect est intéressé.</div>
-    <div class="form-group">
-      <label class="form-label">Résumé de l'appel *</label>
-      <textarea class="form-input" id="rappel-notes" placeholder="Ex: M. Dupont est intéressé par une démo. Il veut plus d'infos sur le prix. Rappeler mardi..." style="min-height:120px"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Statut après appel</label>
-      <select class="form-input" id="rappel-status">
-        <option value="called">Appelé</option>
-        <option value="relance">À relancer</option>
-        <option value="rdv">RDV planifié</option>
-        <option value="noint">Pas intéressé</option>
-        <option value="hot">🔥 Très chaud</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-      <button class="btn" onclick="closeModal('modal-rappel')">Plus tard</button>
-      <button class="btn btn-accent" onclick="saveRappel()">Enregistrer & analyser →</button>
+    <div class="q-progress" id="q-progress"></div>
+    <div class="questionnaire" id="questionnaire">
+
+      <!-- ÉTAPE 1 : Instagram -->
+      <div class="q-step active" id="q-step-1">
+        <div class="q-title">📸 Est-il sur Instagram ?</div>
+        <div class="q-sub">Mettez à jour le statut Instagram du prospect</div>
+        <div class="q-options">
+          <div class="q-option" onclick="selectQ(1,'oui',this)">
+            <span class="q-option-icon">✅</span>
+            <div><div class="q-option-label">Oui, il est actif</div><div class="q-option-sub">Poste régulièrement</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(1,'inactif',this)">
+            <span class="q-option-icon">😴</span>
+            <div><div class="q-option-label">Oui mais inactif</div><div class="q-option-sub">Compte existant mais peu utilisé</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(1,'non',this)">
+            <span class="q-option-icon">❌</span>
+            <div><div class="q-option-label">Non, pas sur Instagram</div><div class="q-option-sub">Pas de compte</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(1,'skip',this)">
+            <span class="q-option-icon">🤷</span>
+            <div><div class="q-option-label">Je ne sais pas</div><div class="q-option-sub">Pas abordé pendant l'appel</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 2 : Intérêt -->
+      <div class="q-step" id="q-step-2">
+        <div class="q-title">🌡️ Quel est son niveau d'intérêt ?</div>
+        <div class="q-sub">Votre ressenti après l'appel</div>
+        <div class="q-options">
+          <div class="q-option" onclick="selectQ(2,'chaud',this)">
+            <span class="q-option-icon">🔥</span>
+            <div><div class="q-option-label">Chaud — Très intéressé</div><div class="q-option-sub">Veut une démo, demande des infos, prêt à avancer</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(2,'tiede',this)">
+            <span class="q-option-icon">🌡️</span>
+            <div><div class="q-option-label">Tiède — Curieux mais réticent</div><div class="q-option-sub">Intéressé mais hésitant, a des objections</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(2,'froid',this)">
+            <span class="q-option-icon">❄️</span>
+            <div><div class="q-option-label">Froid — Pas intéressé</div><div class="q-option-sub">Refus clair, pas le bon moment</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 3 : Rappel -->
+      <div class="q-step" id="q-step-3">
+        <div class="q-title">📞 Faut-il le rappeler ?</div>
+        <div class="q-sub">Romi vous alertera automatiquement au bon moment</div>
+        <div class="q-options">
+          <div class="q-option" onclick="selectQ(3,'3j',this)">
+            <span class="q-option-icon">📅</span>
+            <div><div class="q-option-label">Dans 3 jours</div><div class="q-option-sub">Prospect chaud, rappel rapide</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(3,'1s',this)">
+            <span class="q-option-icon">📅</span>
+            <div><div class="q-option-label">Dans 1 semaine</div><div class="q-option-sub">Veut réfléchir, lui laisser le temps</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(3,'1m',this)">
+            <span class="q-option-icon">📅</span>
+            <div><div class="q-option-label">Dans 1 mois</div><div class="q-option-sub">Pas le bon moment, rappel long terme</div></div>
+          </div>
+          <div class="q-option" onclick="selectQ(3,'non',this)">
+            <span class="q-option-icon">🚫</span>
+            <div><div class="q-option-label">Ne pas rappeler</div><div class="q-option-sub">Pas intéressé, classer</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 4 : Notes -->
+      <div class="q-step" id="q-step-4">
+        <div class="q-title">📝 Notes de l'appel</div>
+        <div class="q-sub">Résumez en quelques mots (Romi analysera automatiquement)</div>
+        <textarea class="form-input" id="q-notes" placeholder="Ex: Intéressé par la gestion Instagram, veut voir une démo. A déjà un prestataire mais pas satisfait. Budget OK." style="min-height:100px;width:100%;margin-bottom:16px"></textarea>
+        <button class="btn btn-accent" style="width:100%" onclick="finalizeQuestionnaire()">✅ Enregistrer & analyser →</button>
+      </div>
+
+      <!-- RÉSULTAT -->
+      <div class="q-step" id="q-step-result">
+        <div style="text-align:center;padding:16px 0">
+          <div style="font-size:40px;margin-bottom:12px" id="result-emoji">✅</div>
+          <div class="q-title" id="result-title" style="text-align:center">Debriefing enregistré !</div>
+          <div class="q-sub" id="result-sub" style="text-align:center;margin-top:6px"></div>
+        </div>
+        <div class="rappel-result" id="rappel-result-box" style="display:none">
+          <div style="font-size:12px;font-weight:600;color:var(--yellow);margin-bottom:4px">⏰ Rappel programmé</div>
+          <div style="font-size:13px;color:var(--text2)" id="rappel-result-text"></div>
+        </div>
+        <div id="email-suggestion-box" style="display:none;margin-top:12px">
+          <div class="email-suggestion">
+            <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">🤖 Romi recommande d'envoyer un email</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px" id="email-suggestion-text">Ce prospect est intéressé — un email de présentation peut faire la différence.</div>
+            <button class="btn btn-green btn-sm" onclick="closeModal('modal-questionnaire');openEmailModal(currentCallProspectId)">📧 Envoyer l'email de présentation</button>
+          </div>
+        </div>
+        <button class="btn" style="width:100%;margin-top:16px" onclick="closeModal('modal-questionnaire')">Fermer</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -410,7 +508,7 @@ select.form-input{appearance:none}
         </div>
         <div class="grid-2">
           <div class="card"><div class="card-header"><div class="card-title">📅 RDV à venir</div></div><div id="rdv-today-list"></div></div>
-          <div class="card"><div class="card-header"><div class="card-title">🔥 À relancer d'urgence</div></div><div id="relance-list"></div></div>
+          <div class="card"><div class="card-header"><div class="card-title">🔥 À relancer</div></div><div id="relance-list"></div></div>
         </div>
       </div>
 
@@ -418,21 +516,12 @@ select.form-input{appearance:none}
       <div class="panel" id="panel-recherche">
         <div class="section-title">🔍 Prospection automatique</div>
         <div class="section-sub">Romi trouve et ajoute les artisans de votre zone automatiquement</div>
-
-        <!-- Zone de chalandise -->
         <div class="card" style="margin-bottom:16px">
           <div class="card-header"><div class="card-title">📍 Zone de chalandise</div></div>
           <div class="form-row" style="margin-bottom:12px">
-            <div>
-              <label class="form-label">Ville centrale</label>
-              <input class="form-input" id="zone-city" value="Pertuis" placeholder="Ex: Pertuis">
-            </div>
-            <div>
-              <label class="form-label">Rayon (km)</label>
-              <input class="form-input" id="zone-radius" type="number" value="30" min="5" max="100">
-            </div>
+            <div><label class="form-label">Ville centrale</label><input class="form-input" id="zone-city" value="Pertuis" placeholder="Ex: Pertuis"></div>
+            <div><label class="form-label">Rayon (km)</label><input class="form-input" id="zone-radius" type="number" value="30" min="5" max="100"></div>
           </div>
-
           <div class="card-header" style="margin-top:4px"><div class="card-title">🏗️ Secteurs (par priorité)</div></div>
           <div class="sector-grid">
             <button class="sector-btn selected" data-sector="peintre bâtiment" onclick="toggleSector(this)">🎨 Peintre</button>
@@ -444,13 +533,10 @@ select.form-input{appearance:none}
             <button class="sector-btn selected" data-sector="chauffagiste" onclick="toggleSector(this)">🔥 Chauffagiste</button>
             <button class="sector-btn" data-sector="couvreur" onclick="toggleSector(this)">🏠 Couvreur</button>
           </div>
-
           <div style="display:flex;gap:8px;margin-top:8px">
             <button class="btn btn-accent" id="btn-search" onclick="startProspection()" style="flex:1">🚀 Lancer la prospection</button>
-            <button class="btn btn-blue" id="btn-stop" onclick="stopProspection()" style="display:none">⏹ Arrêter</button>
+            <button class="btn btn-red" id="btn-stop" onclick="stopProspection()" style="display:none">⏹ Arrêter</button>
           </div>
-
-          <!-- Barre de progression -->
           <div id="prospection-progress" style="display:none;margin-top:12px">
             <div style="display:flex;justify-content:space-between;margin-bottom:6px">
               <div style="font-size:12px;color:var(--text2)" id="progress-label">En cours...</div>
@@ -459,8 +545,6 @@ select.form-input{appearance:none}
             <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
           </div>
         </div>
-
-        <!-- Résultats -->
         <div id="search-results" style="display:none">
           <div class="card-header" style="margin-bottom:12px">
             <div style="font-family:'Clash Display',sans-serif;font-size:15px;font-weight:600" id="results-title">Résultats</div>
@@ -473,7 +557,7 @@ select.form-input{appearance:none}
       <!-- PROSPECTS -->
       <div class="panel" id="panel-prospects">
         <div class="section-title">Mes prospects</div>
-        <div class="section-sub">Cliquez → fiche complète · 📞 Appel en cours → script + chrono</div>
+        <div class="section-sub">Cliquez → fiche · Bouton 📞 → appel en cours avec script</div>
         <div class="prospect-filters">
           <input class="search-input" id="search-input" placeholder="🔍 Rechercher..." oninput="filterProspects()">
           <button class="filter-btn active" onclick="setFilter(this,'all')">Tous</button>
@@ -488,7 +572,7 @@ select.form-input{appearance:none}
           <table class="prospect-table">
             <thead><tr>
               <th>Entreprise</th><th>Gérant</th><th>Téléphone</th>
-              <th>Secteur</th><th>Statut</th><th>Dernière action</th><th></th>
+              <th>Secteur</th><th>Intérêt</th><th>Statut</th><th></th>
             </tr></thead>
             <tbody id="prospects-tbody"></tbody>
           </table>
@@ -529,18 +613,13 @@ const userName = localStorage.getItem('romi_user_name') || 'Commercial';
 if (!token) { window.location.href = '/romi-login.html'; }
 document.getElementById('user-name-display').textContent = userName;
 document.getElementById('user-av-initials').textContent = userName.slice(0,2).toUpperCase();
-
 function logout() {
   fetch('/api/romi-auth/logout', { method:'POST', headers:{ Authorization:`Bearer ${token}` } });
   ['romi_token','romi_user_name','romi_user_role'].forEach(k => localStorage.removeItem(k));
   window.location.href = '/romi-login.html';
 }
-
 async function api(path, opts={}) {
-  const r = await fetch('/api/romi' + path, {
-    ...opts,
-    headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}`, ...(opts.headers||{}) }
-  });
+  const r = await fetch('/api/romi' + path, { ...opts, headers: { 'Content-Type':'application/json', Authorization:`Bearer ${token}`, ...(opts.headers||{}) } });
   if (r.status === 401) { window.location.href = '/romi-login.html'; return null; }
   return r.json();
 }
@@ -551,12 +630,13 @@ let searchResults=[], prospectionRunning=false, prospectionStop=false;
 let selectedSectors=['peintre bâtiment','carreleur','menuisier','électricien','plombier','maçon','chauffagiste'];
 let currentCallProspectId=null, callTimerInterval=null, callSeconds=0;
 let currentEmailProspectId=null;
+let qAnswers = { instagram: null, interet: null, rappel: null };
 
 async function loadData() {
   const [p, r] = await Promise.all([api('/prospects'), api('/rdv')]);
   if (p) prospects = p;
   if (r) rdvs = r.map(rdv => ({ id:rdv.id, prospect_id:rdv.prospect_id, date:rdv.scheduled_at, type:rdv.type, notes:rdv.notes }));
-  updateCounts(); renderDashboard(); renderProspects(); 
+  updateCounts(); renderDashboard(); renderProspects();
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
@@ -572,102 +652,56 @@ function nav(page) {
   if (page==='prospects') renderProspects();
   if (page==='agenda') renderAgenda();
 }
-
 function openModal(id) { document.getElementById(id).classList.add('open') }
 function closeModal(id) { document.getElementById(id).classList.remove('open') }
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open') }));
 
-// ── PROSPECTION AUTOMATIQUE ───────────────────────────────────────────────────
+// ── PROSPECTION ───────────────────────────────────────────────────────────────
 function toggleSector(btn) {
-  const s = btn.dataset.sector;
-  const idx = selectedSectors.indexOf(s);
+  const s = btn.dataset.sector, idx = selectedSectors.indexOf(s);
   if (idx >= 0) { selectedSectors.splice(idx,1); btn.classList.remove('selected'); }
   else { selectedSectors.push(s); btn.classList.add('selected'); }
 }
-
 async function geocodeCity(city) {
   const data = await api(`/geocode?city=${encodeURIComponent(city)}`);
   return data?.lat ? data : null;
 }
-
 async function startProspection() {
   if (prospectionRunning) return;
   const city = document.getElementById('zone-city').value.trim() || 'Pertuis';
   const radiusKm = parseInt(document.getElementById('zone-radius').value) || 30;
   const radiusM = radiusKm * 1000;
   if (!selectedSectors.length) { toast('Sélectionnez au moins un secteur','warn'); return; }
-
   prospectionRunning = true; prospectionStop = false;
   document.getElementById('btn-search').disabled = true;
-  document.getElementById('btn-search').textContent = '⏳ Prospection en cours...';
+  document.getElementById('btn-search').textContent = '⏳ En cours...';
   document.getElementById('btn-stop').style.display = 'block';
   document.getElementById('prospection-progress').style.display = 'block';
   document.getElementById('search-results').style.display = 'block';
-
-  // Géocoder la ville
   toast(`📍 Géolocalisation de ${city}...`, 'info');
   const geo = await geocodeCity(city);
   if (!geo) { toast(`Ville "${city}" introuvable`, 'warn'); stopProspection(); return; }
-  toast(`✅ ${city} localisée — rayon ${radiusKm}km`, 'success');
-
-  searchResults = [];
-  let totalAdded = 0, idx = 0;
-
+  toast(`✅ ${city} — rayon ${radiusKm}km`, 'success');
+  searchResults = []; let totalAdded = 0, idx = 0;
   for (const sector of selectedSectors) {
     if (prospectionStop) break;
     idx++;
-    const pct = Math.round((idx / selectedSectors.length) * 100);
-    document.getElementById('progress-label').textContent = `🔍 ${sector} dans ${radiusKm}km autour de ${city}...`;
-    document.getElementById('progress-fill').style.width = pct + '%';
-
-    // Google Places
-    const googleResults = await api('/search/google', {
-      method:'POST',
-      body: JSON.stringify({ query: sector, lat: geo.lat, lng: geo.lng, radius: radiusM })
-    });
-
-    // Pages Jaunes
-    const pjResults = await api('/search/pagesjaunesearch', {
-      method:'POST',
-      body: JSON.stringify({ query: sector, city })
-    });
-
-    const allResults = [...(googleResults||[]), ...(pjResults||[])];
-
-    for (const p of allResults) {
-      if (prospectionStop) break;
-      if (!p.company_name) continue;
-      // Ajouter automatiquement (sans confirmation)
-      const data = await api('/prospects', {
-        method:'POST',
-        body: JSON.stringify({
-          company_name: p.company_name,
-          sector: sector,
-          phone: p.phone||'',
-          city: p.city||city,
-          website: p.website||'',
-          source: p.source||'Google Maps',
-          status: 'new',
-          instagram: 'non',
-          history: []
-        })
-      });
-      if (data && !data.error && !data._duplicate) {
-        totalAdded++;
-        prospects.unshift(data);
-        searchResults.push({ ...p, _added: true });
-        document.getElementById('progress-added').textContent = `${totalAdded} ajoutés`;
-        updateCounts();
-      } else if (data?._duplicate) {
-        searchResults.push({ ...p, _duplicate: true });
-      }
+    document.getElementById('progress-label').textContent = `🔍 ${sector}...`;
+    document.getElementById('progress-fill').style.width = Math.round((idx/selectedSectors.length)*100) + '%';
+    const [gR, pjR] = await Promise.all([
+      api('/search/google', { method:'POST', body: JSON.stringify({ query: sector, lat: geo.lat, lng: geo.lng, radius: radiusM }) }),
+      api('/search/pagesjaunesearch', { method:'POST', body: JSON.stringify({ query: sector, city }) })
+    ]);
+    for (const p of [...(gR||[]), ...(pjR||[])]) {
+      if (prospectionStop || !p.company_name) continue;
+      const data = await api('/prospects', { method:'POST', body: JSON.stringify({ company_name:p.company_name, sector, phone:p.phone||'', city:p.city||city, website:p.website||'', source:p.source||'Google Maps', status:'new', instagram:'non', history:[] }) });
+      if (data && !data.error && !data._duplicate) { totalAdded++; prospects.unshift(data); searchResults.push({...p,_added:true}); document.getElementById('progress-added').textContent=`${totalAdded} ajoutés`; updateCounts(); }
+      else if (data?._duplicate) searchResults.push({...p,_duplicate:true});
     }
-
     renderResultsList();
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 300));
   }
-
-  document.getElementById('progress-label').textContent = `✅ Prospection terminée`;
+  document.getElementById('progress-label').textContent = '✅ Terminée';
   document.getElementById('progress-fill').style.width = '100%';
   document.getElementById('results-title').textContent = `${searchResults.length} entreprises trouvées`;
   document.getElementById('results-summary').textContent = `${totalAdded} nouveaux ajoutés`;
@@ -675,36 +709,30 @@ async function startProspection() {
   toast(`🎉 ${totalAdded} nouveaux prospects ajoutés !`, 'success');
   renderProspects();
 }
-
 function stopProspection(reset=true) {
-  prospectionStop = true; prospectionRunning = false;
-  document.getElementById('btn-search').disabled = false;
-  document.getElementById('btn-search').textContent = '🚀 Lancer la prospection';
-  document.getElementById('btn-stop').style.display = 'none';
-  if (reset) document.getElementById('prospection-progress').style.display = 'none';
+  prospectionStop=true; prospectionRunning=false;
+  document.getElementById('btn-search').disabled=false;
+  document.getElementById('btn-search').textContent='🚀 Lancer la prospection';
+  document.getElementById('btn-stop').style.display='none';
+  if (reset) document.getElementById('prospection-progress').style.display='none';
 }
-
 function renderResultsList() {
-  document.getElementById('results-list').innerHTML = searchResults.slice(-30).map(p => `
-    <div class="result-item ${p._added?'result-added':''}" style="opacity:${p._duplicate?'.5':'1'}">
+  document.getElementById('results-list').innerHTML = searchResults.slice(-30).map(p=>`
+    <div class="result-item ${p._added?'result-added':''}">
       <div class="result-avatar">${(p.company_name||'?').charAt(0)}</div>
       <div class="result-info">
         <div class="result-name">${p.company_name}</div>
         <div class="result-sub">${p.sector||''} · ${p.city||''} · <span style="color:${p.source==='Pages Jaunes'?'var(--yellow)':'var(--blue)'}">${p.source||''}</span></div>
-        ${p.phone?`<div style="font-size:12px;font-weight:600;color:${/^(06|07)/.test((p.phone||'').replace(/\s/g,''))?'var(--green)':'var(--text3)'}">${p.phone} ${/^(06|07)/.test((p.phone||'').replace(/\s/g,''))?'📱':'☎️'}</div>`:''}
+        ${p.phone?`<div style="font-size:12px;font-weight:600;color:${/^(06|07)/.test((p.phone||'').replace(/\s/g,''))?'var(--green)':'var(--text3)'}">${p.phone}</div>`:''}
       </div>
-      <span style="font-size:11px;color:${p._added?'var(--green)':p._duplicate?'var(--text3)':'var(--text2)'}">${p._added?'✅ Ajouté':p._duplicate?'Déjà dans la base':'—'}</span>
+      <span style="font-size:11px;color:${p._added?'var(--green)':p._duplicate?'var(--text3)':'var(--text2)'}">${p._added?'✅ Ajouté':p._duplicate?'Déjà présent':'—'}</span>
     </div>`).join('');
 }
 
-// ── PROSPECTS TABLE ───────────────────────────────────────────────────────────
-const statusLabels={
-  new:['badge-new','Nouveau'],called:['badge-called','Appelé'],rdv:['badge-rdv','RDV 📅'],
-  relance:['badge-relance','À relancer'],noint:['badge-noint','Pas intéressé'],
-  client:['badge-client','Client ✨'],hot:['badge-hot','🔥 Chaud'],banni:['badge-banni','🚫 Banni']
-};
+// ── PROSPECTS ─────────────────────────────────────────────────────────────────
+const statusLabels={new:['badge-new','Nouveau'],called:['badge-called','Appelé'],rdv:['badge-rdv','RDV 📅'],relance:['badge-relance','À relancer'],noint:['badge-noint','Pas intéressé'],client:['badge-client','Client ✨'],hot:['badge-hot','🔥 Chaud'],banni:['badge-banni','🚫 Banni']};
 const instaLabels={oui:['insta-yes','✅ Actif'],inactif:['insta-maybe','😴 Inactif'],non:['insta-no','❌ Non']};
-function isMob(phone){return /^(06|07)/.test((phone||'').replace(/\s/g,''));}
+function isMob(p){return /^(06|07)/.test((p||'').replace(/\s/g,''));}
 function daysSince(d){if(!d)return 999;return Math.floor((Date.now()-new Date(d))/864e5);}
 function getName(p){return p.company_name||'?';}
 function getPhone(p){return p.phone||'';}
@@ -715,6 +743,7 @@ function getStatus(p){return p.status||'new';}
 function getLastContact(p){return p.last_contact_at||null;}
 function getHistory(p){return p.history||[];}
 function getManager(p){return p.manager_name||'';}
+const interetIcons={chaud:'🔥',tiede:'🌡️',froid:'❄️'};
 
 function renderProspects() {
   const tbody=document.getElementById('prospects-tbody');
@@ -730,22 +759,19 @@ function renderProspects() {
   if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">Aucun prospect</td></tr>`;return;}
   tbody.innerHTML=list.map(p=>{
     const[sc,sl]=statusLabels[getStatus(p)]||['badge-new','Nouveau'];
-    const ds=daysSince(getLastContact(p));
     return `<tr onclick="openFiche('${p.id}')" class="${getStatus(p)==='banni'?'banni':''}">
       <td><div class="company-name">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getCity(p)}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getManager(p)||'—'}</div></td>
       <td><div class="${isMob(getPhone(p))?'phone-mobile':'phone-fixed'}">${getPhone(p)||'—'}</div></td>
       <td><div style="font-size:12px;color:var(--text2)">${getSector(p)}</div></td>
+      <td><span style="font-size:16px">${p.interest_level?interetIcons[p.interest_level]||'—':'—'}</span></td>
       <td><span class="badge ${sc}">${sl}</span></td>
-      <td style="font-size:11px;color:var(--text3)">${getLastContact(p)?`il y a ${ds}j`:'Jamais'}</td>
-      <td><button class="btn btn-orange btn-sm" onclick="event.stopPropagation();startCall('${p.id}')">📞 Appel</button></td>
+      <td><button class="btn btn-orange btn-sm" onclick="event.stopPropagation();startCall('${p.id}')">📞</button></td>
     </tr>`;
   }).join('');
 }
-
 function filterProspects(){renderProspects();}
 function setFilter(el,filter){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');currentFilter=filter;renderProspects();}
-
 function updateCounts() {
   const active=prospects.filter(p=>getStatus(p)!=='banni');
   document.getElementById('nav-count').textContent=active.length;
@@ -757,26 +783,14 @@ function updateCounts() {
   document.getElementById('stat-relance').textContent=active.filter(p=>getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&getStatus(p)==='called')).length;
 }
 
-// ── ADD PROSPECT MANUEL ───────────────────────────────────────────────────────
+// ── ADD PROSPECT ──────────────────────────────────────────────────────────────
 async function addProspect() {
   const company=document.getElementById('np-company').value.trim();
   if(!company){toast('Nom requis','warn');return;}
   const insta=document.querySelector('input[name="insta"]:checked')?.value||'non';
-  const data=await api('/prospects',{method:'POST',body:JSON.stringify({
-    company_name:company,sector:document.getElementById('np-sector').value,
-    manager_name:document.getElementById('np-manager').value.trim(),
-    phone:document.getElementById('np-phone').value.trim(),
-    email:document.getElementById('np-email').value.trim(),
-    website:document.getElementById('np-website').value.trim(),
-    city:document.getElementById('np-city').value.trim()||'Pertuis',
-    instagram:insta,status:'new',
-    notes:document.getElementById('np-notes').value.trim(),history:[]
-  })});
-  if(data&&!data.error&&!data._duplicate){
-    prospects.unshift(data);closeModal('modal-prospect');
-    ['np-company','np-manager','np-phone','np-email','np-website','np-notes'].forEach(id=>document.getElementById(id).value='');
-    renderProspects();updateCounts();toast(`${company} ajouté !`,'success');
-  } else if(data?._duplicate) toast('Ce prospect existe déjà','warn');
+  const data=await api('/prospects',{method:'POST',body:JSON.stringify({company_name:company,sector:document.getElementById('np-sector').value,manager_name:document.getElementById('np-manager').value.trim(),phone:document.getElementById('np-phone').value.trim(),email:document.getElementById('np-email').value.trim(),website:document.getElementById('np-website').value.trim(),city:document.getElementById('np-city').value.trim()||'Pertuis',instagram:insta,status:'new',notes:document.getElementById('np-notes').value.trim(),history:[]})});
+  if(data&&!data.error&&!data._duplicate){prospects.unshift(data);closeModal('modal-prospect');['np-company','np-manager','np-phone','np-email','np-website','np-notes'].forEach(id=>document.getElementById(id).value='');renderProspects();updateCounts();toast(`${company} ajouté !`,'success');}
+  else if(data?._duplicate)toast('Déjà dans la base','warn');
   else toast('Erreur: '+(data?.error||'inconnue'),'warn');
 }
 
@@ -789,112 +803,86 @@ function openFiche(id) {
   const history=getHistory(p);
   const pRdvs=rdvs.filter(r=>r.prospect_id===id&&new Date(r.date)>new Date());
   const isBanni=getStatus(p)==='banni';
-
   document.getElementById('fiche-content').innerHTML=`
     <div class="fiche-header">
       <div class="fiche-avatar" style="${isBanni?'opacity:.4':''}">${getName(p).charAt(0)}</div>
       <div class="fiche-info">
         <div class="fiche-name">${getName(p)}</div>
-        <div class="fiche-sub">${getSector(p)} · ${getCity(p)} ${p.website?`· <a href="${p.website}" target="_blank" style="color:var(--blue);font-size:12px">🌐 Site web</a>`:''}</div>
+        <div class="fiche-sub">${getSector(p)} · ${getCity(p)} ${p.website?`· <a href="${p.website}" target="_blank" style="color:var(--blue);font-size:12px">🌐 Site</a>`:''}</div>
         <div class="fiche-phone">${getPhone(p)||'Pas de téléphone'} ${isMob(getPhone(p))?'📱':'☎️'}</div>
         ${getManager(p)?`<div style="font-size:13px;color:var(--text2);margin-top:3px">👤 ${getManager(p)}</div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         <span class="badge ${sc}">${sl}</span>
         <span class="insta-tag ${ic}">${il}</span>
-        ${p.interest_level?`<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(251,146,60,.1);color:var(--orange)">${p.interest_level==='chaud'?'🔥 Chaud':p.interest_level==='tiede'?'🌡 Tiède':'❄️ Froid'}</span>`:''}
+        ${p.interest_level?`<span style="font-size:13px">${interetIcons[p.interest_level]||''} <span style="font-size:11px;color:var(--text2)">${p.interest_level==='chaud'?'Chaud':p.interest_level==='tiede'?'Tiède':'Froid'}</span></span>`:''}
       </div>
     </div>
-
     ${!isBanni?`
     <div class="fiche-section">
       <div class="fiche-section-title">Statut</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${Object.entries(statusLabels).filter(([k])=>k!=='banni').map(([k,[cls,lbl]])=>
-          `<button onclick="updateStatus('${id}','${k}')" class="btn btn-sm ${getStatus(p)===k?'btn-accent':''}" style="${getStatus(p)===k?'':'opacity:.6'}">${lbl}</button>`
-        ).join('')}
+        ${Object.entries(statusLabels).filter(([k])=>k!=='banni').map(([k,[cls,lbl]])=>`<button onclick="updateStatus('${id}','${k}')" class="btn btn-sm ${getStatus(p)===k?'btn-accent':''}" style="${getStatus(p)===k?'':'opacity:.6'}">${lbl}</button>`).join('')}
       </div>
     </div>
-
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-orange" onclick="closeModal('modal-fiche');startCall('${id}')">📞 Appel en cours</button>
       <button class="btn btn-green" onclick="planRDV('${id}')">📅 RDV</button>
-      ${p.email?`<button class="btn btn-blue" onclick="openEmailModal('${id}')">📧 Envoyer email</button>`:''}
+      ${p.email?`<button class="btn btn-blue" onclick="openEmailModal('${id}')">📧 Email</button>`:''}
     </div>
-
     <div class="fiche-section">
       <div class="fiche-section-title">Observations</div>
       <div class="check-group">
-        ${[['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],['deja_quelquun','👥 A déjà quelqu\'un'],
-           ['pas_instagram','📵 Pas sur Instagram'],['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
-           ['rappeler','📞 Rappeler'],['demande_devis','📋 Veut une démo']
+        ${[['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],['deja_quelquun','👥 A déjà quelqu\'un'],['pas_instagram','📵 Pas sur Instagram'],['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],['rappeler','📞 Rappeler'],['demande_devis','📋 Veut une démo']
         ].map(([v,l])=>`<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('')}
       </div>
     </div>
-
     <div class="fiche-section">
-      <div class="fiche-section-title">Notes & résumés d'appels</div>
+      <div class="fiche-section-title">Notes</div>
       <textarea class="form-input" id="fiche-notes-${id}" style="width:100%;min-height:80px">${p.notes||''}</textarea>
-      <div style="display:flex;gap:8px;margin-top:6px">
-        <button class="btn btn-sm" onclick="saveAndAnalyze('${id}')">💾 Sauvegarder & analyser</button>
-      </div>
+      <button class="btn btn-sm" style="margin-top:6px" onclick="saveAndAnalyze('${id}')">💾 Sauvegarder & analyser</button>
       <div id="ai-suggestion-${id}"></div>
     </div>
-
-    ${pRdvs.length>0?`<div class="fiche-section">
-      <div class="fiche-section-title">RDV à venir</div>
-      ${pRdvs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.2);border-radius:8px;margin-bottom:6px">
-        <span style="color:var(--green);font-size:18px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span>
-        <div><div style="font-size:13px;font-weight:500;color:var(--green)">${new Date(r.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(r.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>
-      </div>`).join('')}
-    </div>`:''}`:``}
-
+    ${pRdvs.length>0?`<div class="fiche-section"><div class="fiche-section-title">RDV à venir</div>${pRdvs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(45,212,160,.06);border:1px solid rgba(45,212,160,.2);border-radius:8px;margin-bottom:6px"><span style="color:var(--green);font-size:18px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span><div style="font-size:13px;font-weight:500;color:var(--green)">${new Date(r.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${new Date(r.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`).join('')}</div>`:''}
+    `:''}
     <div class="fiche-section">
       <div class="fiche-section-title">Historique</div>
       ${!history.length?'<div style="color:var(--text3);font-size:13px">Aucun contact</div>':
         [...history].reverse().map(h=>`<div class="history-item"><div class="history-date">${new Date(h.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}</div><div class="history-text">${h.text}</div></div>`).join('')}
     </div>
-
     <div class="divider"></div>
     <div class="danger-zone">
-      <span style="font-size:18px">⚠️</span>
-      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--red)">Zone danger</div><div style="font-size:11px;color:var(--text3)">Actions irréversibles</div></div>
-      ${!isBanni?`<button class="btn btn-yellow btn-sm" onclick="banProspect('${id}')">🚫 Bannir</button>`:
-                 `<button class="btn btn-green btn-sm" onclick="unbanProspect('${id}')">✅ Débannir</button>`}
+      <span>⚠️</span>
+      <div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--red)">Zone danger</div></div>
+      ${!isBanni?`<button class="btn btn-yellow btn-sm" onclick="banProspect('${id}')">🚫 Bannir</button>`:`<button class="btn btn-green btn-sm" onclick="unbanProspect('${id}')">✅ Débannir</button>`}
       <button class="btn btn-red btn-sm" onclick="deleteProspect('${id}')">🗑 Supprimer</button>
-    </div>
-  `;
+    </div>`;
   openModal('modal-fiche');
 }
 
-// ── SAVE & ANALYZE ────────────────────────────────────────────────────────────
 async function saveAndAnalyze(id) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
   const notes=document.getElementById(`fiche-notes-${id}`).value;
   await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes})});
   p.notes=notes;
-  toast('Notes sauvegardées — analyse en cours...','info');
+  toast('Notes sauvegardées — analyse...','info');
   const result=await api(`/prospects/${id}/analyze`,{method:'POST',body:JSON.stringify({notes})});
   const container=document.getElementById(`ai-suggestion-${id}`);
   if(!container)return;
   if(result?.interested){
-    if(result.level) p.interest_level=result.level;
+    if(result.level)p.interest_level=result.level;
     container.innerHTML=`<div class="email-suggestion" style="margin-top:10px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span style="font-size:20px">🤖</span>
-        <div style="font-weight:600;color:var(--green)">Romi détecte un intérêt !</div>
-      </div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${result.suggestion||'Ce prospect semble intéressé.'} ${result.level==='chaud'?'🔥 Prospect chaud !':''}</div>
-      ${p.email&&result.send_email?`<button class="btn btn-green btn-sm" onclick="openEmailModal('${id}')">📧 Envoyer email de présentation</button>`:''}
+      <div style="font-weight:600;color:var(--green);margin-bottom:8px">🤖 Intérêt détecté ${result.level==='chaud'?'🔥':''}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px">${result.suggestion||''}</div>
+      ${p.email?`<button class="btn btn-green btn-sm" onclick="openEmailModal('${id}')">📧 Envoyer email</button>`:''}
     </div>`;
-    toast(`🤖 ${result.level==='chaud'?'Prospect chaud !':'Intérêt détecté'} ${result.suggestion||''}`, 'success');
+    toast(`🤖 ${result.level==='chaud'?'🔥 Prospect chaud !':'Intérêt détecté'}`, 'success');
   } else {
-    container.innerHTML=`<div style="font-size:12px;color:var(--text3);margin-top:8px">✓ Analysé — pas d'intérêt fort détecté</div>`;
-    toast('Notes analysées','info');
+    container.innerHTML=`<div style="font-size:12px;color:var(--text3);margin-top:8px">✓ Analysé</div>`;
+    toast('Analysé','info');
   }
 }
 
-// ── EMAIL MODAL ───────────────────────────────────────────────────────────────
 async function openEmailModal(id) {
   currentEmailProspectId=id;
   const draft=await api(`/prospects/${id}/email-draft`);
@@ -905,17 +893,13 @@ async function openEmailModal(id) {
   closeModal('modal-fiche');
   openModal('modal-email');
 }
-
 async function sendEmailNow() {
   const btn=document.getElementById('btn-send-email');
-  btn.disabled=true; btn.textContent='📤 Envoi...';
-  const data=await api(`/prospects/${currentEmailProspectId}/send-email`,{method:'POST',body:JSON.stringify({
-    subject:document.getElementById('email-subject').value,
-    body:document.getElementById('email-body').value
-  })});
-  btn.disabled=false; btn.textContent='📤 Envoyer';
+  btn.disabled=true;btn.textContent='📤 Envoi...';
+  const data=await api(`/prospects/${currentEmailProspectId}/send-email`,{method:'POST',body:JSON.stringify({subject:document.getElementById('email-subject').value,body:document.getElementById('email-body').value})});
+  btn.disabled=false;btn.textContent='📤 Envoyer';
   if(data?.success){closeModal('modal-email');toast('Email envoyé ✅','success');}
-  else toast('Erreur envoi email','warn');
+  else toast('Erreur envoi','warn');
 }
 
 // ── APPEL EN COURS ────────────────────────────────────────────────────────────
@@ -924,72 +908,48 @@ async function startCall(id) {
   currentCallProspectId=id;
   document.getElementById('appel-company-name').textContent=getName(p)+' · '+getPhone(p);
   document.getElementById('appel-overlay').classList.add('open');
-
-  // Timer
-  callSeconds=0;
-  clearInterval(callTimerInterval);
-  callTimerInterval=setInterval(()=>{
-    callSeconds++;
-    const m=String(Math.floor(callSeconds/60)).padStart(2,'0');
-    const s=String(callSeconds%60).padStart(2,'0');
-    document.getElementById('appel-timer').textContent=`${m}:${s}`;
-  },1000);
-
-  // Notes existantes
+  callSeconds=0;clearInterval(callTimerInterval);
+  callTimerInterval=setInterval(()=>{callSeconds++;const m=String(Math.floor(callSeconds/60)).padStart(2,'0'),s=String(callSeconds%60).padStart(2,'0');document.getElementById('appel-timer').textContent=`${m}:${s}`;},1000);
   document.getElementById('appel-notes').value=p.notes||'';
-
-  // Checkboxes
   document.getElementById('appel-checkboxes').innerHTML=[
-    ['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],
-    ['deja_quelquun','👥 A déjà quelqu\'un'],['pas_instagram','📵 Pas sur Instagram'],
-    ['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
+    ['interesse','🤩 Intéressé'],['reflechi','🤔 Veut réfléchir'],['deja_quelquun','👥 A déjà quelqu\'un'],
+    ['pas_instagram','📵 Pas sur Instagram'],['pas_temps','⏱ Pas le temps'],['prix','💰 Question prix'],
     ['rappeler','📞 Rappeler'],['demande_devis','📋 Veut une démo']
   ].map(([v,l])=>`<label class="check-pill ${(p.tags||[]).includes(v)?'checked':''}" onclick="toggleCallTag('${id}','${v}',this)"><span class="dot"></span>${l}</label>`).join('');
-
-  // Charger le script
   document.getElementById('script-loading').textContent='⏳ Chargement du script...';
   document.getElementById('appel-script').innerHTML=renderScriptLocal(p);
-
-  // Script IA en arrière-plan
   api(`/prospects/${id}/script`).then(data=>{
     document.getElementById('script-loading').textContent='';
-    if(data?.script) document.getElementById('appel-script').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${data.script}</div>`;
+    if(data?.script)document.getElementById('appel-script').innerHTML=`<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${data.script}</div>`;
   });
-
-  // Marquer comme "en cours d'appel"
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:'📞 Appel en cours'}];
+  const history=[...getHistory(p),{date:new Date().toISOString(),text:`📞 Appel lancé`}];
   await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({history})});
   p.history=history;
 }
 
 function renderScriptLocal(p) {
-  const name=getManager(p)?.split(' ')[0]||'[Prénom]';
-  const sector=getSector(p)||'artisan';
-  const insta=getInsta(p)||'non';
+  const name=getManager(p)?.split(' ')[0]||'[Prénom]',sector=getSector(p)||'artisan',insta=getInsta(p)||'non';
   const accroche=insta==='non'
-    ?`"Bonjour, je cherche ${name} ?\nJe m'appelle [Prénom], SocialAI à Pertuis.\nDe plus en plus de clients cherchent leur ${sector} sur Instagram avant d'appeler.\nCeux qui n'y sont pas perdent des chantiers sans le savoir. J'ai 2 minutes ?"`
+    ?`"Bonjour, je cherche ${name} ?\nJe m'appelle [Prénom], SocialAI à Pertuis.\nDe plus en plus de clients cherchent leur ${sector} sur Instagram avant d'appeler.\nCeux qui n'y sont pas perdent des chantiers. J'ai 2 minutes ?"`
     :insta==='inactif'
-    ?`"Bonjour ${name}, SocialAI à Pertuis.\nJ'ai vu votre Instagram — vous avez fait l'effort d'y être.\nMais vous postez irrégulièrement, ça pénalise votre visibilité.\nOn s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
-    :`"Bonjour ${name}, SocialAI à Pertuis.\nOn accompagne des ${sector.toLowerCase()}s locaux pour booster leur Instagram avec l'IA.\nOn pense pouvoir faire mieux, automatiquement. 2 minutes ?"`;
+    ?`"Bonjour ${name}, SocialAI à Pertuis.\nJ'ai vu votre Instagram — mais vous postez irrégulièrement.\nOn s'occupe de tout ça automatiquement. J'ai 2 minutes ?"`
+    :`"Bonjour ${name}, SocialAI à Pertuis.\nOn accompagne des ${sector.toLowerCase()}s locaux avec notre IA Instagram.\nOn pense pouvoir faire mieux, automatiquement. 2 minutes ?"`;
   return `<div class="script-section"><div class="script-section-title">📞 Accroche</div><div class="script-line highlight" style="white-space:pre-wrap">${accroche}</div></div>
-<div class="script-section"><div class="script-section-title">🤖 Présenter Aria</div><div class="script-line highlight">"Aria gère votre Instagram 7j/7.<br>Vous envoyez vos photos sur WhatsApp — elle publie, répond aux messages, génère des contacts.<br>149€/mois × 3 mois puis 199€. Sans engagement."</div></div>
+<div class="script-section"><div class="script-section-title">🤖 Présenter Aria</div><div class="script-line highlight">"Aria gère votre Instagram 7j/7 — vous envoyez vos photos sur WhatsApp, elle publie, répond aux messages, génère des contacts.<br>149€/mois × 3 mois puis 199€. Sans engagement."</div></div>
 <div class="script-section"><div class="script-section-title">💬 Objections</div>
 <div class="script-line"><strong style="color:var(--yellow)">"J'ai pas le temps"</strong> → "Une photo sur WhatsApp. C'est tout."</div>
 <div class="script-line"><strong style="color:var(--yellow)">"C'est combien ?"</strong> → "149€/mois × 3 mois puis 199€. Sans engagement."</div>
-<div class="script-line"><strong style="color:var(--yellow)">"J'ai déjà quelqu'un"</strong> → "Vous payez combien ? Aria travaille 7j/7 en continu."</div>
+<div class="script-line"><strong style="color:var(--yellow)">"J'ai déjà quelqu'un"</strong> → "Vous payez combien ? Aria travaille 7j/7."</div>
 <div class="script-line"><strong style="color:var(--yellow)">"Je vais réfléchir"</strong> → "20 min de démo — vous réfléchissez sur du concret."</div></div>
-<div class="script-section"><div class="script-section-title">📅 Prise de RDV</div><div class="script-line highlight">"Démo de 20 minutes — visio ou présentiel, on est à Pertuis.<br>[Jour] à [heure] ou [Jour] à [heure] ?"</div></div>`;
+<div class="script-section"><div class="script-section-title">📅 Prise de RDV</div><div class="script-line highlight">"Démo 20 min — visio ou présentiel à Pertuis.<br>[Jour] à [heure] ou [Jour] à [heure] ?"</div></div>`;
 }
 
-async function toggleCallTag(id, tag, el) {
+async function toggleCallTag(id,tag,el) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
-  const tags=p.tags||[];
-  const newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
+  const tags=p.tags||[],newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
   el.classList.toggle('checked',!tags.includes(tag));
-  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});
-  p.tags=newTags;
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});p.tags=newTags;
 }
-
 async function saveCallNotes() {
   const p=prospects.find(x=>x.id===currentCallProspectId);if(!p)return;
   const notes=document.getElementById('appel-notes').value;
@@ -1000,28 +960,127 @@ async function saveCallNotes() {
 function endCall() {
   clearInterval(callTimerInterval);
   document.getElementById('appel-overlay').classList.remove('open');
-  // Ouvrir le rappel résumé
-  document.getElementById('rappel-notes').value=document.getElementById('appel-notes').value||'';
-  openModal('modal-rappel');
+  // Ouvrir le questionnaire
+  qAnswers = { instagram: null, interet: null, rappel: null };
+  const p=prospects.find(x=>x.id===currentCallProspectId);
+  document.getElementById('q-notes').value=document.getElementById('appel-notes').value||'';
+  showQStep(1);
+  openModal('modal-questionnaire');
 }
 
-async function saveRappel() {
-  const id=currentCallProspectId;const p=prospects.find(x=>x.id===id);if(!p)return;
-  const notes=document.getElementById('rappel-notes').value;
-  const status=document.getElementById('rappel-status').value;
-  const history=[...getHistory(p),{date:new Date().toISOString(),text:`📝 Résumé appel (${Math.floor(callSeconds/60)}min) : ${notes.slice(0,80)}...`}];
-  const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({notes,status,history})});
-  if(data)Object.assign(p,data);
-  closeModal('modal-rappel');
-  renderProspects();updateCounts();
-  toast('Résumé enregistré — analyse en cours...','info');
-  // Analyser les notes
-  const result=await api(`/prospects/${id}/analyze`,{method:'POST',body:JSON.stringify({notes})});
-  if(result?.interested){
-    if(result.level)p.interest_level=result.level;
-    toast(`🤖 ${result.level==='chaud'?'🔥 Prospect CHAUD !':'Intérêt détecté !'} ${result.suggestion||''}`, 'success');
-    if(p.email&&result.send_email) setTimeout(()=>openEmailModal(id),1000);
+// ── QUESTIONNAIRE FIN D'APPEL ─────────────────────────────────────────────────
+const TOTAL_STEPS = 4;
+
+function updateQProgress(step) {
+  const prog=document.getElementById('q-progress');
+  prog.innerHTML='';
+  for(let i=1;i<=TOTAL_STEPS;i++){
+    const dot=document.createElement('div');
+    dot.className='q-dot'+(i<step?' done':i===step?' active':'');
+    prog.appendChild(dot);
   }
+}
+
+function showQStep(step) {
+  document.querySelectorAll('.q-step').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(`q-step-${step}`);
+  if(el)el.classList.add('active');
+  updateQProgress(step);
+}
+
+function selectQ(step, value, el) {
+  // Désélectionner les autres options de cette étape
+  el.closest('.q-options').querySelectorAll('.q-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  if(step===1) qAnswers.instagram=value;
+  if(step===2) qAnswers.interet=value;
+  if(step===3) qAnswers.rappel=value;
+  // Passer à l'étape suivante après un court délai
+  setTimeout(()=>showQStep(step+1), 350);
+}
+
+async function finalizeQuestionnaire() {
+  const id=currentCallProspectId;
+  const p=prospects.find(x=>x.id===id);if(!p)return;
+  const notes=document.getElementById('q-notes').value;
+  const durMin=Math.floor(callSeconds/60);
+
+  // Construire les updates
+  const updates = { notes, history: [...getHistory(p)] };
+  let histText = `📞 Appel ${durMin}min`;
+
+  // Instagram
+  if(qAnswers.instagram && qAnswers.instagram !== 'skip') {
+    updates.instagram = qAnswers.instagram;
+    histText += ` · Instagram: ${qAnswers.instagram}`;
+  }
+
+  // Intérêt
+  if(qAnswers.interet) {
+    const levelMap = { chaud:'chaud', tiede:'tiede', froid:'froid' };
+    updates.interest_level = levelMap[qAnswers.interet];
+    histText += ` · ${qAnswers.interet==='chaud'?'🔥 Chaud':qAnswers.interet==='tiede'?'🌡️ Tiède':'❄️ Froid'}`;
+    if(qAnswers.interet==='froid') updates.status='noint';
+    else if(qAnswers.interet==='chaud') updates.status='hot';
+    else updates.status='called';
+  }
+
+  // Rappel
+  let rappelDate = null;
+  if(qAnswers.rappel && qAnswers.rappel !== 'non') {
+    const delayMap = { '3j': 3, '1s': 7, '1m': 30 };
+    const days = delayMap[qAnswers.rappel];
+    rappelDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+    updates.status = 'relance';
+    updates.relance_at = rappelDate.toISOString();
+    histText += ` · Rappel dans ${qAnswers.rappel==='3j'?'3 jours':qAnswers.rappel==='1s'?'1 semaine':'1 mois'}`;
+  } else if(qAnswers.rappel === 'non') {
+    histText += ' · Pas de rappel';
+  }
+
+  if(notes) histText += ` · ${notes.slice(0,60)}${notes.length>60?'...':''}`;
+  updates.history.push({ date: new Date().toISOString(), text: histText });
+  updates.last_contact_at = new Date().toISOString();
+
+  const data = await api(`/prospects/${id}`, {method:'PUT', body:JSON.stringify(updates)});
+  if(data) Object.assign(p, data);
+
+  renderProspects(); updateCounts();
+
+  // Analyser les notes avec l'IA
+  let aiResult = null;
+  if(notes && notes.length > 10) {
+    aiResult = await api(`/prospects/${id}/analyze`, {method:'POST', body:JSON.stringify({notes})});
+    if(aiResult?.level) p.interest_level = aiResult.level;
+  }
+
+  // Afficher le résultat
+  showQStep('result');
+  const emoji = qAnswers.interet==='chaud'?'🔥':qAnswers.interet==='tiede'?'🌡️':qAnswers.interet==='froid'?'❄️':'✅';
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = 'Debriefing enregistré !';
+  const subParts = [];
+  if(qAnswers.interet) subParts.push(`Prospect ${qAnswers.interet==='chaud'?'chaud':qAnswers.interet==='tiede'?'tiède':'froid'}`);
+  document.getElementById('result-sub').textContent = subParts.join(' · ');
+
+  // Rappel programmé
+  if(rappelDate) {
+    document.getElementById('rappel-result-box').style.display='block';
+    document.getElementById('rappel-result-text').textContent=`Romi vous alertera le ${rappelDate.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} pour relancer ${getName(p)}.`;
+  }
+
+  // Suggestion email
+  const shouldSuggestEmail = (qAnswers.interet==='chaud' || aiResult?.interested) && p.email;
+  if(shouldSuggestEmail) {
+    document.getElementById('email-suggestion-box').style.display='block';
+    document.getElementById('email-suggestion-text').textContent = aiResult?.suggestion || `${getName(p)} est intéressé — envoyez un email de présentation pour concrétiser.`;
+  }
+
+  toast(`✅ Debriefing enregistré !`, 'success');
+}
+
+function skipQuestionnaire() {
+  closeModal('modal-questionnaire');
 }
 
 // ── RDV ───────────────────────────────────────────────────────────────────────
@@ -1033,7 +1092,6 @@ function planRDV(prospectId) {
   document.getElementById('rdv-date').value=tomorrow.toISOString().split('T')[0];
   closeModal('modal-fiche');openModal('modal-rdv');
 }
-
 async function saveRDV() {
   const date=document.getElementById('rdv-date').value,time=document.getElementById('rdv-time').value;
   if(!date){toast('Date requise','warn');return;}
@@ -1043,28 +1101,23 @@ async function saveRDV() {
     rdvs.push({id:data.id,prospect_id:currentRDVProspectId,date:dt.toISOString(),type:document.getElementById('rdv-type').value,notes:document.getElementById('rdv-notes').value});
     const p=prospects.find(x=>x.id===currentRDVProspectId);
     if(p){p.status='rdv';const h=getHistory(p);h.push({date:new Date().toISOString(),text:`RDV planifié le ${dt.toLocaleDateString('fr-FR')}`});p.history=h;}
-    closeModal('modal-rdv');renderProspects();updateCounts();renderAgenda();
-    toast(`RDV planifié 📅`,'success');
+    closeModal('modal-rdv');renderProspects();updateCounts();renderAgenda();toast('RDV planifié 📅','success');
   }else toast('Erreur RDV','warn');
 }
 
-// ── FICHE ACTIONS ─────────────────────────────────────────────────────────────
+// ── ACTIONS FICHE ─────────────────────────────────────────────────────────────
 async function updateStatus(id,status) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
   const history=[...getHistory(p),{date:new Date().toISOString(),text:`Statut : ${statusLabels[status]?.[1]||status}`}];
   const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status,history})});
   if(data){Object.assign(p,data);openFiche(id);renderProspects();toast('Statut mis à jour','info');}
 }
-
 async function toggleTag(id,tag,el) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
-  const tags=p.tags||[];
-  const newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
+  const tags=p.tags||[],newTags=tags.includes(tag)?tags.filter(t=>t!==tag):[...tags,tag];
   el.classList.toggle('checked',!tags.includes(tag));
-  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});
-  p.tags=newTags;
+  await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({tags:newTags})});p.tags=newTags;
 }
-
 async function banProspect(id) {
   if(!confirm('Bannir ce prospect ?'))return;
   const p=prospects.find(x=>x.id===id);if(!p)return;
@@ -1072,19 +1125,17 @@ async function banProspect(id) {
   const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'banni',history})});
   if(data){Object.assign(p,data);closeModal('modal-fiche');renderProspects();updateCounts();toast('Prospect banni','warn');}
 }
-
 async function unbanProspect(id) {
   const p=prospects.find(x=>x.id===id);if(!p)return;
   const history=[...getHistory(p),{date:new Date().toISOString(),text:'✅ Débanni'}];
   const data=await api(`/prospects/${id}`,{method:'PUT',body:JSON.stringify({status:'new',history})});
-  if(data){Object.assign(p,data);openFiche(id);renderProspects();updateCounts();toast('Débanni ✓','success');}
+  if(data){Object.assign(p,data);openFiche(id);renderProspects();updateCounts();toast('Débanni','success');}
 }
-
 async function deleteProspect(id) {
   if(!confirm('Supprimer définitivement ?'))return;
   const data=await api(`/prospects/${id}`,{method:'DELETE'});
-  if(data&&!data.error){prospects=prospects.filter(x=>x.id!==id);closeModal('modal-fiche');renderProspects();updateCounts();toast('Supprimé ✓','success');}
-  else toast('Erreur suppression','warn');
+  if(data&&!data.error){prospects=prospects.filter(x=>x.id!==id);closeModal('modal-fiche');renderProspects();updateCounts();toast('Supprimé','success');}
+  else toast('Erreur','warn');
 }
 
 // ── AGENDA ────────────────────────────────────────────────────────────────────
@@ -1105,18 +1156,7 @@ function renderAgenda() {
     return `<div class="cal-day${isToday?' today':''}${other?' other-month':''}"><div class="day-num">${date.getDate()}</div>${dayRDVs.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id);return `<div class="cal-event ev-rdv">${getName(p||{}).split(' ')[0]||'RDV'}</div>`;}).join('')}</div>`;
   }).join('');
   const upcoming=rdvs.filter(r=>new Date(r.date)>new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  document.getElementById('rdv-list-full').innerHTML=upcoming.length===0
-    ?'<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucun RDV à venir</div>'
-    :upcoming.map(r=>{
-      const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);
-      const diff=Math.ceil((d-new Date())/36e5);
-      const urgency=diff<2?'var(--accent)':diff<24?'var(--yellow)':'var(--green)';
-      return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer">
-        <span style="font-size:20px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span>
-        <div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p||{})}</div><div style="font-size:11px;color:var(--text3)">${getManager(p||'')} · ${getPhone(p||'')}</div></div>
-        <div style="text-align:right"><div style="font-size:12px;font-weight:600;color:${urgency}">${d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}</div><div style="font-size:11px;color:var(--text3)">${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>
-      </div>`;
-    }).join('');
+  document.getElementById('rdv-list-full').innerHTML=upcoming.length===0?'<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucun RDV à venir</div>':upcoming.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date),diff=Math.ceil((d-new Date())/36e5),urgency=diff<2?'var(--accent)':diff<24?'var(--yellow)':'var(--green)';return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;margin-bottom:6px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span style="font-size:20px">${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p||{})}</div><div style="font-size:11px;color:var(--text3)">${getManager(p||'')} · ${getPhone(p||'')}</div></div><div style="text-align:right"><div style="font-size:12px;font-weight:600;color:${urgency}">${d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}</div><div style="font-size:11px;color:var(--text3)">${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div></div>`;}).join('');
 }
 function changeMonth(delta){calendarDate.setMonth(calendarDate.getMonth()+delta);renderAgenda();}
 
@@ -1126,21 +1166,25 @@ function renderDashboard() {
   updateCounts();checkAlerts();
   const upcoming=rdvs.filter(r=>new Date(r.date)>new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,4);
   document.getElementById('rdv-today-list').innerHTML=upcoming.length===0?'<div style="color:var(--text3);font-size:13px">Aucun RDV à venir</div>':upcoming.map(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);return `<div onclick="openFiche('${r.prospect_id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>${r.type==='tel'?'📞':r.type==='visio'?'💻':'🤝'}</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p||{})}</div></div><div style="font-size:12px;color:var(--green);font-weight:500">${d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})} ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div></div>`;}).join('');
-  const relances=prospects.filter(p=>getStatus(p)!=='banni'&&(getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','hot'].includes(getStatus(p)))));
+  const relances=prospects.filter(p=>getStatus(p)!=='banni'&&(getStatus(p)==='relance'||(getLastContact(p)&&daysSince(getLastContact(p))>=7&&getStatus(p)==='called')));
   document.getElementById('relance-list').innerHTML=relances.length===0?'<div style="color:var(--text3);font-size:13px">Rien à relancer 🎉</div>':relances.slice(0,4).map(p=>`<div onclick="openFiche('${p.id}')" style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;margin-bottom:4px;background:var(--bg3);border:1px solid var(--border);cursor:pointer"><span>🔁</span><div style="flex:1"><div style="font-size:13px;font-weight:500">${getName(p)}</div><div style="font-size:11px;color:var(--text3)">${getSector(p)}</div></div><div style="font-size:11px;color:var(--yellow)">${daysSince(getLastContact(p))}j</div></div>`).join('');
 }
-
 function checkAlerts() {
   const container=document.getElementById('alerts-container');if(!container)return;
   const alerts=[],now=new Date();
   rdvs.forEach(r=>{const d=new Date(r.date),diffMin=(d-now)/60000;if(diffMin>0&&diffMin<=30){const p=prospects.find(x=>x.id===r.prospect_id);alerts.push({type:'urgent',icon:'⏰',text:`RDV dans ${Math.round(diffMin)} min avec <strong>${getName(p||{})}</strong>`});}});
   prospects.filter(p=>getStatus(p)!=='banni'&&getLastContact(p)&&daysSince(getLastContact(p))>=7&&['called','relance','hot'].includes(getStatus(p))).slice(0,3).forEach(p=>{alerts.push({type:'relance',icon:'🔁',text:`<strong>${getName(p)}</strong> non contacté depuis ${daysSince(getLastContact(p))} jours`});});
   rdvs.filter(r=>{const d=new Date(r.date),diff=(d-now)/36e5;return diff>0.5&&diff<=8;}).forEach(r=>{const p=prospects.find(x=>x.id===r.prospect_id),d=new Date(r.date);alerts.push({type:'rdv',icon:'📅',text:`RDV aujourd'hui à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} avec <strong>${getName(p||{})}</strong>`});});
-  container.innerHTML=alerts.slice(0,4).map(a=>`<div class="alert-item alert-${a.type==='urgent'?'urgent':a.type==='rdv'?'rdv':'info'}"><span class="alert-icon">${a.icon}</span><span class="alert-text">${a.text}</span><button class="alert-close" onclick="this.parentElement.remove()">✕</button></div>`).join('');
+  // Alertes rappels programmés
+  prospects.filter(p=>getStatus(p)==='relance'&&p.relance_at).forEach(p=>{
+    const ra=new Date(p.relance_at),diff=(ra-now)/36e5;
+    if(diff<=0&&diff>-24)alerts.push({type:'urgent',icon:'📞',text:`C'est le moment de rappeler <strong>${getName(p)}</strong> !`});
+  });
+  container.innerHTML=alerts.slice(0,5).map(a=>`<div class="alert-item alert-${a.type==='urgent'?'urgent':a.type==='rdv'?'rdv':'info'}"><span class="alert-icon">${a.icon}</span><span class="alert-text">${a.text}</span><button class="alert-close" onclick="this.parentElement.remove()">✕</button></div>`).join('');
 }
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
-function toast(msg,type='info') {
+function toast(msg,type='info'){
   const icons={success:'✅',info:'💡',warn:'⚠️',urgent:'🚨'};
   const el=document.createElement('div');el.className=`toast ${type}`;
   el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
@@ -1150,21 +1194,11 @@ function toast(msg,type='info') {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.check-pill input[type=radio]').forEach(input=>{
-  input.addEventListener('change',function(){
-    document.querySelectorAll(`.check-pill input[name="${this.name}"]`).forEach(r=>{r.closest('.check-pill').classList.toggle('checked',r.checked);});
-  });
+  input.addEventListener('change',function(){document.querySelectorAll(`.check-pill input[name="${this.name}"]`).forEach(r=>{r.closest('.check-pill').classList.toggle('checked',r.checked);});});
 });
-
-// Ajouter colonnes manquantes Supabase au démarrage
-async function ensureColumns() {
-  // Tente de mettre à jour un champ website pour vérifier que la colonne existe
-  // Si erreur, c'est géré silencieusement
-}
-
-renderDashboard();
-loadData();
+renderDashboard();loadData();
 setInterval(checkAlerts,60000);
-setInterval(()=>{loadData();},5*60*1000); // Refresh toutes les 5 min
+setInterval(loadData,5*60*1000);
 </script>
 </body>
 </html>
