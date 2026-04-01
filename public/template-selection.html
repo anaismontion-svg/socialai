@@ -143,8 +143,8 @@ async function initClient() {
 
 function ck(n,a,b){a=a||'#e8e8e8';b=b||'#f2f2f2';return`<defs><pattern id="p${n}" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="${a}"/><rect x="5" y="5" width="5" height="5" fill="${a}"/><rect x="5" width="5" height="5" fill="${b}"/><rect y="5" width="5" height="5" fill="${b}"/></pattern></defs>`}
 
-function trunc(str,max){return(str||'').length>max?(str||'').substring(0,max)+"…":(str||''")}
-function truncUp(str,max){return(str||'').toUpperCase().length>max?(str||'').toUpperCase().substring(0,max)+"…":(str||'').toUpperCase()}
+function trunc(str,max){return(str||'').length>max?(str||'').substring(0,max)+'...':(str||'')}
+function truncUp(str,max){return(str||'').toUpperCase().length>max?(str||'').toUpperCase().substring(0,max)+'...':(str||'').toUpperCase()}
 
 function getSVG(id) {
   const c = CLIENT;
