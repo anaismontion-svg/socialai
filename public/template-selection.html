@@ -60,7 +60,6 @@ body{font-family:system-ui,sans-serif;background:#f5f4f1;min-height:100vh;color:
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
     <h2>Choisissez vos templates stories</h2>
@@ -69,36 +68,24 @@ body{font-family:system-ui,sans-serif;background:#f5f4f1;min-height:100vh;color:
   <div class="topbar-right">
     <button class="btn btn-ghost" onclick="selectAll()">Tout sélectionner</button>
     <button class="btn btn-ghost" onclick="clearAll()">Effacer</button>
-    <button class="btn btn-validate" id="btn-validate" disabled onclick="handleValidate()">
-      0 / 15 minimum
-    </button>
+    <button class="btn btn-validate" id="btn-validate" disabled onclick="handleValidate()">0 / 15 minimum</button>
   </div>
 </div>
 
-<!-- BARRE PROGRESSION -->
 <div class="progress-bar">
   <span class="counter" id="counter">0 sélectionné</span>
-  <div class="progress-track">
-    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   <span class="progress-label" id="progress-label">Encore 15</span>
 </div>
 
-<!-- ERREUR -->
 <div class="error-banner" id="error-banner"></div>
-
-<!-- CONTENU -->
 <div class="content" id="content"></div>
 
-<!-- BARRE FLOTTANTE -->
 <div class="float-bar" id="float-bar">
   <span id="float-count">0 template sélectionné</span>
-  <button class="float-validate" id="float-validate" disabled onclick="handleValidate()">
-    Encore 15
-  </button>
+  <button class="float-validate" id="float-validate" disabled onclick="handleValidate()">Encore 15</button>
 </div>
 
-<!-- MODAL PREVIEW -->
 <div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-hd">
@@ -112,61 +99,65 @@ body{font-family:system-ui,sans-serif;background:#f5f4f1;min-height:100vh;color:
   </div>
 </div>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="spinner"></div>
   <span style="font-size:14px;color:#666">Enregistrement en cours...</span>
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────────────
 const MIN = 15;
 let selected = new Set();
 let modalId = null;
-let CLIENT = { primaryColor:'#C9A98A', secondaryColor:'#2D2D2D', accentColor:'#F5EDE3', businessName:'Mon Commerce', tagline:'Votre slogan', website:'www.monsite.fr', hashtag:'#monbusiness' };
+let CLIENT = {
+  primaryColor:'#C9A98A', secondaryColor:'#2D2D2D', accentColor:'#F5EDE3',
+  businessName:'Mon Commerce', tagline:'Votre slogan',
+  website:'www.monsite.fr', hashtag:'#monbusiness'
+};
 let CLIENT_ID = null;
 
-// ── Récupérer les données client depuis l'URL/session ─────────────
 async function initClient() {
   const params = new URLSearchParams(window.location.search);
-  CLIENT_ID = params.get('clientId');
-  if (!CLIENT_ID) {
-    // Essayer depuis le localStorage (si défini lors du branding-setup)
-    CLIENT_ID = localStorage.getItem('socialai_client_id');
-  }
+  CLIENT_ID = params.get('clientId') || localStorage.getItem('socialai_client_id');
+
   if (CLIENT_ID) {
     try {
-      const res = await fetch(`/api/branding/client-vars?clientId=${CLIENT_ID}`);
+      const res = await fetch('/api/branding/client/' + CLIENT_ID);
       if (res.ok) {
         const data = await res.json();
-        CLIENT = { ...CLIENT, ...data };
+        if (data.primary_color)   CLIENT.primaryColor   = data.primary_color;
+        if (data.secondary_color) CLIENT.secondaryColor = data.secondary_color;
+        if (data.accent_color)    CLIENT.accentColor    = data.accent_color;
+        if (data.business_name)   CLIENT.businessName   = data.business_name;
+        if (data.tagline)         CLIENT.tagline        = data.tagline;
+        if (data.website)         CLIENT.website        = data.website;
+        if (data.hashtag)         CLIENT.hashtag        = data.hashtag;
       }
-    } catch(e) { console.log('Vars client non trouvées, utilisation des défauts'); }
+    } catch(e) {
+      console.warn('Branding non chargé:', e);
+    }
   }
+
   buildUI();
   updateUI();
 }
 
-// ── Générateur SVG (checker pattern) ─────────────────────────────
 function ck(n,a,b){a=a||'#e8e8e8';b=b||'#f2f2f2';return`<defs><pattern id="p${n}" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="${a}"/><rect x="5" y="5" width="5" height="5" fill="${a}"/><rect x="5" width="5" height="5" fill="${b}"/><rect y="5" width="5" height="5" fill="${b}"/></pattern></defs>`}
 
-// ── 30 Templates SVG ──────────────────────────────────────────────
 function getSVG(id) {
   const c = CLIENT;
   const p1=c.primaryColor, p2=c.secondaryColor, ac=c.accentColor||'#F5EDE3';
   const nm=(c.businessName||'').toUpperCase(), tg=c.tagline||'Votre slogan', wb=c.website||'www.monsite.fr', ht=c.hashtag||'#monbusiness';
-
   const T = {
 T01:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T01')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="62" height="480" fill="${p1}"/><text transform="translate(31,360) rotate(-90)" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="30" y="20" width="3" height="40" fill="rgba(255,255,255,0.4)"/><rect x="38" y="20" width="3" height="40" fill="rgba(255,255,255,0.2)"/><rect x="78" y="26" width="178" height="252" fill="url(#pT01)" rx="2"/><rect x="78" y="296" width="178" height="1.5" fill="${p1}"/><text x="78" y="318" font-family="serif" font-size="15" font-weight="700" fill="${p2}">${tg}</text><text x="78" y="337" font-family="serif" font-size="15" font-weight="700" fill="${p1}">collection</text><text x="78" y="356" font-family="sans-serif" font-size="9" fill="#aaa">${wb}</text><rect x="78" y="370" width="100" height="28" fill="${p1}" rx="2"/><text x="128" y="389" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">DÉCOUVRIR →</text></svg>`,
 T02:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T02')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="138" fill="${p1}"/><text x="135" y="60" font-family="serif" font-size="9" fill="rgba(255,255,255,0.65)" text-anchor="middle" letter-spacing="3">${nm}</text><text x="135" y="98" font-family="serif" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">Nouveauté</text><rect x="38" y="108" width="194" height="230" fill="url(#pT02)" rx="3"/><text x="135" y="370" font-family="serif" font-size="11" fill="${p2}" text-anchor="middle" letter-spacing="2">OFFRE SPÉCIALE</text><text x="135" y="408" font-family="serif" font-size="40" font-weight="700" fill="${p1}" text-anchor="middle">−30%</text><text x="135" y="435" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">sur toute la collection</text><text x="135" y="458" font-family="sans-serif" font-size="9" fill="#bbb" text-anchor="middle">${wb}</text></svg>`,
 T03:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T03')}<rect width="270" height="480" fill="#fff"/><text x="135" y="30" font-family="sans-serif" font-size="9" fill="#bbb" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="12" y="42" width="114" height="188" fill="url(#pT03)" rx="2"/><rect x="144" y="42" width="114" height="188" fill="url(#pT03)" rx="2"/><rect x="12" y="192" width="60" height="22" fill="${p1}"/><text x="42" y="207" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle">AVANT</text><rect x="196" y="192" width="62" height="22" fill="${p2}"/><text x="227" y="207" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle">APRÈS</text><rect x="12" y="248" width="246" height="162" fill="url(#pT03)" rx="2"/><rect x="0" y="428" width="270" height="52" fill="${p1}"/><text x="135" y="450" font-family="serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><text x="135" y="468" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.7)" text-anchor="middle">${ht}</text></svg>`,
-T04:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T04')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="480" fill="${p1}" opacity="0.06"/><rect x="16" y="16" width="238" height="310" fill="url(#pT04)" rx="3"/><rect x="16" y="16" width="238" height="310" fill="none" stroke="${p1}" stroke-width="2" rx="3"/><rect x="60" y="264" width="150" height="36" fill="${p1}"/><text x="135" y="287" font-family="serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="368" font-family="serif" font-size="20" font-weight="700" fill="${p2}" text-anchor="middle">${tg}</text><text x="135" y="394" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">Découvrez nos services</text><rect x="85" y="412" width="100" height="30" fill="${p2}" rx="15"/><text x="135" y="431" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">En savoir + →</text><text x="135" y="460" font-family="sans-serif" font-size="9" fill="#bbb" text-anchor="middle">${wb}</text></svg>`,
+T04:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T04')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="480" fill="${p1}" opacity="0.06"/><rect x="16" y="16" width="238" height="310" fill="url(#pT04)" rx="3"/><rect x="16" y="16" width="238" height="310" fill="none" stroke="${p1}" stroke-width="2" rx="3"/><rect x="60" y="264" width="150" height="36" fill="${p1}"/><text x="135" y="287" font-family="serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="368" font-family="serif" font-size="20" font-weight="700" fill="${p2}" text-anchor="middle">${tg}</text><rect x="85" y="412" width="100" height="30" fill="${p2}" rx="15"/><text x="135" y="431" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">En savoir + →</text><text x="135" y="460" font-family="sans-serif" font-size="9" fill="#bbb" text-anchor="middle">${wb}</text></svg>`,
 T05:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T05')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="380" width="270" height="100" fill="${p1}"/><rect x="16" y="16" width="238" height="348" fill="url(#pT05)" rx="2"/><rect x="16" y="292" width="238" height="72" fill="${p2}" opacity="0.75"/><text x="26" y="324" font-family="serif" font-size="18" font-weight="700" fill="#fff">${tg}</text><text x="26" y="348" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" letter-spacing="1">${nm} · ${wb}</text><text x="135" y="410" font-family="serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Swipe up</text><text x="135" y="438" font-family="sans-serif" font-size="16" fill="#fff" text-anchor="middle">↑</text><text x="135" y="460" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.6)" text-anchor="middle">${ht}</text></svg>`,
 T06:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T06','#ccc','#d8d8d8')}<rect width="270" height="480" fill="${p2}"/><rect x="80" y="0" width="190" height="240" fill="${p1}"/><rect x="0" y="280" width="134" height="120" fill="${p1}" opacity="0.28"/><rect x="40" y="188" width="54" height="54" fill="${ac}"/><rect x="16" y="36" width="140" height="178" fill="url(#pT06)" rx="2"/><text x="26" y="296" font-family="serif" font-size="22" font-weight="700" fill="#fff">${tg}</text><text x="26" y="320" font-family="serif" font-size="22" font-weight="700" fill="${p1}">unique</text><rect x="26" y="345" width="100" height="28" fill="none" stroke="#fff" stroke-width="1.2" rx="2"/><text x="76" y="363" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle">EN SAVOIR +</text><text x="26" y="432" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.35)">${wb}</text></svg>`,
 T07:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T07','#c8c8c8','#d5d5d5')}<rect width="270" height="480" fill="${ac}"/><rect x="0" y="320" width="270" height="160" fill="${p2}"/><circle cx="248" cy="60" r="44" fill="${p1}" opacity="0.22"/><rect x="20" y="54" width="230" height="248" fill="url(#pT07)"/><rect x="20" y="54" width="230" height="248" fill="none" stroke="${p1}" stroke-width="1.5"/><rect x="64" y="256" width="142" height="34" fill="${p1}"/><text x="135" y="278" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="340" font-family="serif" font-size="18" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><text x="135" y="400" font-family="sans-serif" font-size="14" fill="${p1}" text-anchor="middle">↑</text><text x="135" y="425" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.35)" text-anchor="middle">${wb}</text></svg>`,
 T08:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T08')}<rect width="270" height="480" fill="#fff"/><polygon points="0,0 270,0 270,200 0,338" fill="${p1}" opacity="0.1"/><rect x="0" y="374" width="120" height="106" fill="${p1}"/><rect x="26" y="26" width="218" height="282" fill="url(#pT08)" rx="3"/><rect x="26" y="264" width="120" height="34" fill="${p2}"/><text x="36" y="278" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.55)" letter-spacing="2">NOUVEAU</text><text x="36" y="291" font-family="serif" font-size="10" font-weight="700" fill="#fff">${c.businessName}</text><text x="26" y="340" font-family="serif" font-size="20" font-weight="700" fill="${p2}">${tg}</text><text x="26" y="364" font-family="serif" font-size="20" font-weight="700" fill="${p1}">notre univers</text><text x="20" y="412" font-family="sans-serif" font-size="10" fill="#fff">Disponible maintenant</text><text x="20" y="430" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.7)">${wb}</text></svg>`,
 T09:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T09','#ccc','#ddd')}<rect width="270" height="480" fill="${p2}"/><rect x="0" y="0" width="160" height="270" fill="${p1}" opacity="0.18"/><rect x="110" y="200" width="160" height="280" fill="${p1}" opacity="0.12"/><rect x="26" y="26" width="218" height="260" fill="url(#pT09)" rx="3"/><rect x="26" y="26" width="218" height="260" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" rx="3"/><text x="135" y="315" font-family="serif" font-size="11" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="2">${nm}</text><text x="135" y="352" font-family="serif" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><rect x="95" y="368" width="80" height="1.5" fill="${p1}"/><rect x="80" y="420" width="110" height="28" fill="${p1}" rx="14"/><text x="135" y="438" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">Découvrir →</text></svg>`,
-T10:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T10','#ccc','#d8d8d8')}<rect width="270" height="480" fill="${ac}"/><rect x="0" y="0" width="270" height="90" fill="${p2}"/><rect x="0" y="388" width="270" height="92" fill="${p2}"/><text x="135" y="52" font-family="serif" font-size="20" font-weight="700" fill="${p1}" text-anchor="middle">${tg}</text><text x="135" y="72" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle">${c.businessName}</text><rect x="26" y="106" width="218" height="268" fill="url(#pT10)" rx="2"/><rect x="26" y="106" width="218" height="268" fill="none" stroke="${p1}" stroke-width="2" rx="2"/><rect x="74" y="340" width="122" height="16" fill="${p1}"/><text x="135" y="416" font-family="serif" font-size="13" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="438" font-family="sans-serif" font-size="14" fill="${p1}" text-anchor="middle">↑</text><text x="135" y="458" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">${wb.toUpperCase()}</text></svg>`,
+T10:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T10','#ccc','#d8d8d8')}<rect width="270" height="480" fill="${ac}"/><rect x="0" y="0" width="270" height="90" fill="${p2}"/><rect x="0" y="388" width="270" height="92" fill="${p2}"/><text x="135" y="52" font-family="serif" font-size="20" font-weight="700" fill="${p1}" text-anchor="middle">${tg}</text><text x="135" y="72" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle">${c.businessName}</text><rect x="26" y="106" width="218" height="268" fill="url(#pT10)" rx="2"/><rect x="26" y="106" width="218" height="268" fill="none" stroke="${p1}" stroke-width="2" rx="2"/><rect x="74" y="340" width="122" height="16" fill="${p1}"/><text x="135" y="416" font-family="serif" font-size="13" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="438" font-family="sans-serif" font-size="14" fill="${p1}" text-anchor="middle">↑</text></svg>`,
 T11:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T11')}<rect width="270" height="480" fill="#fff"/><text x="20" y="33" font-family="sans-serif" font-size="9" fill="#999" letter-spacing="2">${nm}</text><rect x="184" y="20" width="66" height="20" fill="${p1}"/><text x="217" y="34" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">${ht}</text><rect x="20" y="46" width="230" height="258" fill="url(#pT11)"/><rect x="20" y="46" width="230" height="258" fill="none" stroke="#1a1a1a" stroke-width="1.5"/><rect x="0" y="313" width="270" height="167" fill="#1a1a1a"/><rect x="20" y="330" width="34" height="3" fill="${p1}"/><text x="20" y="358" font-family="serif" font-size="19" font-weight="700" fill="#fff">${tg}</text><text x="20" y="380" font-family="serif" font-size="19" font-weight="700" fill="#fff">du moment</text><rect x="20" y="420" width="86" height="26" fill="${p1}"/><text x="63" y="437" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">VOIR PLUS →</text></svg>`,
 T12:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T12','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#f5f5f5"/><rect x="197" y="0" width="73" height="480" fill="#1a1a1a"/><text transform="translate(234,360) rotate(-90)" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="180" y="20" width="90" height="24" fill="${p1}"/><text x="225" y="36" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">${ht}</text><rect x="14" y="40" width="170" height="284" fill="url(#pT12)"/><rect x="14" y="40" width="170" height="284" fill="none" stroke="#333" stroke-width="1.2"/><text x="14" y="354" font-family="serif" font-size="16" font-weight="700" fill="#1a1a1a">${tg}</text><text x="14" y="374" font-family="serif" font-size="16" font-weight="700" fill="${p1}">ici</text><text x="234" y="446" font-family="sans-serif" font-size="16" fill="${p1}" text-anchor="middle">↑</text></svg>`,
 T13:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T13')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="196" fill="url(#pT13)"/><rect x="0" y="136" width="270" height="60" fill="${p2}" opacity="0.62"/><text x="20" y="181" font-family="serif" font-size="22" font-weight="700" fill="#fff">${tg}</text><rect x="20" y="212" width="37" height="2.5" fill="${p1}"/><text x="20" y="235" font-family="sans-serif" font-size="9" fill="#888" letter-spacing="2">ARTICLE · ${nm}</text><text x="20" y="262" font-family="serif" font-size="13" fill="${p2}">Découvrez nos derniers</text><text x="20" y="280" font-family="serif" font-size="13" fill="${p2}">conseils et actualités</text><rect x="20" y="295" width="103" height="108" fill="url(#pT13)"/><rect x="148" y="295" width="102" height="34" fill="${p1}"/><text x="199" y="316" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Lire la suite</text><rect x="0" y="420" width="270" height="60" fill="${p2}"/><text x="135" y="446" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="464" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.4)" text-anchor="middle">${ht}</text></svg>`,
@@ -176,10 +167,10 @@ T16:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T16','#
 T17:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T17')}<rect width="270" height="480" fill="${p2}"/><path d="M0,134 C80,107 190,161 270,134 L270,360 C190,387 80,334 0,360Z" fill="${p1}"/><rect x="14" y="148" width="114" height="198" fill="url(#pT17)" rx="2"/><rect x="142" y="161" width="114" height="198" fill="url(#pT17)" rx="2"/><text x="135" y="57" font-family="serif" font-size="18" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><text x="135" y="78" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle">${c.businessName}</text><text x="135" y="432" font-family="sans-serif" font-size="14" fill="#fff" text-anchor="middle">↑</text><text x="135" y="454" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.3)" text-anchor="middle">${wb}</text></svg>`,
 T18:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T18','#cee4e4','#daecec')}<rect width="270" height="480" fill="${p2}"/><rect x="14" y="14" width="242" height="452" fill="url(#pT18)" rx="3"/><rect x="14" y="14" width="242" height="452" fill="none" stroke="${p1}" stroke-width="2.5" rx="3"/><path d="M14,14 L256,14 L256,67 C200,87 80,54 14,80Z" fill="${p1}" opacity="0.82"/><rect x="53" y="23" width="164" height="30" fill="${p2}" opacity="0.76"/><text x="135" y="43" font-family="serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><path d="M14,387 C80,374 200,393 256,381 L256,466 L14,466Z" fill="${p1}" opacity="0.88"/><text x="135" y="416" font-family="serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><text x="135" y="440" font-family="sans-serif" font-size="12" fill="#fff" text-anchor="middle">↑</text></svg>`,
 T19:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T19','#d0e8e8','#dceeee')}<rect width="270" height="480" fill="${p1}"/><path d="M0,400 Q135,360 270,400 L270,480 L0,480Z" fill="${p2}" opacity="0.9"/><path d="M0,0 Q135,50 270,0 L270,80 L0,80Z" fill="${p2}" opacity="0.6"/><rect x="20" y="95" width="230" height="292" fill="url(#pT19)" rx="3"/><text x="135" y="30" font-family="serif" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="52" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.5)" text-anchor="middle">${ht}</text><text x="135" y="424" font-family="serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">${tg}</text><text x="135" y="448" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.55)" text-anchor="middle">${wb}</text></svg>`,
-T20:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T20','#cee4e4','#daecec')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="200" fill="${p1}"/><path d="M0,180 C90,210 180,170 270,200 L270,240 C180,210 90,250 0,220Z" fill="#fff"/><rect x="20" y="30" width="230" height="168" fill="url(#pT20)" rx="2"/><text x="135" y="260" font-family="serif" font-size="22" font-weight="700" fill="${p2}" text-anchor="middle">${tg}</text><rect x="95" y="272" width="80" height="1.5" fill="${p1}"/><text x="135" y="304" font-family="sans-serif" font-size="10" fill="#aaa" text-anchor="middle">Découvrez nos services</text><rect x="0" y="330" width="270" height="150" fill="url(#pT20)"/><rect x="0" y="330" width="270" height="150" fill="none" stroke="${p1}" stroke-width="1.5"/><rect x="60" y="448" width="150" height="22" fill="${p1}"/><text x="135" y="463" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">${wb}</text></svg>`,
-T21:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T21','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#f0f0f0"/><rect x="0" y="0" width="73" height="480" fill="${p1}"/><rect x="73" y="0" width="197" height="54" fill="${p2}"/><rect x="73" y="54" width="54" height="54" fill="${p1}"/><text x="100" y="90" font-family="serif" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">01</text><rect x="73" y="108" width="197" height="252" fill="url(#pT21)"/><rect x="73" y="360" width="197" height="120" fill="${p2}"/><text x="87" y="386" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.45)" letter-spacing="2">STORIES</text><text x="87" y="408" font-family="serif" font-size="14" font-weight="700" fill="#fff">${tg}</text><text x="87" y="428" font-family="serif" font-size="14" font-weight="700" fill="${p1}">percutant</text><text x="87" y="448" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.35)">${wb}</text><text transform="translate(39,354) rotate(-90)" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="20" y="20" width="2" height="38" fill="rgba(255,255,255,0.45)"/><rect x="26" y="20" width="2" height="38" fill="rgba(255,255,255,0.25)"/></svg>`,
+T20:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T20','#cee4e4','#daecec')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="200" fill="${p1}"/><path d="M0,180 C90,210 180,170 270,200 L270,240 C180,210 90,250 0,220Z" fill="#fff"/><rect x="20" y="30" width="230" height="168" fill="url(#pT20)" rx="2"/><text x="135" y="260" font-family="serif" font-size="22" font-weight="700" fill="${p2}" text-anchor="middle">${tg}</text><rect x="95" y="272" width="80" height="1.5" fill="${p1}"/><text x="135" y="304" font-family="sans-serif" font-size="10" fill="#aaa" text-anchor="middle">Découvrez nos services</text><rect x="0" y="330" width="270" height="150" fill="url(#pT20)"/><rect x="60" y="448" width="150" height="22" fill="${p1}"/><text x="135" y="463" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">${wb}</text></svg>`,
+T21:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T21','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#f0f0f0"/><rect x="0" y="0" width="73" height="480" fill="${p1}"/><rect x="73" y="0" width="197" height="54" fill="${p2}"/><rect x="73" y="54" width="54" height="54" fill="${p1}"/><text x="100" y="90" font-family="serif" font-size="24" font-weight="700" fill="#fff" text-anchor="middle">01</text><rect x="73" y="108" width="197" height="252" fill="url(#pT21)"/><rect x="73" y="360" width="197" height="120" fill="${p2}"/><text x="87" y="386" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.45)" letter-spacing="2">STORIES</text><text x="87" y="408" font-family="serif" font-size="14" font-weight="700" fill="#fff">${tg}</text><text x="87" y="428" font-family="serif" font-size="14" font-weight="700" fill="${p1}">percutant</text><text transform="translate(39,354) rotate(-90)" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="20" y="20" width="2" height="38" fill="rgba(255,255,255,0.45)"/><rect x="26" y="20" width="2" height="38" fill="rgba(255,255,255,0.25)"/></svg>`,
 T22:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T22')}<rect width="270" height="480" fill="#fff"/><rect x="20" y="20" width="43" height="43" fill="${p1}"/><text x="41" y="50" font-family="serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">03</text><rect x="134" y="20" width="116" height="2" fill="${p2}"/><rect x="134" y="27" width="116" height="2" fill="${p2}"/><rect x="134" y="34" width="116" height="2" fill="${p1}"/><rect x="20" y="77" width="230" height="254" fill="url(#pT22)"/><rect x="20" y="345" width="107" height="50" fill="${p2}"/><text x="73" y="365" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="2">STORIES</text><text x="73" y="382" font-family="serif" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">TEMPLATE</text><text x="140" y="362" font-family="serif" font-size="13" font-weight="700" fill="${p2}">${tg}</text><text x="140" y="380" font-family="serif" font-size="13" font-weight="700" fill="${p1}">du moment</text><rect x="20" y="408" width="230" height="1.5" fill="${p2}"/><rect x="20" y="415" width="120" height="1.5" fill="${p1}"/><text x="20" y="436" font-family="sans-serif" font-size="8" fill="#888" letter-spacing="1">${nm}</text><text x="250" y="436" font-family="sans-serif" font-size="8" fill="${p1}" text-anchor="end">${wb}</text></svg>`,
-T23:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T23','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#f2f2f2"/><rect x="0" y="0" width="270" height="80" fill="${p1}"/><rect x="20" y="20" width="43" height="40" fill="${p2}"/><text x="41" y="47" font-family="serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">05</text><rect x="20" y="94" width="147" height="250" fill="url(#pT23)"/><rect x="180" y="94" width="90" height="120" fill="${p2}"/><rect x="180" y="224" width="90" height="120" fill="${p1}"/><text x="225" y="148" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><rect x="0" y="362" width="270" height="118" fill="${p2}"/><text x="20" y="395" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.4)" letter-spacing="2">STORIES TEMPLATE</text><text x="20" y="418" font-family="serif" font-size="16" font-weight="700" fill="#fff">${tg}</text><text x="20" y="438" font-family="serif" font-size="16" font-weight="700" fill="${p1}">percutant</text><text x="20" y="458" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.35)" letter-spacing="1">${wb.toUpperCase()}</text></svg>`,
+T23:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T23','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#f2f2f2"/><rect x="0" y="0" width="270" height="80" fill="${p1}"/><rect x="20" y="20" width="43" height="40" fill="${p2}"/><text x="41" y="47" font-family="serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">05</text><rect x="20" y="94" width="147" height="250" fill="url(#pT23)"/><rect x="180" y="94" width="90" height="120" fill="${p2}"/><rect x="180" y="224" width="90" height="120" fill="${p1}"/><text x="225" y="148" font-family="serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">${c.businessName}</text><rect x="0" y="362" width="270" height="118" fill="${p2}"/><text x="20" y="395" font-family="sans-serif" font-size="8" fill="rgba(255,255,255,0.4)" letter-spacing="2">STORIES TEMPLATE</text><text x="20" y="418" font-family="serif" font-size="16" font-weight="700" fill="#fff">${tg}</text><text x="20" y="438" font-family="serif" font-size="16" font-weight="700" fill="${p1}">percutant</text></svg>`,
 T24:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T24','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#1a1a1a"/><rect x="0" y="0" width="270" height="4" fill="${p1}"/><rect x="0" y="476" width="270" height="4" fill="${p1}"/><rect x="0" y="0" width="4" height="480" fill="${p1}"/><rect x="266" y="0" width="4" height="480" fill="${p1}"/><rect x="20" y="22" width="230" height="260" fill="url(#pT24)"/><rect x="20" y="296" width="100" height="30" fill="${p1}"/><text x="70" y="316" font-family="sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">${ht}</text><rect x="20" y="340" width="44" height="3" fill="${p1}"/><text x="20" y="370" font-family="serif" font-size="18" font-weight="700" fill="#fff">${tg}</text><text x="20" y="393" font-family="serif" font-size="18" font-weight="700" fill="${p1}">— exclusif</text><rect x="20" y="444" width="120" height="24" fill="${p1}" rx="12"/><text x="80" y="460" font-family="sans-serif" font-size="9" fill="#fff" text-anchor="middle" font-weight="700">Voir la collection →</text></svg>`,
 T25:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T25','#ccc','#d5d5d5')}<rect width="270" height="480" fill="#fff"/><rect x="0" y="0" width="270" height="110" fill="${p2}"/><rect x="0" y="370" width="270" height="110" fill="${p2}"/><text x="135" y="58" font-family="serif" font-size="22" font-weight="700" fill="${p1}" text-anchor="middle">${tg}</text><text x="135" y="84" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,0.45)" text-anchor="middle" letter-spacing="2">${nm}</text><rect x="20" y="126" width="230" height="230" fill="url(#pT25)"/><rect x="20" y="126" width="230" height="230" fill="none" stroke="${p1}" stroke-width="2"/><rect x="20" y="304" width="230" height="36" fill="${p1}" opacity="0.9"/><text x="135" y="328" font-family="serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Nouvelle prestation</text><text x="135" y="406" font-family="serif" font-size="15" fill="#fff" text-anchor="middle">${c.businessName}</text><text x="135" y="430" font-family="sans-serif" font-size="13" fill="${p1}" text-anchor="middle">↑ Swipe up</text></svg>`,
 T26:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T26','#e0e0e0','#eaeaea')}<rect width="270" height="480" fill="${ac}"/><circle cx="227" cy="60" r="70" fill="${p1}" opacity="0.14"/><circle cx="40" cy="380" r="90" fill="${p2}" opacity="0.06"/><rect x="30" y="36" width="210" height="270" fill="url(#pT26)" rx="4"/><rect x="30" y="36" width="210" height="270" fill="none" stroke="${p1}" stroke-width="1" rx="4"/><rect x="30" y="36" width="1.5" height="270" fill="${p1}"/><text x="135" y="334" font-family="serif" font-size="11" fill="${p1}" text-anchor="middle" letter-spacing="3">${nm}</text><text x="135" y="374" font-family="serif" font-size="22" font-weight="700" fill="${p2}" text-anchor="middle">${tg}</text><rect x="85" y="418" width="100" height="28" fill="${p1}" rx="14"/><text x="135" y="436" font-family="sans-serif" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">En savoir +</text><text x="135" y="465" font-family="sans-serif" font-size="9" fill="#bbb" text-anchor="middle">${wb}</text></svg>`,
@@ -191,7 +182,6 @@ T30:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 480">${ck('T30','#
   return T[id] || '';
 }
 
-// ── Structure des styles ──────────────────────────────────────────
 const STYLES = [
   {id:'1', label:'Minimaliste Bande',     ids:['T01','T02','T03','T04','T05']},
   {id:'2', label:'Géométrique Organique', ids:['T06','T07','T08','T09','T10']},
@@ -201,10 +191,8 @@ const STYLES = [
   {id:'6', label:'Soft Premium',          ids:['T26','T27','T28','T29','T30']},
 ];
 
-// ── Construction de l'interface ───────────────────────────────────
 function buildUI() {
-  const content = document.getElementById('content');
-  content.innerHTML = STYLES.map(style => `
+  document.getElementById('content').innerHTML = STYLES.map(style => `
     <div class="style-group">
       <div class="style-label">Style ${style.id} — ${style.label}</div>
       <div class="cards-row">
@@ -213,9 +201,7 @@ function buildUI() {
             <div class="check-badge" id="badge-${id}">✓</div>
             <button class="zoom-btn" onclick="event.stopPropagation();openModal('${id}')">⛶</button>
             <div class="svg-wrap">${getSVG(id)}</div>
-            <div class="card-foot">
-              <div class="card-tid" id="tid-${id}" style="color:${CLIENT.secondaryColor}">${id}</div>
-            </div>
+            <div class="card-foot"><div class="card-tid" style="color:${CLIENT.secondaryColor}">${id}</div></div>
           </div>
         `).join('')}
       </div>
@@ -223,75 +209,55 @@ function buildUI() {
   `).join('');
 }
 
-// ── Mise à jour UI après chaque action ───────────────────────────
 function updateUI() {
-  const count = selected.size;
-  const pct = Math.min(100, Math.round(count / MIN * 100));
-  const ready = count >= MIN;
+  const n = selected.size, pct = Math.min(100, Math.round(n/MIN*100)), ready = n >= MIN;
   const p1 = CLIENT.primaryColor;
-
-  // Badges sur les cartes
   document.querySelectorAll('.card').forEach(card => {
-    const id = card.id.replace('card-','');
-    const isSel = selected.has(id);
+    const id = card.id.replace('card-',''), isSel = selected.has(id);
     card.classList.toggle('sel', isSel);
     card.style.borderColor = isSel ? p1 : 'transparent';
-    card.style.boxShadow = isSel
-      ? `0 0 0 3px ${p1}28, 0 4px 16px rgba(0,0,0,0.1)`
-      : '0 1px 6px rgba(0,0,0,0.07)';
-    document.getElementById(`badge-${id}`).style.background = p1;
+    card.style.boxShadow = isSel ? `0 0 0 3px ${p1}28,0 4px 16px rgba(0,0,0,.1)` : '0 1px 6px rgba(0,0,0,.07)';
+    document.getElementById('badge-'+id).style.background = p1;
   });
-
-  // Progress bar
-  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-fill').style.width = pct+'%';
   document.getElementById('progress-fill').style.background = p1;
-  document.getElementById('counter').innerHTML = `<strong style="color:${p1}">${count}</strong> sélectionné${count>1?'s':''}`;
+  document.getElementById('counter').innerHTML = `<strong style="color:${p1}">${n}</strong> sélectionné${n>1?'s':''}`;
   const lbl = document.getElementById('progress-label');
-  lbl.textContent = ready ? 'Minimum atteint !' : `Encore ${MIN - count}`;
-  lbl.className = 'progress-label' + (ready ? ' ready' : '');
+  lbl.textContent = ready ? 'Minimum atteint !' : `Encore ${MIN-n}`;
+  lbl.className = 'progress-label'+(ready?' ready':'');
   lbl.style.color = ready ? p1 : '#aaa';
-
-  // Bouton valider topbar
   const btn = document.getElementById('btn-validate');
   btn.disabled = !ready;
   btn.style.background = ready ? p1 : '#e0e0e0';
   btn.style.color = ready ? '#fff' : '#aaa';
-  btn.textContent = ready ? `Valider (${count}) →` : `${count}/${MIN} minimum`;
-
-  // Barre flottante
-  const floatBar = document.getElementById('float-bar');
-  floatBar.classList.toggle('show', count > 0);
-  document.getElementById('float-count').innerHTML = `<strong style="color:${p1}">${count}</strong> template${count>1?'s':''} sélectionné${count>1?'s':''}`;
+  btn.textContent = ready ? `Valider (${n}) →` : `${n}/${MIN} minimum`;
+  const fb = document.getElementById('float-bar');
+  fb.classList.toggle('show', n>0);
+  document.getElementById('float-count').innerHTML = `<strong style="color:${p1}">${n}</strong> template${n>1?'s':''} sélectionné${n>1?'s':''}`;
   const fbtn = document.getElementById('float-validate');
   fbtn.disabled = !ready;
   fbtn.style.background = ready ? p1 : '#555';
-  fbtn.textContent = ready ? 'Valider →' : `Encore ${MIN - count}`;
-
-  // Modal si ouverte
+  fbtn.textContent = ready ? 'Valider →' : `Encore ${MIN-n}`;
   if (modalId) {
-    const mBtn = document.getElementById('modal-sel-btn');
-    mBtn.style.background = selected.has(modalId) ? '#eee' : p1;
-    mBtn.style.color = selected.has(modalId) ? '#555' : '#fff';
-    mBtn.textContent = selected.has(modalId) ? 'Désélectionner' : 'Sélectionner ✓';
+    const mb = document.getElementById('modal-sel-btn');
+    mb.style.background = selected.has(modalId) ? '#eee' : p1;
+    mb.style.color = selected.has(modalId) ? '#555' : '#fff';
+    mb.textContent = selected.has(modalId) ? 'Désélectionner' : 'Sélectionner ✓';
   }
 }
 
-// ── Actions ───────────────────────────────────────────────────────
-function toggle(id) {
-  selected.has(id) ? selected.delete(id) : selected.add(id);
-  updateUI();
-}
+function toggle(id) { selected.has(id) ? selected.delete(id) : selected.add(id); updateUI(); }
 function selectAll() { STYLES.forEach(s => s.ids.forEach(id => selected.add(id))); updateUI(); }
-function clearAll()  { selected.clear(); updateUI(); }
+function clearAll() { selected.clear(); updateUI(); }
 
 function openModal(id) {
   modalId = id;
-  document.getElementById('modal-title').textContent = 'Template ' + id;
+  document.getElementById('modal-title').textContent = 'Template '+id;
   document.getElementById('modal-body').innerHTML = getSVG(id);
-  const mBtn = document.getElementById('modal-sel-btn');
-  mBtn.style.background = selected.has(id) ? '#eee' : CLIENT.primaryColor;
-  mBtn.style.color = selected.has(id) ? '#555' : '#fff';
-  mBtn.textContent = selected.has(id) ? 'Désélectionner' : 'Sélectionner ✓';
+  const mb = document.getElementById('modal-sel-btn');
+  mb.style.background = selected.has(id) ? '#eee' : CLIENT.primaryColor;
+  mb.style.color = selected.has(id) ? '#555' : '#fff';
+  mb.textContent = selected.has(id) ? 'Désélectionner' : 'Sélectionner ✓';
   document.getElementById('modal-bg').classList.add('show');
 }
 function closeModal(e) {
@@ -300,43 +266,29 @@ function closeModal(e) {
     modalId = null;
   }
 }
-function toggleFromModal() {
-  if (modalId) { toggle(modalId); }
-}
+function toggleFromModal() { if (modalId) toggle(modalId); }
 
-// ── Validation et envoi ───────────────────────────────────────────
 async function handleValidate() {
   if (selected.size < MIN) return;
-
   document.getElementById('loading-overlay').classList.add('show');
   document.getElementById('error-banner').style.display = 'none';
-
   try {
     const res = await fetch('/api/templates/validate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clientId: CLIENT_ID,
-        templateIds: [...selected],
-        templateVars: CLIENT,
-      }),
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ clientId: CLIENT_ID, templateIds: [...selected], templateVars: CLIENT }),
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur serveur');
-
-    // Succès → rediriger vers l'espace client
     window.location.href = '/client.html?onboarding=complete';
-
-  } catch (err) {
-    document.getElementById('error-banner').textContent = 'Erreur : ' + err.message;
+  } catch(err) {
+    document.getElementById('error-banner').textContent = 'Erreur : '+err.message;
     document.getElementById('error-banner').style.display = 'block';
   } finally {
     document.getElementById('loading-overlay').classList.remove('show');
   }
 }
 
-// ── Démarrage ─────────────────────────────────────────────────────
 initClient();
 </script>
 </body>
