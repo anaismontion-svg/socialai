@@ -75,7 +75,7 @@ router.get('/client/:clientId', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('clients')
-      .select('name, branding, branding_status, instagram_handle, website')
+      .select('name, branding, branding_status')
       .eq('id', req.params.clientId)
       .single();
 
@@ -85,15 +85,15 @@ router.get('/client/:clientId', async (req, res) => {
     const palette = b.palette || {};
 
     res.json({
-      business_name:   data.name             || '',
-      primary_color:   palette.primary       || '#C9A98A',
-      secondary_color: palette.dark          || '#2D2D2D',
-      accent_color:    palette.light         || '#F5EDE3',
-      font_title:      b.fonts?.titre        || 'Georgia, serif',
-      font_body:       b.fonts?.corps        || 'system-ui, sans-serif',
-      tagline:         b.tagline             || '',
-      website:         data.website          || '',
-      hashtag:         data.instagram_handle ? '#' + data.instagram_handle : '',
+      business_name:   data.name          || '',
+      primary_color:   palette.primary    || '#C9A98A',
+      secondary_color: palette.dark       || '#2D2D2D',
+      accent_color:    palette.light      || '#F5EDE3',
+      font_title:      b.fonts?.titre     || 'Georgia, serif',
+      font_body:       b.fonts?.corps     || 'system-ui, sans-serif',
+      tagline:         b.tagline          || '',
+      website:         '',
+      hashtag:         '',
     });
   } catch(err) {
     res.status(500).json({ error: err.message });
