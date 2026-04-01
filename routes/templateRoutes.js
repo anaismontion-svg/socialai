@@ -264,11 +264,13 @@ function getDefaultStoryData(theme) {
 }
 
 async function notifyAriaTemplatesReady(clientId) {
-  await supabase.from('aria_events').insert({
-    client_id: clientId,
-    event_type: 'templates_validated',
-    payload: { message: 'Le client a validé ses templates stories.' },
-  }).catch(() => {});
+  try {
+    await supabase.from('aria_events').insert({
+      client_id: clientId,
+      event_type: 'templates_validated',
+      payload: { message: 'Le client a validé ses templates stories.' },
+    });
+  } catch(e) {}
 }
 
 module.exports = router;
