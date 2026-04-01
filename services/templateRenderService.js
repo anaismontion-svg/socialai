@@ -1,10 +1,9 @@
 // ================================================================
 //  SocialAI — templateRenderService.js
-//  Rendu SVG → PNG 1080×1920 pour publication Instagram
+//  Version simplifiée sans puppeteer (conversion PNG à implémenter plus tard)
 //  Chemin : services/templateRenderService.js
 // ================================================================
 
-const puppeteer = require('puppeteer');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -42,123 +41,32 @@ function renderSVG(templateId, clientVars, storyData = {}) {
 }
 
 // ----------------------------------------------------------------
-//  svgToPng(svgString)
-//  Convertit un SVG en Buffer PNG 1080×1920
-// ----------------------------------------------------------------
-async function svgToPng(svgString) {
-  let browser;
-  try {
-    browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-
-    const page = await browser.newPage();
-
-    // Format story Instagram : 1080×1920
-    await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
-
-    // Scale le SVG (viewBox 270×480) → 1080×1920 (×4)
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { width: 1080px; height: 1920px; overflow: hidden; background: #fff; }
-  .container {
-    width: 1080px;
-    height: 1920px;
-    display: flex;
-    align-items: stretch;
-  }
-  .container svg {
-    width: 1080px !important;
-    height: 1920px !important;
-  }
-</style>
-</head>
-<body>
-<div class="container">${svgString}</div>
-</body>
-</html>`;
-
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-
-    // Attendre que les polices soient chargées
-    await page.evaluate(() => document.fonts.ready);
-
-    const buffer = await page.screenshot({
-      type: 'png',
-      clip: { x: 0, y: 0, width: 1080, height: 1920 },
-    });
-
-    return buffer;
-  } finally {
-    if (browser) await browser.close();
-  }
-}
-
-// ----------------------------------------------------------------
-//  uploadToStorage(buffer, clientId, storyTheme)
-//  Upload le PNG sur Supabase Storage
-// ----------------------------------------------------------------
-async function uploadToStorage(buffer, clientId, storyTheme) {
-  const date = new Date().toISOString().split('T')[0];
-  const filename = `${clientId}/${date}_${storyTheme}_${Date.now()}.png`;
-
-  const { data, error } = await supabase.storage
-    .from('stories')
-    .upload(filename, buffer, {
-      contentType: 'image/png',
-      upsert: false,
-    });
-
-  if (error) throw error;
-
-  const { data: urlData } = supabase.storage
-    .from('stories')
-    .getPublicUrl(filename);
-
-  return urlData.publicUrl;
-}
-
-// ----------------------------------------------------------------
 //  generateStoryImage(clientId, storyTheme, storyData)
-//  Pipeline complet : template → SVG → PNG → Storage
-//  Retourne l'URL publique du PNG
+//  Pour l'instant : génère le SVG et le sauvegarde en base
+//  La conversion PNG sera ajoutée ultérieurement
 // ----------------------------------------------------------------
 async function generateStoryImage(clientId, storyTheme, storyData = {}) {
-  const { templateRotationService } = require('./templateRotationService');
+  const { getNextTemplate } = require('./templateRotationService');
 
   // 1. Obtenir le template du jour pour ce thème
-  const { templateId, templateVars } = await templateRotationService
-    .getNextTemplate(clientId, storyTheme);
+  const { templateId, templateVars } = await getNextTemplate(clientId, storyTheme);
 
   // 2. Rendre le SVG
   const svgString = renderSVG(templateId, templateVars, storyData);
 
-  // 3. Convertir en PNG
-  const pngBuffer = await svgToPng(svgString);
-
-  // 4. Upload sur Supabase Storage
-  const imageUrl = await uploadToStorage(pngBuffer, clientId, storyTheme);
-
-  // 5. Sauvegarder en base
+  // 3. Sauvegarder en base (sans image PNG pour l'instant)
   await supabase.from('stories_generated').insert({
     client_id: clientId,
     story_theme: storyTheme,
     template_id: templateId,
     svg_content: svgString,
-    image_url: imageUrl,
     custom_data: storyData,
   });
 
-  return { imageUrl, templateId, svgString };
+  return { svgString, templateId, imageUrl: null };
 }
 
 module.exports = {
   renderSVG,
-  svgToPng,
-  uploadToStorage,
   generateStoryImage,
 };
