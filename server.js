@@ -59,20 +59,6 @@ const { runScheduler } = require('./routes/scheduler');
 runScheduler();
 setInterval(runScheduler, 24 * 60 * 60 * 1000);
 
-// ── Stories quotidiennes Aria — chaque jour à 8h ─────────────────────────────
-const { runDailyStoriesCron } = require('./aria_stories_integration');
-const CronJob = (() => {
-  try { return require('node-cron'); } catch { return null; }
-})();
-if (CronJob) {
-  CronJob.schedule('0 8 * * *', () => {
-    console.log('📸 Aria — Génération stories quotidiennes...');
-    runDailyStoriesCron().catch(err =>
-      console.error('❌ Erreur stories cron:', err.message)
-    );
-  });
-}
-
 // ── Synchronisation Instagram ─────────────────────────────────────────────────
 const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
 (async () => {
