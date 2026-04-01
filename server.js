@@ -9,9 +9,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Pages espace client ───────────────────────────────────────────────────────
-app.get('/login.html',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/client.html',         (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
-app.get('/branding-setup.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
+app.get('/login.html',               (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/client.html',              (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
+app.get('/branding-setup.html',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
+app.get('/template-selection.html',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'template-selection.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
 app.use('/api/clients',         require('./routes/clients'));
@@ -23,11 +24,13 @@ app.use('/api/reports',         require('./routes/reports'));
 app.use('/api/branding',        require('./routes/branding'));
 app.use('/api/pipeline',        require('./routes/pipeline'));
 app.use('/api/story-templates', require('./routes/story-templates'));
-app.use('/api/romi', require('./routes/romi'));
-app.use('/api/romi-auth', require('./routes/romi-auth').router);
-app.get('/romi.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi.html')));
+app.use('/api/romi',            require('./routes/romi'));
+app.use('/api/romi-auth',       require('./routes/romi-auth').router);
+app.use('/api/templates',       require('./routes/templateRoutes'));   // ← NOUVEAU
+
+app.get('/romi.html',       (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi.html')));
 app.get('/romi-login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi-login.html')));
-app.use('/',                    require('./routes/meta'));
+app.use('/',                require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
@@ -54,6 +57,20 @@ setInterval(syncPostMetrics, 6 * 60 * 60 * 1000);
 const { runScheduler } = require('./routes/scheduler');
 runScheduler();
 setInterval(runScheduler, 24 * 60 * 60 * 1000);
+
+// ── Stories quotidiennes Aria — chaque jour à 8h ─────────────────────────────
+const { runDailyStoriesCron } = require('./aria_stories_integration');   // ← NOUVEAU
+const CronJob = (() => {
+  try { return require('node-cron'); } catch { return null; }
+})();
+if (CronJob) {
+  CronJob.schedule('0 8 * * *', () => {
+    console.log('📸 Aria — Génération stories quotidiennes...');
+    runDailyStoriesCron().catch(err =>
+      console.error('❌ Erreur stories cron:', err.message)
+    );
+  });
+}
 
 // ── Synchronisation Instagram ─────────────────────────────────────────────────
 const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
