@@ -101,7 +101,6 @@ const ASSEMBLER_URL = process.env.ASSEMBLER_URL || 'http://localhost:5001';
 async function generateStoryVisual(client, storyType, content) {
   try {
     await axios.get(`${ASSEMBLER_URL}/health`, { timeout: 5000 });
-
     const payload = {
       client_id:   client.id,
       client_name: client.name,
@@ -109,23 +108,18 @@ async function generateStoryVisual(client, storyType, content) {
       story_type:  storyType,
       content
     };
-
     const response = await axios.post(
       `${ASSEMBLER_URL}/story`,
       payload,
       { responseType: 'arraybuffer', timeout: 60000 }
     );
-
     const buffer   = Buffer.from(response.data);
     const filename = `story_${storyType}_${Date.now()}.jpg`;
     const path     = `stories/${client.id}/${filename}`;
-
     const { error } = await supabaseAdmin.storage
       .from('media')
       .upload(path, buffer, { contentType: 'image/jpeg', upsert: true });
-
     if (error) throw new Error(`Upload: ${error.message}`);
-
     const { data } = supabaseAdmin.storage.from('media').getPublicUrl(path);
     return data.publicUrl;
   } catch(err) {
@@ -148,10 +142,8 @@ async function getStoryTemplate(clientId, type) {
 async function planifierStoryEntreprise(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'entreprise');
   let mediaUrl = template?.visuel_url || null;
-
   const needsRegen = !mediaUrl ||
     (template?.generated_at && (Date.now() - new Date(template.generated_at)) > 7 * 24 * 3600 * 1000);
-
   if (needsRegen) {
     const content = template?.content || {
       titre:     client.name,
@@ -162,26 +154,20 @@ async function planifierStoryEntreprise(client, scheduledAt) {
     if (newUrl) {
       mediaUrl = newUrl;
       await supabase.from('story_templates').upsert({
-        client_id:    client.id,
-        type:         'entreprise',
-        visuel_url:   newUrl,
-        generated_at: new Date().toISOString(),
-        content,
-        actif:        true
+        client_id: client.id, type: 'entreprise',
+        visuel_url: newUrl, generated_at: new Date().toISOString(),
+        content, actif: true
       }, { onConflict: 'client_id,type' });
     }
   }
-
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id);
     mediaUrl = media?.url || null;
   }
-
   if (!mediaUrl) {
     console.warn(`⚠️ ${client.name} — Story entreprise ignorée : aucun visuel`);
     return false;
   }
-
   await supabase.from('queue').insert({
     client_id: client.id, media_url: mediaUrl,
     caption: `${client.name} — Qui sommes-nous ?`,
@@ -189,25 +175,21 @@ async function planifierStoryEntreprise(client, scheduledAt) {
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_fixe_entreprise'
   });
-  console.log(`📸 Story entreprise planifiée pour ${client.name}`);
+  console.log(`📸 Story entreprise planifiée pour ${client.name} à ${scheduledAt.toLocaleString('fr-FR')}`);
   return true;
 }
 
 async function planifierStoryTarifs(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'tarifs');
-
-  let mediaUrl = null;
-  let mediaId  = null;
+  let mediaUrl = null, mediaId = null;
   const mediaTaggee = await getAvailableMedia(client.id, 'tarifs');
-
   if (mediaTaggee?.url) {
-    mediaUrl = mediaTaggee.url;
-    mediaId  = mediaTaggee.id;
+    mediaUrl = mediaTaggee.url; mediaId = mediaTaggee.id;
   } else if (template?.visuel_url) {
     mediaUrl = template.visuel_url;
   } else {
     const content = template?.content || {
-      titre:    'Nos tarifs',
+      titre: 'Nos tarifs',
       services: client.description || 'Contactez-nous pour en savoir plus'
     };
     const newUrl = await generateStoryVisual(client, 'tarifs', content);
@@ -220,17 +202,14 @@ async function planifierStoryTarifs(client, scheduledAt) {
       }, { onConflict: 'client_id,type' });
     }
   }
-
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id);
     if (media?.url) { mediaUrl = media.url; mediaId = media.id; }
   }
-
   if (!mediaUrl) {
     console.warn(`⚠️ ${client.name} — Story tarifs ignorée : aucun visuel`);
     return false;
   }
-
   await supabase.from('queue').insert({
     client_id: client.id, media_id: mediaId, media_url: mediaUrl,
     caption: 'Nos services & tarifs ✨',
@@ -238,17 +217,15 @@ async function planifierStoryTarifs(client, scheduledAt) {
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_fixe_tarifs'
   });
-  console.log(`📸 Story tarifs planifiée pour ${client.name}`);
+  console.log(`📸 Story tarifs planifiée pour ${client.name} à ${scheduledAt.toLocaleString('fr-FR')}`);
   return true;
 }
 
 async function planifierStoryTemoignage(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'temoignage');
   let mediaUrl = template?.visuel_url || null;
-
   const needsRegen = !mediaUrl ||
     (template?.generated_at && (Date.now() - new Date(template.generated_at)) > 7 * 24 * 3600 * 1000);
-
   if (needsRegen && template?.content) {
     const newUrl = await generateStoryVisual(client, 'temoignage', template.content);
     if (newUrl) {
@@ -260,7 +237,6 @@ async function planifierStoryTemoignage(client, scheduledAt) {
       }, { onConflict: 'client_id,type' });
     }
   }
-
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id, 'temoignage');
     mediaUrl = media?.url || null;
@@ -269,44 +245,35 @@ async function planifierStoryTemoignage(client, scheduledAt) {
       mediaUrl = anyMedia?.url || null;
     }
   }
-
   if (!mediaUrl) {
     console.warn(`⚠️ ${client.name} — Story témoignage ignorée : configurez un témoignage dans le back office`);
     return false;
   }
-
   const caption = template?.content?.texte
     ? `"${template.content.texte.slice(0, 80)}..." ⭐`
     : 'Ce que nos clients disent de nous ⭐';
-
   await supabase.from('queue').insert({
-    client_id: client.id, media_url: mediaUrl,
-    caption,
+    client_id: client.id, media_url: mediaUrl, caption,
     scheduled_at: scheduledAt.toISOString(),
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_fixe_temoignage'
   });
-  console.log(`📸 Story témoignage planifiée pour ${client.name}`);
+  console.log(`📸 Story témoignage planifiée pour ${client.name} à ${scheduledAt.toLocaleString('fr-FR')}`);
   return true;
 }
 
 async function planifierStoryAvantApres(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'avant_apres');
   let mediaUrl = template?.visuel_url || null;
-
   const needsRegen = !mediaUrl ||
     (template?.generated_at && (Date.now() - new Date(template.generated_at)) > 7 * 24 * 3600 * 1000);
-
   if (needsRegen) {
     const mediaAvant = await getAvailableMedia(client.id, 'avant');
     const mediaApres = await getAvailableMedia(client.id, 'apres');
-
     if (mediaAvant?.url && mediaApres?.url) {
       const content = {
-        url_avant: mediaAvant.url,
-        url_apres: mediaApres.url,
-        titre:     template?.content?.titre || 'Avant / Après',
-        sous_titre: client.name
+        url_avant: mediaAvant.url, url_apres: mediaApres.url,
+        titre: template?.content?.titre || 'Avant / Après', sous_titre: client.name
       };
       const newUrl = await generateStoryVisual(client, 'avant_apres', content);
       if (newUrl) {
@@ -319,17 +286,14 @@ async function planifierStoryAvantApres(client, scheduledAt) {
       }
     }
   }
-
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id);
     mediaUrl = media?.url || null;
   }
-
   if (!mediaUrl) {
     console.warn(`⚠️ ${client.name} — Story avant/après ignorée : uploadez 2 photos taggées 'avant' et 'apres'`);
     return false;
   }
-
   await supabase.from('queue').insert({
     client_id: client.id, media_url: mediaUrl,
     caption: 'La transformation parle d\'elle-même ✨',
@@ -337,53 +301,84 @@ async function planifierStoryAvantApres(client, scheduledAt) {
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_fixe_avant_apres'
   });
-  console.log(`📸 Story avant/après planifiée pour ${client.name}`);
+  console.log(`📸 Story avant/après planifiée pour ${client.name} à ${scheduledAt.toLocaleString('fr-FR')}`);
   return true;
 }
 
 // ─────────────────────────────────────────────
-// PLANIFICATION 4 STORIES FIXES — ANTI-DOUBLON CORRIGÉ
+// PLANIFICATION 4 STORIES — 24H APRÈS LA DERNIÈRE SÉRIE
 // ─────────────────────────────────────────────
 async function scheduleFixedStoriesForClient(client) {
   if (client.status === 'paused') return;
 
   const storySlots = [
-    { hour: 8,  fn: planifierStoryEntreprise,  source: 'story_fixe_entreprise'  },
-    { hour: 11, fn: planifierStoryTarifs,      source: 'story_fixe_tarifs'      },
-    { hour: 15, fn: planifierStoryTemoignage,  source: 'story_fixe_temoignage'  },
-    { hour: 19, fn: planifierStoryAvantApres,  source: 'story_fixe_avant_apres' },
+    { offsetMinutes: 0,  fn: planifierStoryEntreprise,  source: 'story_fixe_entreprise'  },
+    { offsetMinutes: 5,  fn: planifierStoryTarifs,      source: 'story_fixe_tarifs'      },
+    { offsetMinutes: 10,  fn: planifierStoryTemoignage,  source: 'story_fixe_temoignage'  },
+    { offsetMinutes: 15, fn: planifierStoryAvantApres,  source: 'story_fixe_avant_apres' },
   ];
 
-  for (const slot of storySlots) {
-    // Calculer la date cible pour ce slot
-    const scheduledAt = new Date();
-    scheduledAt.setHours(slot.hour, 0, 0, 0);
+  // 1. Trouver la dernière story publiée (peu importe le type)
+  const { data: lastPublished } = await supabase
+    .from('queue')
+    .select('published_at, scheduled_at')
+    .eq('client_id', client.id)
+    .eq('type', 'story')
+    .eq('statut', 'publie')
+    .order('published_at', { ascending: false })
+    .limit(1);
 
-    // Si l'heure est déjà passée → planifier pour demain
-    if (scheduledAt <= new Date()) {
-      scheduledAt.setDate(scheduledAt.getDate() + 1);
+  // 2. Calculer la base de la prochaine série
+  // Si une story a été publiée → base = published_at + 24h
+  // Sinon → base = maintenant (première série)
+  let serieBase;
+  if (lastPublished?.[0]?.published_at) {
+    serieBase = new Date(lastPublished[0].published_at);
+    serieBase.setHours(serieBase.getHours() + 24);
+  } else {
+    // Pas encore de publication → vérifier s'il y a des stories planifiées
+    const { data: nextPlanned } = await supabase
+      .from('queue')
+      .select('scheduled_at')
+      .eq('client_id', client.id)
+      .eq('type', 'story')
+      .eq('statut', 'planifie')
+      .order('scheduled_at', { ascending: false })
+      .limit(1);
+
+    if (nextPlanned?.[0]?.scheduled_at) {
+      // Déjà des stories planifiées → prochaine série 24h après la dernière planifiée
+      serieBase = new Date(nextPlanned[0].scheduled_at);
+      serieBase.setHours(serieBase.getHours() + 24);
+    } else {
+      // Aucune story → commencer maintenant + 10 min
+      serieBase = new Date();
+      serieBase.setMinutes(serieBase.getMinutes() + 10);
     }
+  }
 
-    // Fenêtre de vérification : le jour de scheduledAt (minuit → minuit+1)
-    const dayStart = new Date(scheduledAt);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setDate(dayEnd.getDate() + 1);
+  // 3. Pour chaque slot, vérifier si déjà planifié et créer si besoin
+  for (const slot of storySlots) {
+    // Date de ce slot = base + offset en heures
+    const scheduledAt = new Date(serieBase);
+    scheduledAt.setMinutes(scheduledAt.getMinutes() + slot.offsetMinutes);
 
-    // ✅ Vérifier si cette source est déjà planifiée CE jour-là (peu importe le statut)
+    // Vérifier si cette source est déjà planifiée dans une fenêtre de ±2h autour du slot
+    const windowStart = new Date(scheduledAt);
+    windowStart.setMinutes(windowStart.getMinutes() - 10);
+    const windowEnd = new Date(scheduledAt);
+    windowEnd.setMinutes(windowEnd.getMinutes() + 10);
+
     const { data: existing } = await supabase
       .from('queue')
       .select('id')
       .eq('client_id', client.id)
       .eq('source', slot.source)
-      .gte('scheduled_at', dayStart.toISOString())
-      .lt('scheduled_at', dayEnd.toISOString())
+      .gte('scheduled_at', windowStart.toISOString())
+      .lt('scheduled_at', windowEnd.toISOString())
       .in('statut', ['planifie', 'publie']);
 
-    if (existing && existing.length > 0) {
-      // Déjà planifiée ou publiée pour ce jour → skip
-      continue;
-    }
+    if (existing && existing.length > 0) continue;
 
     await slot.fn(client, scheduledAt);
   }
