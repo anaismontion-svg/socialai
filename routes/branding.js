@@ -69,6 +69,37 @@ Règles importantes :
   }
 }
 
+// ── GET /api/branding/client/:clientId ───────────────────────────────────────
+// Retourne les variables template pour la page de sélection des templates
+router.get('/client/:clientId', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('clients')
+      .select('name, branding, branding_status, instagram_handle, website')
+      .eq('id', req.params.clientId)
+      .single();
+
+    if (error || !data) return res.status(404).json({ error: 'Client introuvable' });
+
+    const b = data.branding || {};
+    const palette = b.palette || {};
+
+    res.json({
+      business_name:   data.name             || '',
+      primary_color:   palette.primary       || '#C9A98A',
+      secondary_color: palette.dark          || '#2D2D2D',
+      accent_color:    palette.light         || '#F5EDE3',
+      font_title:      b.fonts?.titre        || 'Georgia, serif',
+      font_body:       b.fonts?.corps        || 'system-ui, sans-serif',
+      tagline:         b.tagline             || '',
+      website:         data.website          || '',
+      hashtag:         data.instagram_handle ? '#' + data.instagram_handle : '',
+    });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── GET /api/branding/proposals/:clientId ─────────────────────────────────────
 // Génère et retourne les 4 thèmes pour un client
 router.get('/proposals/:clientId', async (req, res) => {
