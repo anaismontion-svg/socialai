@@ -6,45 +6,27 @@ const nodemailer = require('nodemailer');
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// ── Envoi email alerte contenu faible ────────────────────────────────────────
 async function sendLowContentAlert(client) {
   try {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD
-      }
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD }
     });
-
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: process.env.GMAIL_USER,
       subject: `🚨 URGENT — Contenu faible pour ${client.name}`,
-      text: `
-Bonjour,
-
-Le compte de votre client ${client.name} manque de contenu pour continuer les publications automatiques.
-
-Il reste moins de 5 médias disponibles dans la médiathèque.
-
-Merci de demander à ${client.name} d'envoyer de nouvelles photos et vidéos dès que possible pour ne pas interrompre le planning de publication.
-
----
-SocialAI — Alerte automatique
-      `.trim()
+      text: `Le compte de votre client ${client.name} manque de contenu.\nIl reste moins de 5 médias disponibles.\n---\nSocialAI — Alerte automatique`
     });
-
     console.log(`📧 Alerte contenu faible envoyée pour ${client.name}`);
   } catch (err) {
     console.error('❌ Erreur envoi alerte:', err.message);
   }
 }
 
-// ── Génération caption IA ─────────────────────────────────────────────────────
 async function generateCaption(client, mediaType, topPosts = []) {
   const topPostsContext = topPosts.length > 0
-    ? `\nVoici les posts qui ont le mieux marché pour ce compte (inspire-toi de leur style) :\n${topPosts.map(p => `- "${p.caption}" (${p.likes || 0} likes, ${p.comments || 0} commentaires)`).join('\n')}`
+    ? `\nVoici les posts qui ont le mieux marché pour ce compte :\n${topPosts.map(p => `- "${p.caption}" (${p.likes || 0} likes, ${p.comments || 0} commentaires)`).join('\n')}`
     : '';
 
   const message = await anthropic.messages.create({
@@ -53,13 +35,11 @@ async function generateCaption(client, mediaType, topPosts = []) {
     messages: [{
       role: 'user',
       content: `Tu es un expert en community management Instagram et Facebook.
-
 Client : ${client.name}
 Secteur : ${client.sector || 'non précisé'}
 Ton souhaité : ${client.tone || 'professionnel'}
 Type de média : ${mediaType}
 ${topPostsContext}
-
 Génère une caption engageante pour Instagram/Facebook. 
 - Commence par une phrase accrocheuse
 - Utilise des émojis pertinents (3-5 max)
@@ -69,11 +49,9 @@ Génère une caption engageante pour Instagram/Facebook.
 - Ne mets pas de guillemets autour de la caption`
     }]
   });
-
   return message.content[0].text;
 }
 
-// ── Récupérer les top posts du client ────────────────────────────────────────
 async function getTopPosts(clientId) {
   const { data } = await supabase
     .from('queue')
@@ -85,68 +63,39 @@ async function getTopPosts(clientId) {
   return data || [];
 }
 
-// ── Attendre qu'un container Meta soit prêt ───────────────────────────────────
-// Interroge l'API toutes les 5s jusqu'à statut FINISHED (max 2min)
 async function waitForContainer(accessToken, containerId, maxAttempts = 24) {
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(resolve => setTimeout(resolve, 5000));
-
     const statusRes = await axios.get(
       `https://graph.instagram.com/v19.0/${containerId}`,
-      {
-        params: {
-          fields:       'status_code',
-          access_token: accessToken
-        }
-      }
+      { params: { fields: 'status_code', access_token: accessToken } }
     );
-
     const status = statusRes.data.status_code;
     console.log(`  ⏳ Container ${containerId} — statut : ${status} (tentative ${i + 1}/${maxAttempts})`);
-
     if (status === 'FINISHED') return true;
-    if (status === 'ERROR')    throw new Error(`Container ${containerId} en erreur`);
+    if (status === 'ERROR') throw new Error(`Container ${containerId} en erreur`);
   }
-
   throw new Error(`Timeout container ${containerId} après ${maxAttempts * 5}s`);
 }
 
-// ── Publier un post single ou reel Instagram ──────────────────────────────────
 async function publishToInstagram(accessToken, igAccountId, mediaUrl, caption, mediaType) {
   try {
-    // Étape 1 : Créer le container
     const containerRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media`,
-      null,
-      {
-        params: {
-          image_url: mediaType === 'image' ? mediaUrl : undefined,
-          video_url: mediaType === 'video' ? mediaUrl : undefined,
-          media_type: mediaType === 'video' ? 'REELS' : 'IMAGE',
-          caption,
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
+      { params: {
+        image_url: mediaType === 'image' ? mediaUrl : undefined,
+        video_url: mediaType === 'video' ? mediaUrl : undefined,
+        media_type: mediaType === 'video' ? 'REELS' : 'IMAGE',
+        caption, access_token: accessToken
+      }}
     );
-
     const containerId = containerRes.data.id;
     console.log(`  ⏳ Container créé (${containerId}), attente validation Meta...`);
-
-    // ✅ Attendre que le container soit prêt — images ET vidéos
     await waitForContainer(accessToken, containerId);
-
-    // Étape 2 : Publier le container
     const publishRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`,
-      null,
-      {
-        params: {
-          creation_id: containerId,
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`, null,
+      { params: { creation_id: containerId, access_token: accessToken } }
     );
-
     return { success: true, postId: publishRes.data.id };
   } catch (err) {
     console.error('❌ Erreur publication Instagram:', err.response?.data || err.message);
@@ -154,74 +103,38 @@ async function publishToInstagram(accessToken, igAccountId, mediaUrl, caption, m
   }
 }
 
-// ── Publier un carousel Instagram ────────────────────────────────────────────
 async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, caption) {
   try {
-    // Étape 1 : Créer un container enfant pour chaque slide
     const childIds = [];
-
     for (const url of mediaUrls) {
       const isVideo = url.match(/\.(mp4|mov|avi)$/i);
-
       const childRes = await axios.post(
-        `https://graph.instagram.com/v19.0/${igAccountId}/media`,
-        null,
-        {
-          params: {
-            image_url:        !isVideo ? url : undefined,
-            video_url:        isVideo  ? url : undefined,
-            media_type:       isVideo  ? 'VIDEO' : 'IMAGE',
-            is_carousel_item: true,
-            access_token:     accessToken
-          }
-        }
+        `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
+        { params: {
+          image_url: !isVideo ? url : undefined,
+          video_url: isVideo ? url : undefined,
+          media_type: isVideo ? 'VIDEO' : 'IMAGE',
+          is_carousel_item: true, access_token: accessToken
+        }}
       );
-
       const childId = childRes.data.id;
       console.log(`  ⏳ Container slide créé (${childId}), attente validation Meta...`);
-
-      // ✅ Attendre que chaque slide soit prête — images ET vidéos
       await waitForContainer(accessToken, childId);
-
       childIds.push(childId);
       console.log(`  📎 Slide ${childIds.length}/${mediaUrls.length} prête (${childId})`);
-
-      // Pause entre chaque upload pour éviter le rate limit Meta
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
-
-    // Étape 2 : Créer le container parent carousel
     const parentRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media`,
-      null,
-      {
-        params: {
-          media_type:   'CAROUSEL',
-          children:     childIds.join(','),
-          caption,
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
+      { params: { media_type: 'CAROUSEL', children: childIds.join(','), caption, access_token: accessToken }}
     );
-
     const parentId = parentRes.data.id;
     console.log(`  ⏳ Container carousel parent créé (${parentId}), attente...`);
-
-    // Attendre que le carousel parent soit prêt
     await waitForContainer(accessToken, parentId);
-
-    // Étape 3 : Publier le carousel
     const publishRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`,
-      null,
-      {
-        params: {
-          creation_id:  parentId,
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`, null,
+      { params: { creation_id: parentId, access_token: accessToken }}
     );
-
     return { success: true, postId: publishRes.data.id };
   } catch (err) {
     console.error('❌ Erreur publication carousel:', err.response?.data || err.message);
@@ -229,39 +142,23 @@ async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, c
   }
 }
 
-// ── Publier une story Instagram ───────────────────────────────────────────────
 async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, mediaType) {
   try {
     const containerRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media`,
-      null,
-      {
-        params: {
-          image_url:    mediaType === 'image' ? mediaUrl : undefined,
-          video_url:    mediaType === 'video' ? mediaUrl : undefined,
-          media_type:   'STORIES',
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
+      { params: {
+        image_url: mediaType === 'image' ? mediaUrl : undefined,
+        video_url: mediaType === 'video' ? mediaUrl : undefined,
+        media_type: 'STORIES', access_token: accessToken
+      }}
     );
-
     const containerId = containerRes.data.id;
     console.log(`  ⏳ Container story créé (${containerId}), attente validation Meta...`);
-
-    // ✅ CORRECTION : attendre que le container soit prêt — images ET vidéos
     await waitForContainer(accessToken, containerId);
-
     const publishRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`,
-      null,
-      {
-        params: {
-          creation_id:  containerId,
-          access_token: accessToken
-        }
-      }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`, null,
+      { params: { creation_id: containerId, access_token: accessToken }}
     );
-
     return { success: true, postId: publishRes.data.id };
   } catch (err) {
     console.error('❌ Erreur publication story:', err.response?.data || err.message);
@@ -273,11 +170,26 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
 async function processQueue() {
   const now = new Date();
 
+  // Récupérer les clients qui ont un compte Instagram actif
+  const { data: accountsData } = await supabase
+    .from('social_accounts')
+    .select('client_id, access_token, account_id')
+    .eq('platform', 'instagram');
+
+  if (!accountsData || accountsData.length === 0) return;
+
+  const validClientIds = accountsData.map(a => a.client_id);
+  const accountsByClient = {};
+  accountsData.forEach(a => { accountsByClient[a.client_id] = a; });
+
+  // Ne prendre QUE les items des clients avec un compte Instagram
   const { data: items, error } = await supabase
     .from('queue')
     .select('*, clients(*)')
     .eq('statut', 'planifie')
     .lte('scheduled_at', now.toISOString())
+    .in('client_id', validClientIds)
+    .order('scheduled_at', { ascending: true })
     .limit(10);
 
   if (error || !items || items.length === 0) return;
@@ -289,13 +201,7 @@ async function processQueue() {
     if (!client) continue;
 
     try {
-      const { data: socialAccount } = await supabase
-        .from('social_accounts')
-        .select('access_token, account_id')
-        .eq('client_id', client.id)
-        .eq('platform', 'instagram')
-        .single();
-
+      const socialAccount = accountsByClient[client.id];
       if (!socialAccount) {
         console.warn(`⚠️ Pas de compte Instagram pour ${client.name}`);
         continue;
@@ -311,87 +217,52 @@ async function processQueue() {
 
       if (item.type === 'carousel') {
         let mediaUrls = item.media_urls || [];
-
         if (!mediaUrls.length && item.media_ids?.length) {
           const { data: medias } = await supabase
-            .from('media')
-            .select('url')
-            .in('id', item.media_ids);
+            .from('media').select('url').in('id', item.media_ids);
           mediaUrls = medias?.map(m => m.url) || [];
         }
-
-        if (mediaUrls.length < 2) {
-          throw new Error('Carousel requiert au moins 2 slides');
-        }
-
+        if (mediaUrls.length < 2) throw new Error('Carousel requiert au moins 2 slides');
         console.log(`🎠 Publication carousel ${mediaUrls.length} slides pour ${client.name}`);
         result = await publishCarouselToInstagram(
-          socialAccount.access_token,
-          socialAccount.account_id,
-          mediaUrls,
-          caption
+          socialAccount.access_token, socialAccount.account_id, mediaUrls, caption
         );
 
       } else if (item.type === 'story') {
         let storyUrl = item.media_url;
-
         if (!storyUrl && item.media_id) {
           const { data: media } = await supabase
-            .from('media')
-            .select('url')
-            .eq('id', item.media_id)
-            .single();
+            .from('media').select('url').eq('id', item.media_id).single();
           if (media?.url) storyUrl = media.url;
         }
-
-        if (!storyUrl) {
-          throw new Error('Story sans media_url');
-        }
-
+        if (!storyUrl) throw new Error('Story sans media_url');
         console.log(`📖 Publication story pour ${client.name} — url: ${storyUrl}`);
         result = await publishStoryToInstagram(
-          socialAccount.access_token,
-          socialAccount.account_id,
-          storyUrl,
-          'image'
+          socialAccount.access_token, socialAccount.account_id, storyUrl, 'image'
         );
 
       } else {
         let mediaUrl = item.media_url;
         if (!mediaUrl && item.media_id) {
           const { data: media } = await supabase
-            .from('media')
-            .select('url, type')
-            .eq('id', item.media_id)
-            .single();
+            .from('media').select('url, type').eq('id', item.media_id).single();
           if (media) mediaUrl = media.url;
         }
-
-        if (!mediaUrl) {
-          throw new Error('Aucun média disponible');
-        }
-
+        if (!mediaUrl) throw new Error('Aucun média disponible');
         const mediaType = item.type === 'reel' ? 'video' : 'image';
         result = await publishToInstagram(
-          socialAccount.access_token,
-          socialAccount.account_id,
-          mediaUrl,
-          caption,
-          mediaType
+          socialAccount.access_token, socialAccount.account_id, mediaUrl, caption, mediaType
         );
       }
 
       if (result.success) {
         await supabase.from('queue').update({
-          statut:       'publie',
-          published_at: now.toISOString(),
-          caption
+          statut: 'publie', published_at: now.toISOString(), caption
         }).eq('id', item.id);
         console.log(`✅ Publié pour ${client.name} — ${item.type}`);
       } else {
         await supabase.from('queue').update({
-          statut:        'erreur',
-          error_message: result.error
+          statut: 'erreur', error_message: result.error
         }).eq('id', item.id);
         console.error(`❌ Échec publication pour ${client.name}:`, result.error);
       }
@@ -399,29 +270,20 @@ async function processQueue() {
     } catch (err) {
       console.error(`❌ Erreur traitement item ${item.id}:`, err.message);
       await supabase.from('queue').update({
-        statut:        'erreur',
-        error_message: err.message
+        statut: 'erreur', error_message: err.message
       }).eq('id', item.id);
     }
   }
 }
 
-// ── Vérification contenu faible ───────────────────────────────────────────────
 async function checkLowContent() {
   const { data: clients } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('status', 'active');
-
+    .from('clients').select('*').eq('status', 'active');
   if (!clients) return;
-
   for (const client of clients) {
     const { count } = await supabase
-      .from('media')
-      .select('*', { count: 'exact', head: true })
-      .eq('client_id', client.id)
-      .eq('used', false);
-
+      .from('media').select('*', { count: 'exact', head: true })
+      .eq('client_id', client.id).eq('used', false);
     if (count !== null && count < 5) {
       console.warn(`⚠️ Contenu faible pour ${client.name} (${count} médias restants)`);
       await sendLowContentAlert(client);
