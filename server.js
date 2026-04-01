@@ -13,6 +13,8 @@ app.get('/login.html',               (req, res) => res.sendFile(path.join(__dirn
 app.get('/client.html',              (req, res) => res.sendFile(path.join(__dirname, 'public', 'client.html')));
 app.get('/branding-setup.html',      (req, res) => res.sendFile(path.join(__dirname, 'public', 'branding-setup.html')));
 app.get('/template-selection.html',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'template-selection.html')));
+app.get('/romi.html',                (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi.html')));
+app.get('/romi-login.html',          (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi-login.html')));
 
 // ── Routes API ────────────────────────────────────────────────────────────────
 app.use('/api/clients',         require('./routes/clients'));
@@ -26,11 +28,10 @@ app.use('/api/pipeline',        require('./routes/pipeline'));
 app.use('/api/story-templates', require('./routes/story-templates'));
 app.use('/api/romi',            require('./routes/romi'));
 app.use('/api/romi-auth',       require('./routes/romi-auth').router);
-app.use('/api/templates',       require('./routes/templateRoutes'));   // ← NOUVEAU
+app.use('/api/templates',       require('./routes/templateRoutes'));
 
-app.get('/romi.html',       (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi.html')));
-app.get('/romi-login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'romi-login.html')));
-app.use('/',                require('./routes/meta'));
+// ── Route meta APRÈS les pages statiques ─────────────────────────────────────
+app.use('/',                    require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
@@ -59,7 +60,7 @@ runScheduler();
 setInterval(runScheduler, 24 * 60 * 60 * 1000);
 
 // ── Stories quotidiennes Aria — chaque jour à 8h ─────────────────────────────
-const { runDailyStoriesCron } = require('./aria_stories_integration');   // ← NOUVEAU
+const { runDailyStoriesCron } = require('./aria_stories_integration');
 const CronJob = (() => {
   try { return require('node-cron'); } catch { return null; }
 })();
