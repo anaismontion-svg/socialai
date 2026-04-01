@@ -8,12 +8,9 @@ const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABAS
 
 const BEST_HOURS = {
   post:  [9, 12, 18, 20],
-  story: [8, 11, 15, 19]  // 4 créneaux pour les 4 stories fixes
+  story: [8, 11, 15, 19]
 };
 
-// ─────────────────────────────────────────────
-// FORFAITS
-// ─────────────────────────────────────────────
 const PLANS = {
   starter: {
     postsPerWeek: 3, storiesPerDay: 4, recyclage: false,
@@ -31,9 +28,6 @@ function getPlan(client) {
   return PLANS[(client.plan||'starter').toLowerCase()] || PLANS.starter;
 }
 
-// ─────────────────────────────────────────────
-// UTILITAIRES DATES
-// ─────────────────────────────────────────────
 function getNextPublishDate(lastDate, frequency) {
   const date = new Date(lastDate || Date.now());
   if (frequency === 'daily') {
@@ -54,9 +48,6 @@ async function getClientFrequency(client) {
   return getPlan(client).postsPerWeek >= 7 ? 'daily' : '3x_week';
 }
 
-// ─────────────────────────────────────────────
-// MÉDIAS DISPONIBLES
-// ─────────────────────────────────────────────
 async function getAvailableMedia(clientId, category = null) {
   let query = supabase
     .from('media')
@@ -70,9 +61,6 @@ async function getAvailableMedia(clientId, category = null) {
   return data?.[0] || null;
 }
 
-// ─────────────────────────────────────────────
-// RECYCLAGE PRO
-// ─────────────────────────────────────────────
 async function selectRecyclablePost(clientId) {
   const twoMonthsAgo = new Date();
   twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
@@ -108,14 +96,10 @@ Réécris plus engageant. Max 150 mots. Retourne uniquement la caption.` }]
   return message.content[0].text;
 }
 
-// ─────────────────────────────────────────────
-// 🆕 GÉNÉRATION VISUEL STORY VIA ASSEMBLEUR
-// ─────────────────────────────────────────────
 const ASSEMBLER_URL = process.env.ASSEMBLER_URL || 'http://localhost:5001';
 
 async function generateStoryVisual(client, storyType, content) {
   try {
-    // Vérifier que l'assembleur est dispo
     await axios.get(`${ASSEMBLER_URL}/health`, { timeout: 5000 });
 
     const payload = {
@@ -132,7 +116,6 @@ async function generateStoryVisual(client, storyType, content) {
       { responseType: 'arraybuffer', timeout: 60000 }
     );
 
-    // Upload dans Supabase Storage
     const buffer   = Buffer.from(response.data);
     const filename = `story_${storyType}_${Date.now()}.jpg`;
     const path     = `stories/${client.id}/${filename}`;
@@ -151,11 +134,6 @@ async function generateStoryVisual(client, storyType, content) {
   }
 }
 
-// ─────────────────────────────────────────────
-// 🆕 STORIES FIXES — LOGIQUE PAR TYPE
-// ─────────────────────────────────────────────
-
-// Récupère ou génère le template d'un client
 async function getStoryTemplate(clientId, type) {
   const { data } = await supabase
     .from('story_templates')
@@ -171,7 +149,6 @@ async function planifierStoryEntreprise(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'entreprise');
   let mediaUrl = template?.visuel_url || null;
 
-  // Si pas de visuel en cache ou trop vieux (>7 jours) → regénérer
   const needsRegen = !mediaUrl ||
     (template?.generated_at && (Date.now() - new Date(template.generated_at)) > 7 * 24 * 3600 * 1000);
 
@@ -184,7 +161,6 @@ async function planifierStoryEntreprise(client, scheduledAt) {
     const newUrl = await generateStoryVisual(client, 'entreprise', content);
     if (newUrl) {
       mediaUrl = newUrl;
-      // Mettre à jour le template
       await supabase.from('story_templates').upsert({
         client_id:    client.id,
         type:         'entreprise',
@@ -196,7 +172,6 @@ async function planifierStoryEntreprise(client, scheduledAt) {
     }
   }
 
-  // Fallback : photo uploadée par le client
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id);
     mediaUrl = media?.url || null;
@@ -221,7 +196,6 @@ async function planifierStoryEntreprise(client, scheduledAt) {
 async function planifierStoryTarifs(client, scheduledAt) {
   const template = await getStoryTemplate(client.id, 'tarifs');
 
-  // Priorité : photo uploadée avec category='tarifs'
   let mediaUrl = null;
   let mediaId  = null;
   const mediaTaggee = await getAvailableMedia(client.id, 'tarifs');
@@ -232,7 +206,6 @@ async function planifierStoryTarifs(client, scheduledAt) {
   } else if (template?.visuel_url) {
     mediaUrl = template.visuel_url;
   } else {
-    // Générer via assembleur
     const content = template?.content || {
       titre:    'Nos tarifs',
       services: client.description || 'Contactez-nous pour en savoir plus'
@@ -249,7 +222,6 @@ async function planifierStoryTarifs(client, scheduledAt) {
   }
 
   if (!mediaUrl) {
-    // Fallback : n'importe quel média dispo
     const media = await getAvailableMedia(client.id);
     if (media?.url) { mediaUrl = media.url; mediaId = media.id; }
   }
@@ -290,7 +262,6 @@ async function planifierStoryTemoignage(client, scheduledAt) {
   }
 
   if (!mediaUrl) {
-    // Pas encore configuré → fallback photo client
     const media = await getAvailableMedia(client.id, 'temoignage');
     mediaUrl = media?.url || null;
     if (!mediaUrl) {
@@ -327,7 +298,6 @@ async function planifierStoryAvantApres(client, scheduledAt) {
     (template?.generated_at && (Date.now() - new Date(template.generated_at)) > 7 * 24 * 3600 * 1000);
 
   if (needsRegen) {
-    // Chercher 2 médias taggés avant/apres
     const mediaAvant = await getAvailableMedia(client.id, 'avant');
     const mediaApres = await getAvailableMedia(client.id, 'apres');
 
@@ -350,7 +320,6 @@ async function planifierStoryAvantApres(client, scheduledAt) {
     }
   }
 
-  // Fallback : n'importe quel média
   if (!mediaUrl) {
     const media = await getAvailableMedia(client.id);
     mediaUrl = media?.url || null;
@@ -373,43 +342,48 @@ async function planifierStoryAvantApres(client, scheduledAt) {
 }
 
 // ─────────────────────────────────────────────
-// 🆕 PLANIFICATION 4 STORIES FIXES PAR JOUR
+// PLANIFICATION 4 STORIES FIXES — ANTI-DOUBLON CORRIGÉ
 // ─────────────────────────────────────────────
 async function scheduleFixedStoriesForClient(client) {
   if (client.status === 'paused') return;
 
-  const today    = new Date(); today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-
-  // Vérifier combien de stories fixes sont déjà planifiées aujourd'hui
-  const { data: existing } = await supabase
-    .from('queue')
-    .select('source')
-    .eq('client_id', client.id)
-    .eq('type', 'story')
-    .eq('statut', 'planifie')
-    .gte('scheduled_at', today.toISOString())
-    .lt('scheduled_at', tomorrow.toISOString());
-
-  const existingSources = (existing || []).map(e => e.source || '');
-
-  // Les 4 stories fixes avec leurs créneaux horaires
   const storySlots = [
-    { hour: 8,  type: 'entreprise', fn: planifierStoryEntreprise,  source: 'story_fixe_entreprise'  },
-    { hour: 11, type: 'tarifs',     fn: planifierStoryTarifs,      source: 'story_fixe_tarifs'      },
-    { hour: 15, type: 'temoignage', fn: planifierStoryTemoignage,  source: 'story_fixe_temoignage'  },
-    { hour: 19, type: 'avant_apres',fn: planifierStoryAvantApres,  source: 'story_fixe_avant_apres' },
+    { hour: 8,  fn: planifierStoryEntreprise,  source: 'story_fixe_entreprise'  },
+    { hour: 11, fn: planifierStoryTarifs,      source: 'story_fixe_tarifs'      },
+    { hour: 15, fn: planifierStoryTemoignage,  source: 'story_fixe_temoignage'  },
+    { hour: 19, fn: planifierStoryAvantApres,  source: 'story_fixe_avant_apres' },
   ];
 
   for (const slot of storySlots) {
-    // Déjà planifiée aujourd'hui pour ce type ? Skip
-    if (existingSources.includes(slot.source)) continue;
-
-    const scheduledAt = new Date(today);
+    // Calculer la date cible pour ce slot
+    const scheduledAt = new Date();
     scheduledAt.setHours(slot.hour, 0, 0, 0);
 
     // Si l'heure est déjà passée → planifier pour demain
-    if (scheduledAt <= new Date()) scheduledAt.setDate(scheduledAt.getDate() + 1);
+    if (scheduledAt <= new Date()) {
+      scheduledAt.setDate(scheduledAt.getDate() + 1);
+    }
+
+    // Fenêtre de vérification : le jour de scheduledAt (minuit → minuit+1)
+    const dayStart = new Date(scheduledAt);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    // ✅ Vérifier si cette source est déjà planifiée CE jour-là (peu importe le statut)
+    const { data: existing } = await supabase
+      .from('queue')
+      .select('id')
+      .eq('client_id', client.id)
+      .eq('source', slot.source)
+      .gte('scheduled_at', dayStart.toISOString())
+      .lt('scheduled_at', dayEnd.toISOString())
+      .in('statut', ['planifie', 'publie']);
+
+    if (existing && existing.length > 0) {
+      // Déjà planifiée ou publiée pour ce jour → skip
+      continue;
+    }
 
     await slot.fn(client, scheduledAt);
   }
@@ -510,7 +484,7 @@ async function runScheduler() {
   for (const client of clients) {
     try {
       await schedulePostsForClient(client);
-      await scheduleFixedStoriesForClient(client); // ← nouveau
+      await scheduleFixedStoriesForClient(client);
     } catch (err) {
       console.error(`❌ Erreur planification ${client.name}:`, err.message);
     }
