@@ -67,6 +67,7 @@ router.get('/:clientId/info', requireAuth, async (req, res) => {
 
 // ─────────────────────────────────────────────
 // GET /api/portal/:clientId/posts
+// Retourne les posts ET les stories planifiés
 // ─────────────────────────────────────────────
 router.get('/:clientId/posts', requireAuth, async (req, res) => {
   const { clientId } = req.params;
@@ -91,19 +92,30 @@ router.get('/:clientId/posts', requireAuth, async (req, res) => {
     .eq('client_id', clientId)
     .in('statut', ['planifie', 'en_attente_validation'])
     .order('scheduled_at', { ascending: true })
-    .limit(plan.postsVisibles === 999 ? 100 : plan.postsVisibles + 10);
+    .limit(100);
 
   if (error) return res.status(500).json({ error: error.message });
 
-  let posts = (data||[]);
+  const all = data || [];
+
+  // Séparer posts et stories
+  let posts   = all.filter(p => p.type !== 'story');
+  const stories = all.filter(p => p.type === 'story').slice(0, 20);
+
+  // Limiter les posts selon le forfait
   if (plan.postsVisibles === 1) {
-    const next = posts.find(p => p.type !== 'story');
+    const next = posts.find(p => true);
     posts = next ? [next] : [];
   } else {
-    posts = posts.filter(p => p.type !== 'story');
+    posts = posts.slice(0, plan.postsVisibles === 999 ? 100 : plan.postsVisibles);
   }
 
-  res.json({ posts, plan:(client.plan||'starter').toLowerCase(), planLimits:plan });
+  res.json({
+    posts,
+    stories,
+    plan:       (client.plan||'starter').toLowerCase(),
+    planLimits: plan
+  });
 });
 
 // ─────────────────────────────────────────────
@@ -166,7 +178,6 @@ router.patch('/posts/:postId/caption', requireAuth, async (req, res) => {
 
 // ─────────────────────────────────────────────
 // DELETE /api/portal/posts/:postId
-// Supprimer un post planifié
 // ─────────────────────────────────────────────
 router.delete('/posts/:postId', requireAuth, async (req, res) => {
   const { postId } = req.params;
@@ -201,7 +212,6 @@ router.post('/:clientId/special-post', requireAuth, async (req, res) => {
 
     const plan = getPlan(client);
 
-    // Vérification quota STARTER
     if (plan.postsSpeciauxMax < 999) {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -217,7 +227,6 @@ router.post('/:clientId/special-post', requireAuth, async (req, res) => {
       }
     }
 
-    // Génération caption IA
     let caption = manual_caption || message;
     if (let_ai_decide && message) {
       const response = await anthropic.messages.create({
@@ -265,12 +274,10 @@ Retourne uniquement la caption.`
 
     if (error) return res.status(500).json({ error:error.message });
 
-    // Notification CM
     await sendEmail(
       process.env.GMAIL_USER,
       `[SocialAI] Post spécial — ${client.name}`,
-      `
-      <div style="font-family:sans-serif;max-width:500px;padding:24px;background:#0d0d14;color:#f5f4f0;border-radius:12px">
+      `<div style="font-family:sans-serif;max-width:500px;padding:24px;background:#0d0d14;color:#f5f4f0;border-radius:12px">
         <div style="font-size:18px;font-weight:700;margin-bottom:16px">⭐ Nouveau post spécial</div>
         <p style="color:#c8c6be"><strong style="color:#f5f4f0">${client.name}</strong> a demandé un post spécial.</p>
         <div style="background:#1a1a26;border:1px solid #3a3a50;border-radius:8px;padding:14px;margin:12px 0">
@@ -295,7 +302,6 @@ Retourne uniquement la caption.`
 
 // ─────────────────────────────────────────────
 // POST /api/portal/:clientId/help-request
-// Demande d'aide au CM — envoie un email
 // ─────────────────────────────────────────────
 router.post('/:clientId/help-request', requireAuth, async (req, res) => {
   const { clientId } = req.params;
@@ -312,38 +318,29 @@ router.post('/:clientId/help-request', requireAuth, async (req, res) => {
   };
 
   const subjectLabels = {
-    modification_post: '✏️ Modifier un post planifié',
-    contenu_urgent:    '⚡ Contenu urgent',
-    probleme_technique:'🔧 Problème technique',
-    strategie:         '🎯 Question stratégie',
-    autre:             '💬 Autre demande'
+    modification_post:  '✏️ Modifier un post planifié',
+    contenu_urgent:     '⚡ Contenu urgent',
+    probleme_technique: '🔧 Problème technique',
+    strategie:          '🎯 Question stratégie',
+    autre:              '💬 Autre demande'
   };
 
   try {
     await sendEmail(
       process.env.GMAIL_USER,
       `[SocialAI] ${subjectLabels[subject]||subject} — ${clientName||clientId}`,
-      `
-      <div style="font-family:sans-serif;max-width:500px;padding:24px;background:#0d0d14;color:#f5f4f0;border-radius:12px">
+      `<div style="font-family:sans-serif;max-width:500px;padding:24px;background:#0d0d14;color:#f5f4f0;border-radius:12px">
         <div style="font-size:18px;font-weight:700;margin-bottom:16px">💬 Demande d'aide client</div>
         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-          <span style="font-size:12px;padding:3px 10px;border-radius:10px;background:#1a1a26;border:1px solid #3a3a50;color:#c8c6be">
-            ${subjectLabels[subject]||subject}
-          </span>
-          <span style="font-size:12px;padding:3px 10px;border-radius:10px;background:#1a1a26;border:1px solid #3a3a50;color:#ffb340">
-            ${urgencyLabels[urgency]||urgency}
-          </span>
+          <span style="font-size:12px;padding:3px 10px;border-radius:10px;background:#1a1a26;border:1px solid #3a3a50;color:#c8c6be">${subjectLabels[subject]||subject}</span>
+          <span style="font-size:12px;padding:3px 10px;border-radius:10px;background:#1a1a26;border:1px solid #3a3a50;color:#ffb340">${urgencyLabels[urgency]||urgency}</span>
         </div>
-        <p style="color:#c8c6be;margin-bottom:12px">
-          De : <strong style="color:#f5f4f0">${clientName||'Client'}</strong>
-        </p>
+        <p style="color:#c8c6be;margin-bottom:12px">De : <strong style="color:#f5f4f0">${clientName||'Client'}</strong></p>
         <div style="background:#1a1a26;border:1px solid #3a3a50;border-radius:8px;padding:14px;margin-bottom:16px">
           <div style="font-size:11px;color:#7a7870;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Message</div>
           <div style="font-size:14px;color:#f5f4f0;line-height:1.6;white-space:pre-wrap">${message}</div>
         </div>
-        <div style="font-size:12px;color:#7a7870">
-          📅 ${new Date().toLocaleString('fr-FR')} · Client ID : ${clientId}
-        </div>
+        <div style="font-size:12px;color:#7a7870">📅 ${new Date().toLocaleString('fr-FR')} · Client ID : ${clientId}</div>
       </div>`
     );
 
