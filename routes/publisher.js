@@ -137,15 +137,35 @@ async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, c
   }
 }
 
+// ─────────────────────────────────────────────
+// PUBLICATION STORY — CORRIGÉE
+// - Vérification stricte de l'URL avant envoi
+// - Détection automatique image/vidéo
+// ─────────────────────────────────────────────
 async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, mediaType) {
   try {
+    // Refus strict si URL invalide
+    if (!mediaUrl || typeof mediaUrl !== 'string' || !mediaUrl.startsWith('http')) {
+      throw new Error(`URL média invalide pour la story: "${mediaUrl}"`);
+    }
+
+    // Détection automatique du type
+    const isVideo = mediaType === 'video' ||
+      /\.(mp4|mov|avi|webm)(\?|$)/i.test(mediaUrl);
+
+    const params = {
+      media_type:   'STORIES',
+      access_token: accessToken,
+    };
+    if (isVideo) {
+      params.video_url = mediaUrl;
+    } else {
+      params.image_url = mediaUrl;
+    }
+
     const containerRes = await axios.post(
       `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
-      { params: {
-        image_url: mediaType === 'image' ? mediaUrl : undefined,
-        video_url: mediaType === 'video' ? mediaUrl : undefined,
-        media_type: 'STORIES', access_token: accessToken
-      }}
+      { params }
     );
     const containerId = containerRes.data.id;
     console.log(`  ⏳ Container story créé (${containerId}), attente...`);
@@ -163,7 +183,6 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
 
 // ─────────────────────────────────────────────
 // MARQUER LE MÉDIA COMME UTILISÉ
-// Libère aussi la réservation et incrémente use_count
 // ─────────────────────────────────────────────
 async function markMediaAsUsed(mediaId) {
   if (!mediaId) return;
@@ -195,8 +214,8 @@ async function processQueue() {
 
   if (!accountsData || accountsData.length === 0) return;
 
-  const validClientIds    = accountsData.map(a => a.client_id);
-  const accountsByClient  = {};
+  const validClientIds   = accountsData.map(a => a.client_id);
+  const accountsByClient = {};
   accountsData.forEach(a => { accountsByClient[a.client_id] = a; });
 
   const { data: items, error } = await supabase
@@ -229,7 +248,7 @@ async function processQueue() {
       }
 
       let result;
-      const mediaIdsUsed = []; // Médias à marquer comme utilisés après publication
+      const mediaIdsUsed = [];
 
       if (item.type === 'carousel') {
         let mediaUrls = item.media_urls || [];
@@ -247,17 +266,33 @@ async function processQueue() {
 
       } else if (item.type === 'story') {
         let storyUrl = item.media_url;
+
+        // Récupérer l'URL depuis la table media si absente
         if (!storyUrl && item.media_id) {
           const { data: media } = await supabase
-            .from('media').select('url').eq('id', item.media_id).single();
+            .from('media').select('url, type').eq('id', item.media_id).single();
           if (media?.url) storyUrl = media.url;
         }
-        if (!storyUrl) throw new Error('Story sans media_url');
-        console.log(`📖 Publication story pour ${client.name}`);
+
+        // ── Refus strict si pas d'URL valide ──
+        if (!storyUrl || !storyUrl.startsWith('http')) {
+          console.warn(`⚠️ ${client.name} — Story ignorée (pas de média valide) — source: ${item.source}`);
+          await supabase.from('queue').update({
+            statut: 'erreur',
+            error_message: 'Aucun média disponible pour cette story'
+          }).eq('id', item.id);
+          continue;
+        }
+
+        console.log(`📖 Publication story pour ${client.name} (source: ${item.source})`);
+        const isVideo = /\.(mp4|mov|avi|webm)(\?|$)/i.test(storyUrl);
         result = await publishStoryToInstagram(
-          socialAccount.access_token, socialAccount.account_id, storyUrl, 'image'
+          socialAccount.access_token, socialAccount.account_id,
+          storyUrl,
+          isVideo ? 'video' : 'image'
         );
-        // Ne pas marquer le média du repost comme utilisé (il l'est déjà)
+
+        // Ne pas marquer comme utilisé pour les reposts
         if (item.media_id && item.source !== 'story_repost_post') {
           mediaIdsUsed.push(item.media_id);
         }
@@ -278,7 +313,6 @@ async function processQueue() {
       }
 
       if (result.success) {
-        // Mettre à jour la queue
         await supabase.from('queue').update({
           statut:            'publie',
           published_at:      now.toISOString(),
@@ -286,7 +320,6 @@ async function processQueue() {
           instagram_post_id: result.postId
         }).eq('id', item.id);
 
-        // MARQUER LES MÉDIAS COMME UTILISÉS — empêche toute réutilisation
         for (const mediaId of mediaIdsUsed) {
           await markMediaAsUsed(mediaId);
         }
@@ -294,7 +327,6 @@ async function processQueue() {
         console.log(`✅ Publié pour ${client.name} — ${item.type}${mediaIdsUsed.length ? ` (${mediaIdsUsed.length} média(s) marqué(s) utilisé(s))` : ''}`);
 
       } else {
-        // En cas d'échec : libérer la réservation du média pour ne pas le bloquer
         if (item.media_id) {
           await supabase.from('media').update({ reserved: false, reserved_at: null }).eq('id', item.media_id);
         }
@@ -306,7 +338,6 @@ async function processQueue() {
 
     } catch (err) {
       console.error(`❌ Erreur traitement item ${item.id}:`, err.message);
-      // Libérer la réservation en cas d'erreur
       if (item.media_id) {
         await supabase.from('media').update({ reserved: false, reserved_at: null }).eq('id', item.media_id);
       }
