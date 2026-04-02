@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios     = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 const nodemailer = require('nodemailer');
@@ -14,7 +14,7 @@ async function sendLowContentAlert(client) {
     });
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
-      to: process.env.GMAIL_USER,
+      to:   process.env.GMAIL_USER,
       subject: `🚨 URGENT — Contenu faible pour ${client.name}`,
       text: `Le compte de votre client ${client.name} manque de contenu.\nIl reste moins de 5 médias disponibles.\n---\nSocialAI — Alerte automatique`
     });
@@ -26,7 +26,7 @@ async function sendLowContentAlert(client) {
 
 async function generateCaption(client, mediaType, topPosts = []) {
   const topPostsContext = topPosts.length > 0
-    ? `\nVoici les posts qui ont le mieux marché pour ce compte :\n${topPosts.map(p => `- "${p.caption}" (${p.likes || 0} likes, ${p.comments || 0} commentaires)`).join('\n')}`
+    ? `\nVoici les posts qui ont le mieux marché :\n${topPosts.map(p => `- "${p.caption}" (${p.likes || 0} likes, ${p.comments || 0} commentaires)`).join('\n')}`
     : '';
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 400,
@@ -113,10 +113,10 @@ async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, c
         }}
       );
       const childId = childRes.data.id;
-      console.log(`  ⏳ Container slide créé (${childId}), attente validation Meta...`);
+      console.log(`  ⏳ Container slide créé (${childId}), attente...`);
       await waitForContainer(accessToken, childId);
       childIds.push(childId);
-      console.log(`  📎 Slide ${childIds.length}/${mediaUrls.length} prête (${childId})`);
+      console.log(`  📎 Slide ${childIds.length}/${mediaUrls.length} prête`);
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
     const parentRes = await axios.post(
@@ -148,7 +148,7 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
       }}
     );
     const containerId = containerRes.data.id;
-    console.log(`  ⏳ Container story créé (${containerId}), attente validation Meta...`);
+    console.log(`  ⏳ Container story créé (${containerId}), attente...`);
     await waitForContainer(accessToken, containerId);
     const publishRes = await axios.post(
       `https://graph.instagram.com/v19.0/${igAccountId}/media_publish`, null,
@@ -163,26 +163,24 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
 
 // ─────────────────────────────────────────────
 // MARQUER LE MÉDIA COMME UTILISÉ
-// Empêche la réutilisation du même visuel
+// Libère aussi la réservation et incrémente use_count
 // ─────────────────────────────────────────────
 async function markMediaAsUsed(mediaId) {
   if (!mediaId) return;
-  await supabase.from('media').update({
-    used:         true,
-    last_used_at: new Date().toISOString(),
-    use_count:    supabase.rpc ? undefined : undefined // use_count incrémenté via SQL ci-dessous
-  }).eq('id', mediaId);
-
-  // Incrémenter use_count proprement
-  await supabase.rpc('increment_use_count', { media_id: mediaId }).catch(() => {
-    // Si la fonction RPC n'existe pas, on fait une requête manuelle
-    supabase.from('media').select('use_count').eq('id', mediaId).single()
-      .then(({ data }) => {
-        if (data) supabase.from('media').update({ use_count: (data.use_count || 0) + 1 }).eq('id', mediaId);
-      });
-  });
-
-  console.log(`🔒 Média ${mediaId} marqué comme utilisé`);
+  try {
+    const { data: current } = await supabase
+      .from('media').select('use_count').eq('id', mediaId).single();
+    await supabase.from('media').update({
+      used:         true,
+      reserved:     false,
+      reserved_at:  null,
+      last_used_at: new Date().toISOString(),
+      use_count:    (current?.use_count || 0) + 1
+    }).eq('id', mediaId);
+    console.log(`🔒 Média ${mediaId} marqué utilisé (use_count: ${(current?.use_count || 0) + 1})`);
+  } catch(err) {
+    console.error(`❌ Erreur markMediaAsUsed ${mediaId}:`, err.message);
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -197,8 +195,8 @@ async function processQueue() {
 
   if (!accountsData || accountsData.length === 0) return;
 
-  const validClientIds = accountsData.map(a => a.client_id);
-  const accountsByClient = {};
+  const validClientIds    = accountsData.map(a => a.client_id);
+  const accountsByClient  = {};
   accountsData.forEach(a => { accountsByClient[a.client_id] = a; });
 
   const { data: items, error } = await supabase
@@ -231,8 +229,7 @@ async function processQueue() {
       }
 
       let result;
-      // Collecter les IDs médias utilisés pour les marquer après publication
-      const mediaIdsUsed = [];
+      const mediaIdsUsed = []; // Médias à marquer comme utilisés après publication
 
       if (item.type === 'carousel') {
         let mediaUrls = item.media_urls || [];
@@ -260,8 +257,7 @@ async function processQueue() {
         result = await publishStoryToInstagram(
           socialAccount.access_token, socialAccount.account_id, storyUrl, 'image'
         );
-        // Pour les stories : on marque le média utilisé SEULEMENT si ce n'est pas un repost
-        // (le repost utilise un média déjà publié qu'on ne doit pas bloquer)
+        // Ne pas marquer le média du repost comme utilisé (il l'est déjà)
         if (item.media_id && item.source !== 'story_repost_post') {
           mediaIdsUsed.push(item.media_id);
         }
@@ -282,16 +278,15 @@ async function processQueue() {
       }
 
       if (result.success) {
-        // ── Mettre à jour la queue ──────────────────────────────────────────
+        // Mettre à jour la queue
         await supabase.from('queue').update({
-          statut: 'publie',
-          published_at: now.toISOString(),
+          statut:            'publie',
+          published_at:      now.toISOString(),
           caption,
           instagram_post_id: result.postId
         }).eq('id', item.id);
 
-        // ── MARQUER LES MÉDIAS COMME UTILISÉS ─────────────────────────────
-        // C'est LE fix principal : empêche la répétition du même visuel
+        // MARQUER LES MÉDIAS COMME UTILISÉS — empêche toute réutilisation
         for (const mediaId of mediaIdsUsed) {
           await markMediaAsUsed(mediaId);
         }
@@ -299,6 +294,10 @@ async function processQueue() {
         console.log(`✅ Publié pour ${client.name} — ${item.type}${mediaIdsUsed.length ? ` (${mediaIdsUsed.length} média(s) marqué(s) utilisé(s))` : ''}`);
 
       } else {
+        // En cas d'échec : libérer la réservation du média pour ne pas le bloquer
+        if (item.media_id) {
+          await supabase.from('media').update({ reserved: false, reserved_at: null }).eq('id', item.media_id);
+        }
         await supabase.from('queue').update({
           statut: 'erreur', error_message: result.error
         }).eq('id', item.id);
@@ -307,6 +306,10 @@ async function processQueue() {
 
     } catch (err) {
       console.error(`❌ Erreur traitement item ${item.id}:`, err.message);
+      // Libérer la réservation en cas d'erreur
+      if (item.media_id) {
+        await supabase.from('media').update({ reserved: false, reserved_at: null }).eq('id', item.media_id);
+      }
       await supabase.from('queue').update({
         statut: 'erreur', error_message: err.message
       }).eq('id', item.id);

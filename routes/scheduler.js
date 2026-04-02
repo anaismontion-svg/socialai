@@ -44,12 +44,8 @@ const STORY_CHAT_CATEGORIES = [
 ];
 
 // ─────────────────────────────────────────────
-// UTILITAIRES
+// DATES
 // ─────────────────────────────────────────────
-function getPlan(client) {
-  return PLANS[(client.plan || 'starter').toLowerCase()] || PLANS.starter;
-}
-
 function getNextPublishDate(lastDate, frequency) {
   const date = new Date(lastDate || Date.now());
   if (frequency === 'daily') {
@@ -69,9 +65,14 @@ async function getClientFrequency(client) {
   return getPlan(client).postsPerWeek >= 7 ? 'daily' : '3x_week';
 }
 
-// Récupère un média non utilisé, en rotation parmi les catégories disponibles
+// ─────────────────────────────────────────────
+// SÉLECTION MÉDIA AVEC RÉSERVATION IMMÉDIATE
+// Empêche 2 posts d'utiliser le même visuel
+// ─────────────────────────────────────────────
 async function getAvailableMedia(clientId, categories = null) {
-  // Si plusieurs catégories possibles, on essaie dans l'ordre aléatoire
+  let candidates = [];
+
+  // Si des catégories sont spécifiées, chercher dans cet ordre
   if (Array.isArray(categories) && categories.length > 0) {
     const shuffled = [...categories].sort(() => Math.random() - 0.5);
     for (const cat of shuffled) {
@@ -79,70 +80,127 @@ async function getAvailableMedia(clientId, categories = null) {
         .from('media').select('*')
         .eq('client_id', clientId)
         .eq('used', false)
+        .eq('reserved', false)
         .eq('story_category', cat)
-        .order('created_at', { ascending: true }) // FIFO pour éviter les répétitions
-        .limit(1);
-      if (data?.[0]) return data[0];
+        .order('created_at', { ascending: true })
+        .limit(10);
+      if (data?.length) { candidates = data; break; }
     }
   }
-  // Fallback : n'importe quel média non utilisé
-  const { data } = await supabase
-    .from('media').select('*')
-    .eq('client_id', clientId)
-    .eq('used', false)
-    .order('created_at', { ascending: true })
-    .limit(1);
-  return data?.[0] || null;
+
+  // Fallback : n'importe quel média non utilisé et non réservé
+  if (!candidates.length) {
+    const { data } = await supabase
+      .from('media').select('*')
+      .eq('client_id', clientId)
+      .eq('used', false)
+      .eq('reserved', false)
+      .order('created_at', { ascending: true })
+      .limit(10);
+    candidates = data || [];
+  }
+
+  // Si tous les médias sont réservés/utilisés → réutiliser les réservés
+  // (évite le blocage si peu de médias disponibles)
+  if (!candidates.length) {
+    console.warn(`⚠️ ${clientId} — Plus de médias libres, réutilisation des réservés`);
+    const { data } = await supabase
+      .from('media').select('*')
+      .eq('client_id', clientId)
+      .eq('used', false)
+      .order('reserved_at', { ascending: true }) // Les plus anciens en premier
+      .limit(10);
+    candidates = data || [];
+  }
+
+  if (!candidates.length) return null;
+
+  // Choisir aléatoirement parmi les candidats pour varier
+  const chosen = candidates[Math.floor(Math.random() * Math.min(candidates.length, 5))];
+
+  // RÉSERVER IMMÉDIATEMENT le média choisi
+  await supabase.from('media').update({
+    reserved:    true,
+    reserved_at: new Date().toISOString()
+  }).eq('id', chosen.id);
+
+  console.log(`🔒 Média réservé : ${chosen.filename || chosen.id}`);
+  return chosen;
 }
 
-// Récupère un média différent de celui utilisé hier pour cette story
+// Variante avec rotation (évite le même média qu'hier pour une source donnée)
 async function getMediaRotation(clientId, source, categories = null) {
-  // Trouver le média utilisé hier pour cette source
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-
+  // Trouver le média utilisé récemment pour cette source
   const { data: lastUsed } = await supabase
     .from('queue')
-    .select('media_id, media_url')
+    .select('media_id')
     .eq('client_id', clientId)
     .eq('source', source)
-    .gte('created_at', yesterday.toISOString())
+    .not('media_id', 'is', null)
     .order('created_at', { ascending: false })
-    .limit(1);
+    .limit(3);
 
-  const lastMediaId = lastUsed?.[0]?.media_id;
+  const recentMediaIds = lastUsed?.map(r => r.media_id).filter(Boolean) || [];
 
-  // Récupérer un média différent
+  let candidates = [];
+
   if (Array.isArray(categories) && categories.length > 0) {
     const shuffled = [...categories].sort(() => Math.random() - 0.5);
     for (const cat of shuffled) {
-      let query = supabase.from('media').select('*')
+      const { data } = await supabase
+        .from('media').select('*')
         .eq('client_id', clientId)
+        .eq('used', false)
+        .eq('reserved', false)
         .eq('story_category', cat)
         .order('created_at', { ascending: true })
-        .limit(5);
-      const { data: candidates } = await query;
-      if (!candidates?.length) continue;
-      // Choisir un média différent du dernier
-      const different = candidates.find(m => m.id !== lastMediaId);
-      if (different) return different;
-      if (candidates[0]) return candidates[0]; // Fallback si un seul média
+        .limit(10);
+      if (data?.length) { candidates = [...candidates, ...data]; }
     }
   }
 
-  // Fallback général avec rotation
-  let query = supabase.from('media').select('*')
-    .eq('client_id', clientId)
-    .order('created_at', { ascending: true })
-    .limit(10);
-  const { data: all } = await query;
-  if (!all?.length) return null;
-  const different = all.find(m => m.id !== lastMediaId);
-  return different || all[0];
+  if (!candidates.length) {
+    const { data } = await supabase
+      .from('media').select('*')
+      .eq('client_id', clientId)
+      .eq('used', false)
+      .eq('reserved', false)
+      .order('created_at', { ascending: true })
+      .limit(20);
+    candidates = data || [];
+  }
+
+  if (!candidates.length) {
+    // Fallback : médias réservés (peu de contenu disponible)
+    const { data } = await supabase
+      .from('media').select('*')
+      .eq('client_id', clientId)
+      .eq('used', false)
+      .order('reserved_at', { ascending: true })
+      .limit(10);
+    candidates = data || [];
+  }
+
+  if (!candidates.length) return null;
+
+  // Privilégier un média différent des récents
+  const different = candidates.filter(m => !recentMediaIds.includes(m.id));
+  const chosen = different.length > 0
+    ? different[Math.floor(Math.random() * Math.min(different.length, 5))]
+    : candidates[Math.floor(Math.random() * Math.min(candidates.length, 5))];
+
+  // Réserver immédiatement
+  await supabase.from('media').update({
+    reserved:    true,
+    reserved_at: new Date().toISOString()
+  }).eq('id', chosen.id);
+
+  console.log(`🔒 Média réservé (rotation) : ${chosen.filename || chosen.id} — catégorie: ${chosen.story_category || 'générale'}`);
+  return chosen;
 }
 
 // ─────────────────────────────────────────────
-// ANTI-DOUBLON — 1 story par type par 24h
+// ANTI-DOUBLON STORIES — 1 par type par 24h
 // ─────────────────────────────────────────────
 async function storyDejaPlanifeePour(clientId, source, depuisDate) {
   const jusqu = new Date(depuisDate);
@@ -159,7 +217,7 @@ async function storyDejaPlanifeePour(clientId, source, depuisDate) {
 }
 
 // ─────────────────────────────────────────────
-// NETTOYAGE DES DOUBLONS
+// NETTOYAGE DES DOUBLONS STORIES
 // ─────────────────────────────────────────────
 async function cleanDuplicateStories(clientId) {
   const sources = [
@@ -170,20 +228,29 @@ async function cleanDuplicateStories(clientId) {
   ];
   for (const source of sources) {
     const { data: stories } = await supabase
-      .from('queue').select('id, scheduled_at')
+      .from('queue').select('id, scheduled_at, media_id')
       .eq('client_id', clientId).eq('source', source)
       .eq('statut', 'planifie')
       .order('scheduled_at', { ascending: true });
     if (!stories || stories.length <= 1) continue;
     const byDay = {};
     const toDelete = [];
+    const mediaToFree = [];
     for (const s of stories) {
       const day = new Date(s.scheduled_at).toDateString();
-      if (byDay[day]) toDelete.push(s.id);
-      else byDay[day] = s.id;
+      if (byDay[day]) {
+        toDelete.push(s.id);
+        if (s.media_id) mediaToFree.push(s.media_id);
+      } else {
+        byDay[day] = s.id;
+      }
     }
     if (toDelete.length > 0) {
       await supabase.from('queue').delete().in('id', toDelete);
+      // Libérer les médias réservés des doublons supprimés
+      if (mediaToFree.length > 0) {
+        await supabase.from('media').update({ reserved: false, reserved_at: null }).in('id', mediaToFree);
+      }
       console.log(`🗑️ ${toDelete.length} doublon(s) supprimé(s) pour "${source}"`);
     }
   }
@@ -191,7 +258,6 @@ async function cleanDuplicateStories(clientId) {
 
 // ─────────────────────────────────────────────
 // STORY 1 — PRÉSENTATION CHATS / CHATONS
-// Photo différente chaque jour + caption IA
 // ─────────────────────────────────────────────
 async function planifierStoryChatsChatons(client, scheduledAt) {
   const media = await getMediaRotation(client.id, 'story_chats_chatons', STORY_CHAT_CATEGORIES);
@@ -199,8 +265,6 @@ async function planifierStoryChatsChatons(client, scheduledAt) {
     console.warn(`⚠️ ${client.name} — Story chats/chatons : aucun média disponible`);
     return false;
   }
-
-  // Générer une caption courte et variée avec l'IA
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 150, temperature: 1,
     messages: [{
@@ -220,33 +284,26 @@ Génère une caption TRÈS courte et émotionnelle pour une story Instagram pré
 Retourne uniquement la caption.`
     }]
   });
-
   const caption = response.content[0].text.trim();
-
   await supabase.from('queue').insert({
     client_id: client.id, media_id: media.id, media_url: media.url, caption,
     scheduled_at: scheduledAt.toISOString(),
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_chats_chatons'
   });
-
-  console.log(`📸 Story chats/chatons planifiée pour ${client.name} — média: ${media.story_category || 'général'}`);
+  console.log(`📸 Story chats/chatons planifiée pour ${client.name} — ${media.story_category || 'général'}`);
   return true;
 }
 
 // ─────────────────────────────────────────────
 // STORY 2 — QUI SOMMES-NOUS ?
-// Photo de la chatterie/éleveuse + texte varié
 // ─────────────────────────────────────────────
 async function planifierStoryQuiSommesNous(client, scheduledAt) {
   const media = await getMediaRotation(client.id, 'story_qui_sommes_nous', ['chatterie', 'equipe', 'coulisses', 'elevage']);
-  const mediaUrl = media?.url || null;
-
-  if (!mediaUrl) {
-    console.warn(`⚠️ ${client.name} — Story "qui sommes-nous" : aucun média. Uploadez des photos taggées "chatterie" ou "elevage".`);
+  if (!media?.url) {
+    console.warn(`⚠️ ${client.name} — Story "qui sommes-nous" : uploadez des photos taggées "chatterie" ou "coulisses"`);
     return false;
   }
-
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 120, temperature: 1,
     messages: [{
@@ -261,33 +318,26 @@ Génère une caption TRÈS courte pour une story "qui sommes-nous / présentatio
 Retourne uniquement la caption.`
     }]
   });
-
   const caption = response.content[0].text.trim();
-
   await supabase.from('queue').insert({
-    client_id: client.id, media_id: media?.id || null, media_url: mediaUrl, caption,
+    client_id: client.id, media_id: media.id, media_url: media.url, caption,
     scheduled_at: scheduledAt.toISOString(),
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_qui_sommes_nous'
   });
-
   console.log(`📸 Story "qui sommes-nous" planifiée pour ${client.name}`);
   return true;
 }
 
 // ─────────────────────────────────────────────
 // STORY 3 — ACCOMPAGNEMENT ADOPTION
-// L'IA varie autour du texte de base validé
 // ─────────────────────────────────────────────
 async function planifierStoryAccompagnement(client, scheduledAt) {
-  // Récupérer le texte de base personnalisé (back office) ou utiliser le défaut
   const { data: template } = await supabase
     .from('story_templates').select('content')
     .eq('client_id', client.id).eq('type', 'accompagnement').single();
-
   const texteBase = template?.content?.texte_base || TEXTE_BASE_ACCOMPAGNEMENT;
 
-  // L'IA reformule différemment chaque jour
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 200, temperature: 1,
     messages: [{
@@ -309,37 +359,30 @@ Règles STRICTES :
 Retourne uniquement la caption reformulée.`
     }]
   });
-
   const caption = response.content[0].text.trim();
 
-  // Utiliser un média varié (photo de famille, chaton, accompagnement...)
   const media = await getMediaRotation(client.id, 'story_accompagnement',
     ['famille_adoption', 'chaton_disponible', 'chat_adulte', 'coulisses', 'elevage']);
-  const mediaUrl = media?.url || null;
 
   await supabase.from('queue').insert({
-    client_id: client.id, media_id: media?.id || null, media_url: mediaUrl, caption,
+    client_id: client.id, media_id: media?.id || null, media_url: media?.url || null, caption,
     scheduled_at: scheduledAt.toISOString(),
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_accompagnement'
   });
-
   console.log(`📸 Story accompagnement planifiée pour ${client.name}`);
   return true;
 }
 
 // ─────────────────────────────────────────────
 // STORY 4 — REPOST DU DERNIER POST
-// Reprend le dernier post publié ou planifié
 // ─────────────────────────────────────────────
 async function planifierStoryRepost(client, scheduledAt) {
-  // Chercher le post publié aujourd'hui en priorité
-  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const today    = new Date(); today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-
   let postRef = null;
 
-  // 1. Post publié aujourd'hui
+  // Post publié aujourd'hui en priorité
   const { data: postAujourdhui } = await supabase
     .from('queue').select('media_url, caption, media_id')
     .eq('client_id', client.id)
@@ -347,35 +390,30 @@ async function planifierStoryRepost(client, scheduledAt) {
     .eq('statut', 'publie')
     .gte('published_at', today.toISOString())
     .lt('published_at', tomorrow.toISOString())
-    .order('published_at', { ascending: false })
-    .limit(1);
+    .order('published_at', { ascending: false }).limit(1);
 
   if (postAujourdhui?.[0]) {
     postRef = postAujourdhui[0];
   } else {
-    // 2. Dernier post publié (même si pas aujourd'hui)
+    // Dernier post publié (même si pas aujourd'hui)
     const { data: dernierPost } = await supabase
       .from('queue').select('media_url, caption, media_id')
       .eq('client_id', client.id)
       .in('type', ['post', 'recycled', 'special'])
       .eq('statut', 'publie')
-      .order('published_at', { ascending: false })
-      .limit(1);
-
+      .order('published_at', { ascending: false }).limit(1);
     if (dernierPost?.[0]) postRef = dernierPost[0];
   }
 
   if (!postRef?.media_url) {
-    // 3. Fallback : prochain post planifié
+    // Fallback : prochain post planifié
     const { data: prochainPost } = await supabase
       .from('queue').select('media_url, caption, media_id')
       .eq('client_id', client.id)
       .in('type', ['post', 'recycled', 'special'])
       .eq('statut', 'planifie')
       .gte('scheduled_at', new Date().toISOString())
-      .order('scheduled_at', { ascending: true })
-      .limit(1);
-
+      .order('scheduled_at', { ascending: true }).limit(1);
     if (prochainPost?.[0]) postRef = prochainPost[0];
   }
 
@@ -384,7 +422,6 @@ async function planifierStoryRepost(client, scheduledAt) {
     return false;
   }
 
-  // Caption courte pour le repost
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 80, temperature: 1,
     messages: [{
@@ -392,7 +429,6 @@ async function planifierStoryRepost(client, scheduledAt) {
       content: `Tu gères le compte Instagram de Love Queen Dolls (chatterie Ragdoll).
 Génère une caption ultra-courte pour une story qui reposte ce post :
 "${(postRef.caption || '').slice(0, 100)}"
-
 - Maximum 1 phrase
 - 1 emoji
 - Encourage à voir le post (ex: "Notre post du jour 👆", "Vous avez vu notre dernière publication ? 👀")
@@ -400,29 +436,28 @@ Génère une caption ultra-courte pour une story qui reposte ce post :
 Retourne uniquement la caption.`
     }]
   });
-
   const caption = response.content[0].text.trim();
 
   await supabase.from('queue').insert({
-    client_id: client.id, media_id: postRef.media_id || null,
-    media_url: postRef.media_url, caption,
+    client_id: client.id,
+    media_id:  postRef.media_id || null,
+    media_url: postRef.media_url,
+    caption,
     scheduled_at: scheduledAt.toISOString(),
     type: 'story', platform: 'instagram', statut: 'planifie',
     source: 'story_repost_post'
+    // Pas de réservation média ici : c'est un repost, le média est déjà utilisé
   });
-
   console.log(`📸 Story repost planifiée pour ${client.name}`);
   return true;
 }
 
 // ─────────────────────────────────────────────
-// STORY PERSONNALISÉE À LA DEMANDE (client.html)
-// Appelée depuis client-portal.js
+// STORY PERSONNALISÉE À LA DEMANDE
 // ─────────────────────────────────────────────
 async function planifierStoryPersonnalisee(clientId, message, mediaUrl, scheduledAt) {
   const { data: client } = await supabase.from('clients').select('*').eq('id', clientId).single();
   if (!client) throw new Error('Client introuvable');
-
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-20250514', max_tokens: 150, temperature: 1,
     messages: [{
@@ -430,18 +465,14 @@ async function planifierStoryPersonnalisee(clientId, message, mediaUrl, schedule
       content: `Tu gères le compte Instagram de Love Queen Dolls, chatterie Ragdoll.
 Le client souhaite une story personnalisée avec ce message :
 "${message}"
-
 Génère une caption story adaptée :
 - Maximum 2 phrases
 - 1-2 emojis
 - Ton chaleureux et authentique
-- Adapté à une story Instagram
 Retourne uniquement la caption.`
     }]
   });
-
   const caption = response.content[0].text.trim();
-
   const { data, error } = await supabase.from('queue').insert({
     client_id: clientId, media_url: mediaUrl || null, caption,
     scheduled_at: scheduledAt || new Date().toISOString(),
@@ -449,7 +480,6 @@ Retourne uniquement la caption.`
     source: 'story_personnalisee',
     special_request: true, special_message: message
   }).select().single();
-
   if (error) throw new Error(error.message);
   return { success: true, post: data, caption };
 }
@@ -460,14 +490,13 @@ Retourne uniquement la caption.`
 async function scheduleFixedStoriesForClient(client) {
   if (client.status === 'paused') return;
 
-  // Calculer la base de la prochaine série
   const { data: lastStory } = await supabase
     .from('queue')
     .select('scheduled_at, published_at, statut')
     .eq('client_id', client.id)
     .eq('type', 'story')
     .in('statut', ['planifie', 'en_cours', 'publie'])
-    .not('source', 'eq', 'story_personnalisee') // Ignorer les stories perso pour le calcul
+    .not('source', 'eq', 'story_personnalisee')
     .order('scheduled_at', { ascending: false })
     .limit(1);
 
@@ -476,44 +505,38 @@ async function scheduleFixedStoriesForClient(client) {
     const ref = lastStory[0].published_at || lastStory[0].scheduled_at;
     serieBase = new Date(ref);
     const heuresDepuisRef = (Date.now() - serieBase.getTime()) / (1000 * 60 * 60);
-
     if (heuresDepuisRef < 20) {
       // Stories déjà planifiées pour aujourd'hui → demain à 8h
       serieBase = new Date();
       serieBase.setDate(serieBase.getDate() + 1);
       serieBase.setHours(8, 0, 0, 0);
     } else {
-      // Stories passées → nouvelle série maintenant + 15 min
+      // Stories passées → nouvelle série dans 15 min
       serieBase = new Date();
       serieBase.setMinutes(serieBase.getMinutes() + 15);
     }
   } else {
-    // Aucune story → commencer dans 15 minutes
     serieBase = new Date();
     serieBase.setMinutes(serieBase.getMinutes() + 15);
   }
 
-  // Les 4 stories espacées de 3h sur la journée
+  // 4 stories espacées de 3h
   const storySlots = [
-    { hoursOffset: 0, fn: planifierStoryChatsChatons,    source: 'story_chats_chatons'    },
-    { hoursOffset: 3, fn: planifierStoryQuiSommesNous,   source: 'story_qui_sommes_nous'  },
-    { hoursOffset: 6, fn: planifierStoryAccompagnement,  source: 'story_accompagnement'   },
-    { hoursOffset: 9, fn: planifierStoryRepost,          source: 'story_repost_post'      },
+    { hoursOffset: 0, fn: planifierStoryChatsChatons,   source: 'story_chats_chatons'   },
+    { hoursOffset: 3, fn: planifierStoryQuiSommesNous,  source: 'story_qui_sommes_nous' },
+    { hoursOffset: 6, fn: planifierStoryAccompagnement, source: 'story_accompagnement'  },
+    { hoursOffset: 9, fn: planifierStoryRepost,         source: 'story_repost_post'     },
   ];
 
   let storyPlanifiees = 0;
-
   for (const slot of storySlots) {
     const scheduledAt = new Date(serieBase);
     scheduledAt.setHours(scheduledAt.getHours() + slot.hoursOffset);
-
-    // ANTI-DOUBLON : vérifier si cette source est déjà planifiée dans les 26h
     const dejaPresente = await storyDejaPlanifeePour(client.id, slot.source, serieBase);
     if (dejaPresente) {
       console.log(`⏭️ ${client.name} — "${slot.source}" déjà planifiée, ignorée`);
       continue;
     }
-
     try {
       const ok = await slot.fn(client, scheduledAt);
       if (ok) storyPlanifiees++;
@@ -533,10 +556,8 @@ async function scheduleFixedStoriesForClient(client) {
 // RECYCLAGE
 // ─────────────────────────────────────────────
 async function selectRecyclablePost(clientId) {
-  const twoMonthsAgo = new Date();
-  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const twoMonthsAgo = new Date(); twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+  const oneWeekAgo   = new Date(); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   const { data: recentRecycled } = await supabase
     .from('queue').select('id').eq('client_id', clientId)
     .eq('type', 'recycled').gte('created_at', oneWeekAgo.toISOString());
@@ -566,10 +587,9 @@ Réécris plus engageant. Max 150 mots. Retourne uniquement la caption.` }]
 // ─────────────────────────────────────────────
 async function schedulePostsForClient(client) {
   if (client.status === 'paused') { console.log(`⏸️ ${client.name} en pause`); return; }
-
-  const plan = getPlan(client);
+  const plan      = getPlan(client);
   const frequency = await getClientFrequency(client);
-  const nextWeek = new Date(); nextWeek.setDate(nextWeek.getDate() + 7);
+  const nextWeek  = new Date(); nextWeek.setDate(nextWeek.getDate() + 7);
 
   const { data: existingPosts } = await supabase
     .from('queue').select('id, scheduled_at')
@@ -588,7 +608,7 @@ async function schedulePostsForClient(client) {
     .eq('client_id', client.id).in('type', ['post', 'recycled'])
     .order('scheduled_at', { ascending: false }).limit(1);
 
-  let lastDate = lastPost?.[0]?.scheduled_at || new Date();
+  let lastDate       = lastPost?.[0]?.scheduled_at || new Date();
   const recycleIndex = plan.recyclage ? Math.floor(toCreate / 2) : -1;
 
   for (let i = 0; i < toCreate; i++) {
@@ -599,27 +619,39 @@ async function schedulePostsForClient(client) {
     if (i === recycleIndex && plan.recyclage) {
       const recyclable = await selectRecyclablePost(client.id);
       if (recyclable) {
-        media = recyclable;
-        caption = await generateRecycledCaption(recyclable.caption, client, recyclable.performance_score,
+        media    = recyclable;
+        caption  = await generateRecycledCaption(recyclable.caption, client, recyclable.performance_score,
           { likes: recyclable.likes, comments: recyclable.comments, reach: recyclable.reach });
         postType = 'recycled';
-        await supabase.from('media').update({ recycled: true, last_used_at: new Date().toISOString(), use_count: (recyclable.use_count || 0) + 1 }).eq('id', recyclable.id);
+        await supabase.from('media').update({
+          recycled:    true,
+          reserved:    true,
+          reserved_at: new Date().toISOString(),
+          last_used_at: new Date().toISOString(),
+          use_count:   (recyclable.use_count || 0) + 1
+        }).eq('id', recyclable.id);
       }
     }
 
     if (!media) {
-      media = await getAvailableMedia(client.id);
+      // getAvailableMedia réserve automatiquement le média choisi
+      media    = await getAvailableMedia(client.id);
       const topPosts = await getTopPosts(client.id);
-      caption = await generateCaption(client, 'image', topPosts);
+      caption  = await generateCaption(client, 'image', topPosts);
       postType = 'post';
     }
 
-    if (!media?.url) { console.warn(`⚠️ ${client.name} — aucun média, post ignoré`); continue; }
+    if (!media?.url) { console.warn(`⚠️ ${client.name} — aucun média disponible, post ignoré`); continue; }
 
     await supabase.from('queue').insert({
-      client_id: client.id, media_id: media.id || null, media_url: media.url, caption,
+      client_id:    client.id,
+      media_id:     media.id || null,
+      media_url:    media.url,
+      caption,
       scheduled_at: scheduledAt.toISOString(),
-      type: postType, platform: 'instagram', statut: 'planifie'
+      type:         postType,
+      platform:     'instagram',
+      statut:       'planifie'
     });
     console.log(`📌 Post "${postType}" planifié pour ${client.name} le ${scheduledAt.toLocaleDateString('fr-FR')}`);
   }
@@ -630,7 +662,8 @@ async function schedulePostsForClient(client) {
 // ─────────────────────────────────────────────
 async function runScheduler() {
   console.log('🗓️ Lancement du planificateur...');
-  const { data: clients } = await supabase.from('clients').select('*').in('status', ['active', 'paused']);
+  const { data: clients } = await supabase
+    .from('clients').select('*').in('status', ['active', 'paused']);
   if (!clients?.length) { console.log('Aucun client'); return; }
 
   for (const client of clients) {
