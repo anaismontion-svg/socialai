@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 const nodemailer = require('nodemailer');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 async function sendLowContentAlert(client) {
@@ -28,10 +28,8 @@ async function generateCaption(client, mediaType, topPosts = []) {
   const topPostsContext = topPosts.length > 0
     ? `\nVoici les posts qui ont le mieux marché pour ce compte :\n${topPosts.map(p => `- "${p.caption}" (${p.likes || 0} likes, ${p.comments || 0} commentaires)`).join('\n')}`
     : '';
-
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 400,
+    model: 'claude-sonnet-4-20250514', max_tokens: 400,
     messages: [{
       role: 'user',
       content: `Tu es un expert en community management Instagram et Facebook.
@@ -40,7 +38,7 @@ Secteur : ${client.sector || 'non précisé'}
 Ton souhaité : ${client.tone || 'professionnel'}
 Type de média : ${mediaType}
 ${topPostsContext}
-Génère une caption engageante pour Instagram/Facebook. 
+Génère une caption engageante pour Instagram/Facebook.
 - Commence par une phrase accrocheuse
 - Utilise des émojis pertinents (3-5 max)
 - Ajoute 5 hashtags pertinents à la fin
@@ -54,12 +52,9 @@ Génère une caption engageante pour Instagram/Facebook.
 
 async function getTopPosts(clientId) {
   const { data } = await supabase
-    .from('queue')
-    .select('caption, likes, comments')
-    .eq('client_id', clientId)
-    .eq('statut', 'publie')
-    .order('likes', { ascending: false })
-    .limit(3);
+    .from('queue').select('caption, likes, comments')
+    .eq('client_id', clientId).eq('statut', 'publie')
+    .order('likes', { ascending: false }).limit(3);
   return data || [];
 }
 
@@ -166,14 +161,38 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
   }
 }
 
-// ── Moteur principal de publication ──────────────────────────────────────────
+// ─────────────────────────────────────────────
+// MARQUER LE MÉDIA COMME UTILISÉ
+// Empêche la réutilisation du même visuel
+// ─────────────────────────────────────────────
+async function markMediaAsUsed(mediaId) {
+  if (!mediaId) return;
+  await supabase.from('media').update({
+    used:         true,
+    last_used_at: new Date().toISOString(),
+    use_count:    supabase.rpc ? undefined : undefined // use_count incrémenté via SQL ci-dessous
+  }).eq('id', mediaId);
+
+  // Incrémenter use_count proprement
+  await supabase.rpc('increment_use_count', { media_id: mediaId }).catch(() => {
+    // Si la fonction RPC n'existe pas, on fait une requête manuelle
+    supabase.from('media').select('use_count').eq('id', mediaId).single()
+      .then(({ data }) => {
+        if (data) supabase.from('media').update({ use_count: (data.use_count || 0) + 1 }).eq('id', mediaId);
+      });
+  });
+
+  console.log(`🔒 Média ${mediaId} marqué comme utilisé`);
+}
+
+// ─────────────────────────────────────────────
+// MOTEUR PRINCIPAL DE PUBLICATION
+// ─────────────────────────────────────────────
 async function processQueue() {
   const now = new Date();
 
-  // Récupérer les clients qui ont un compte Instagram actif
   const { data: accountsData } = await supabase
-    .from('social_accounts')
-    .select('client_id, access_token, account_id')
+    .from('social_accounts').select('client_id, access_token, account_id')
     .eq('platform', 'instagram');
 
   if (!accountsData || accountsData.length === 0) return;
@@ -182,10 +201,8 @@ async function processQueue() {
   const accountsByClient = {};
   accountsData.forEach(a => { accountsByClient[a.client_id] = a; });
 
-  // Ne prendre QUE les items des clients avec un compte Instagram
   const { data: items, error } = await supabase
-    .from('queue')
-    .select('*, clients(*)')
+    .from('queue').select('*, clients(*)')
     .eq('statut', 'planifie')
     .lte('scheduled_at', now.toISOString())
     .in('client_id', validClientIds)
@@ -214,13 +231,16 @@ async function processQueue() {
       }
 
       let result;
+      // Collecter les IDs médias utilisés pour les marquer après publication
+      const mediaIdsUsed = [];
 
       if (item.type === 'carousel') {
         let mediaUrls = item.media_urls || [];
         if (!mediaUrls.length && item.media_ids?.length) {
           const { data: medias } = await supabase
-            .from('media').select('url').in('id', item.media_ids);
+            .from('media').select('url, id').in('id', item.media_ids);
           mediaUrls = medias?.map(m => m.url) || [];
+          medias?.forEach(m => mediaIdsUsed.push(m.id));
         }
         if (mediaUrls.length < 2) throw new Error('Carousel requiert au moins 2 slides');
         console.log(`🎠 Publication carousel ${mediaUrls.length} slides pour ${client.name}`);
@@ -236,10 +256,15 @@ async function processQueue() {
           if (media?.url) storyUrl = media.url;
         }
         if (!storyUrl) throw new Error('Story sans media_url');
-        console.log(`📖 Publication story pour ${client.name} — url: ${storyUrl}`);
+        console.log(`📖 Publication story pour ${client.name}`);
         result = await publishStoryToInstagram(
           socialAccount.access_token, socialAccount.account_id, storyUrl, 'image'
         );
+        // Pour les stories : on marque le média utilisé SEULEMENT si ce n'est pas un repost
+        // (le repost utilise un média déjà publié qu'on ne doit pas bloquer)
+        if (item.media_id && item.source !== 'story_repost_post') {
+          mediaIdsUsed.push(item.media_id);
+        }
 
       } else {
         let mediaUrl = item.media_url;
@@ -249,6 +274,7 @@ async function processQueue() {
           if (media) mediaUrl = media.url;
         }
         if (!mediaUrl) throw new Error('Aucun média disponible');
+        if (item.media_id) mediaIdsUsed.push(item.media_id);
         const mediaType = item.type === 'reel' ? 'video' : 'image';
         result = await publishToInstagram(
           socialAccount.access_token, socialAccount.account_id, mediaUrl, caption, mediaType
@@ -256,10 +282,22 @@ async function processQueue() {
       }
 
       if (result.success) {
+        // ── Mettre à jour la queue ──────────────────────────────────────────
         await supabase.from('queue').update({
-          statut: 'publie', published_at: now.toISOString(), caption
+          statut: 'publie',
+          published_at: now.toISOString(),
+          caption,
+          instagram_post_id: result.postId
         }).eq('id', item.id);
-        console.log(`✅ Publié pour ${client.name} — ${item.type}`);
+
+        // ── MARQUER LES MÉDIAS COMME UTILISÉS ─────────────────────────────
+        // C'est LE fix principal : empêche la répétition du même visuel
+        for (const mediaId of mediaIdsUsed) {
+          await markMediaAsUsed(mediaId);
+        }
+
+        console.log(`✅ Publié pour ${client.name} — ${item.type}${mediaIdsUsed.length ? ` (${mediaIdsUsed.length} média(s) marqué(s) utilisé(s))` : ''}`);
+
       } else {
         await supabase.from('queue').update({
           statut: 'erreur', error_message: result.error
@@ -277,8 +315,7 @@ async function processQueue() {
 }
 
 async function checkLowContent() {
-  const { data: clients } = await supabase
-    .from('clients').select('*').eq('status', 'active');
+  const { data: clients } = await supabase.from('clients').select('*').eq('status', 'active');
   if (!clients) return;
   for (const client of clients) {
     const { count } = await supabase
