@@ -233,12 +233,10 @@ textarea.form-input{resize:vertical;min-height:80px}
 .toast.success{border-left:3px solid var(--green)}
 .toast.info{border-left:3px solid var(--purple)}
 .toast.warn{border-left:3px solid var(--yellow)}
-.post-detail-img{width:100%;max-height:280px;object-fit:cover;border-radius:var(--r-md);margin-bottom:16px;display:block}
-.post-detail-placeholder{width:100%;height:200px;background:var(--bg3);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px}
+.post-detail-img{width:100%;max-height:280px;object-fit:cover;border-radius:var(--r-md);display:block}
+.post-detail-placeholder{width:100%;height:200px;background:var(--bg3);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:48px}
 .ai-suggestion-box{background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));border:1px solid rgba(139,92,246,0.2);border-radius:var(--r-md);padding:16px;margin-top:12px}
 .ai-suggestion-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:10px}
-.ai-explanation-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--text2)}
-.ai-explanation-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px}
 .score-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .score-label{font-size:12px;color:var(--text2);width:110px;flex-shrink:0}
 .score-bg{flex:1;height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
@@ -313,43 +311,19 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="modal-title">Ajouter un client</div>
       <button class="modal-close" onclick="closeModal('modal-add-client')">✕</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">Nom de l'entreprise *</label>
-      <input class="form-input" id="new-client-name" type="text" placeholder="Ex: Love Queen Dolls">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email du client</label>
-      <input class="form-input" id="new-client-email" type="email" placeholder="client@email.com">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Secteur</label>
-      <select class="form-select form-input" id="new-client-sector">
-        <option>Élevage / Animaux</option><option>Décoration intérieure</option>
-        <option>Restauration</option><option>Mode & Beauté</option>
-        <option>Fitness & Bien-être</option><option>Immobilier</option><option>Autre</option>
-      </select>
-    </div>
+    <div class="form-group"><label class="form-label">Nom de l'entreprise *</label><input class="form-input" id="new-client-name" type="text" placeholder="Ex: Love Queen Dolls"></div>
+    <div class="form-group"><label class="form-label">Email du client</label><input class="form-input" id="new-client-email" type="email" placeholder="client@email.com"></div>
+    <div class="form-group"><label class="form-label">Secteur</label><select class="form-select form-input" id="new-client-sector"><option>Élevage / Animaux</option><option>Décoration intérieure</option><option>Restauration</option><option>Mode & Beauté</option><option>Fitness & Bien-être</option><option>Immobilier</option><option>Autre</option></select></div>
     <div class="grid-2" style="gap:12px;margin-bottom:16px">
       <div><label class="form-label">Instagram</label><input class="form-input" id="new-client-ig" type="text" placeholder="@compte"></div>
       <div><label class="form-label">Facebook</label><input class="form-input" id="new-client-fb" type="text" placeholder="@compte"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Description / Ton</label>
-      <textarea class="form-input" id="new-client-desc" placeholder="Ton chaleureux, passionné..."></textarea>
-    </div>
+    <div class="form-group"><label class="form-label">Description / Ton</label><textarea class="form-input" id="new-client-desc" placeholder="Ton chaleureux, passionné..."></textarea></div>
     <div class="form-group">
       <label class="form-label">Forfait</label>
       <div class="plan-selector">
-        <div class="plan-option selected-starter" id="plan-starter" onclick="selectPlan('starter')">
-          <div class="plan-check">✓</div>
-          <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
-          <div class="plan-option-features">3 posts/sem · 1 story/jour<br>1 post spécial/sem · Pas de DM</div>
-        </div>
-        <div class="plan-option" id="plan-pro" onclick="selectPlan('pro')">
-          <div class="plan-check">✓</div>
-          <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
-          <div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires · Illimité</div>
-        </div>
+        <div class="plan-option selected-starter" id="plan-starter" onclick="selectPlan('starter')"><div class="plan-check">✓</div><div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div><div class="plan-option-features">3 posts/sem · 1 story/jour<br>1 post spécial/sem · Pas de DM</div></div>
+        <div class="plan-option" id="plan-pro" onclick="selectPlan('pro')"><div class="plan-check">✓</div><div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div><div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires · Illimité</div></div>
       </div>
       <input type="hidden" id="new-client-plan" value="starter">
     </div>
@@ -363,22 +337,11 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- MODAL CHANGE PLAN -->
 <div class="overlay" id="modal-change-plan">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header">
-      <div class="modal-title">Changer le forfait</div>
-      <button class="modal-close" onclick="closeModal('modal-change-plan')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Changer le forfait</div><button class="modal-close" onclick="closeModal('modal-change-plan')">✕</button></div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Client : <strong id="change-plan-client-name" style="color:var(--text)"></strong></div>
     <div class="plan-selector">
-      <div class="plan-option" id="modal-plan-starter" onclick="selectModalPlan('starter')">
-        <div class="plan-check">✓</div>
-        <div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div>
-        <div class="plan-option-features">3 posts/sem · 1 post spécial/sem<br>Pas de DM ni commentaires</div>
-      </div>
-      <div class="plan-option" id="modal-plan-pro" onclick="selectModalPlan('pro')">
-        <div class="plan-check">✓</div>
-        <div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div>
-        <div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires illimités</div>
-      </div>
+      <div class="plan-option" id="modal-plan-starter" onclick="selectModalPlan('starter')"><div class="plan-check">✓</div><div class="plan-option-name" style="color:var(--teal)">⚡ Starter</div><div class="plan-option-features">3 posts/sem · 1 post spécial/sem<br>Pas de DM ni commentaires</div></div>
+      <div class="plan-option" id="modal-plan-pro" onclick="selectModalPlan('pro')"><div class="plan-check">✓</div><div class="plan-option-name" style="color:var(--purple)">🚀 Pro</div><div class="plan-option-features">7 posts/sem · Recyclage<br>DM + commentaires illimités</div></div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn" onclick="closeModal('modal-change-plan')">Annuler</button>
@@ -390,41 +353,27 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- MODAL SWITCH CLIENT -->
 <div class="overlay" id="modal-switch-client">
   <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title">Choisir un client</div>
-      <button class="modal-close" onclick="closeModal('modal-switch-client')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Choisir un client</div><button class="modal-close" onclick="closeModal('modal-switch-client')">✕</button></div>
     <div id="client-switch-list"></div>
-    <div style="margin-top:12px">
-      <button class="btn btn-accent" style="width:100%" onclick="closeModal('modal-switch-client');openModal('modal-add-client')">+ Ajouter un client</button>
-    </div>
+    <div style="margin-top:12px"><button class="btn btn-accent" style="width:100%" onclick="closeModal('modal-switch-client');openModal('modal-add-client')">+ Ajouter un client</button></div>
   </div>
 </div>
 
 <!-- MODAL UPLOAD -->
 <div class="overlay" id="modal-upload">
   <div class="modal" style="max-width:600px">
-    <div class="modal-header">
-      <div class="modal-title">📤 Ajouter des médias</div>
-      <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">📤 Ajouter des médias</div><button class="modal-close" onclick="closeModal('modal-upload')">✕</button></div>
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
       <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)">
       <div class="upload-icon">🗂️</div>
       <div class="upload-title">Glissez vos fichiers ici</div>
       <div class="upload-sub">ou cliquez pour sélectionner</div>
-      <div class="upload-formats">
-        <span class="format-tag">JPG / PNG</span><span class="format-tag">MP4 / MOV</span>
-        <span class="format-tag">GIF</span><span class="format-tag">WebP</span>
-      </div>
+      <div class="upload-formats"><span class="format-tag">JPG / PNG</span><span class="format-tag">MP4 / MOV</span><span class="format-tag">GIF</span><span class="format-tag">WebP</span></div>
     </div>
     <div id="upload-preview" style="margin-top:16px;display:none">
       <div style="font-size:13px;font-weight:500;margin-bottom:8px" id="upload-count"></div>
       <div id="upload-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-      <div style="margin-top:12px">
-        <div class="loading-bar"><div class="loading-fill" id="upload-fill" style="width:0%"></div></div>
-        <div style="font-size:11px;color:var(--text3);margin-top:4px" id="upload-status">Prêt à analyser</div>
-      </div>
+      <div style="margin-top:12px"><div class="loading-bar"><div class="loading-fill" id="upload-fill" style="width:0%"></div></div><div style="font-size:11px;color:var(--text3);margin-top:4px" id="upload-status">Prêt à analyser</div></div>
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn" onclick="closeModal('modal-upload')">Fermer</button>
@@ -436,10 +385,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- MODAL STORY TEMPLATE -->
 <div class="overlay" id="modal-story-template">
   <div class="modal" style="max-width:580px">
-    <div class="modal-header">
-      <div class="modal-title" id="story-modal-title">Configurer la story</div>
-      <button class="modal-close" onclick="closeModal('modal-story-template')">✕</button>
-    </div>
+    <div class="modal-header"><div class="modal-title" id="story-modal-title">Configurer la story</div><button class="modal-close" onclick="closeModal('modal-story-template')">✕</button></div>
     <div id="story-modal-body"></div>
   </div>
 </div>
@@ -453,57 +399,33 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="client-selector">
       <button class="client-btn" onclick="openModal('modal-switch-client')">
         <div class="client-avatar" id="sidebar-client-avatar">LQ</div>
-        <div class="client-info">
-          <div class="client-name" id="sidebar-client-name">Lovequeendolls</div>
-          <div class="client-plan" id="sidebar-client-plan">Plan Starter</div>
-        </div>
+        <div class="client-info"><div class="client-name" id="sidebar-client-name">Lovequeendolls</div><div class="client-plan" id="sidebar-client-plan">Plan Starter</div></div>
         <div class="chevron">▾</div>
       </button>
     </div>
     <nav class="nav">
       <div class="nav-section">
         <div class="nav-section-label">Principal</div>
-        <div class="nav-item active" onclick="nav('dashboard')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10zm6-1l2 2 4-4-1.4-1.4L10 9.2 8.7 7.9 7.3 9.3z"/></svg>Vue d'ensemble
-        </div>
-        <div class="nav-item" onclick="nav('clients')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>Clients
-          <div class="nav-badge" id="nav-client-count">1</div>
-        </div>
+        <div class="nav-item active" onclick="nav('dashboard')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 1116 0A8 8 0 012 10zm6-1l2 2 4-4-1.4-1.4L10 9.2 8.7 7.9 7.3 9.3z"/></svg>Vue d'ensemble</div>
+        <div class="nav-item" onclick="nav('clients')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>Clients<div class="nav-badge" id="nav-client-count">1</div></div>
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Contenu</div>
-        <div class="nav-item" onclick="nav('media')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>Médiathèque
-          <div class="nav-badge" id="nav-media-count">0</div>
-        </div>
-        <div class="nav-item" onclick="nav('queue')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>File de publication
-        </div>
-        <div class="nav-item" onclick="nav('reports')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Rapports
-        </div>
+        <div class="nav-item" onclick="nav('media')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>Médiathèque<div class="nav-badge" id="nav-media-count">0</div></div>
+        <div class="nav-item" onclick="nav('queue')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>File de publication</div>
+        <div class="nav-item" onclick="nav('reports')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>Rapports</div>
       </div>
       <div class="nav-section">
         <div class="nav-section-label">Analytics</div>
-        <div class="nav-item" onclick="nav('calendar')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>Calendrier
-        </div>
-        <div class="nav-item" onclick="nav('automation')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>Automatisation
-        </div>
-        <div class="nav-item" onclick="nav('stories')">
-          <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/></svg>Stories fixes
-        </div>
+        <div class="nav-item" onclick="nav('calendar')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/></svg>Calendrier</div>
+        <div class="nav-item" onclick="nav('automation')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/></svg>Automatisation</div>
+        <div class="nav-item" onclick="nav('stories')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/></svg>Stories fixes</div>
       </div>
     </nav>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar">CM</div>
-        <div style="flex:1">
-          <div class="user-name">Community Manager</div>
-          <div class="user-role">Agence SocialAI</div>
-        </div>
+        <div style="flex:1"><div class="user-name">Community Manager</div><div class="user-role">Agence SocialAI</div></div>
         <button onclick="logout()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer" title="Déconnexion">⬡</button>
       </div>
     </div>
@@ -513,9 +435,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div class="topbar">
       <div class="topbar-title" id="topbar-title">Vue d'ensemble</div>
       <div class="topbar-actions">
-        <button class="btn btn-ghost" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)">
-          <div class="auto-dot dot-on" style="width:6px;height:6px"></div> IA Active
-        </button>
+        <button class="btn btn-ghost" style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green)"><div class="auto-dot dot-on" style="width:6px;height:6px"></div> IA Active</button>
         <button class="btn" onclick="openModal('modal-upload')">📤 Médias</button>
         <button class="btn btn-accent" onclick="openModal('modal-add-client')">+ Nouveau client</button>
       </div>
@@ -565,7 +485,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <!-- QUEUE -->
       <div class="panel" id="panel-queue">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
-          <div><div class="section-title">File de publication</div><div class="section-sub">Cliquez sur un post pour le modifier.</div></div>
+          <div><div class="section-title">File de publication</div><div class="section-sub">Cliquez sur un post pour modifier la photo, la caption ou le publier immédiatement.</div></div>
           <button class="btn btn-accent" onclick="openModal('modal-upload')">+ Médias</button>
         </div>
         <div id="queue-list"></div>
@@ -607,15 +527,9 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="card">
           <div class="cal-header">
             <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600" id="cal-month-label">Mars 2026</div>
-            <div class="cal-nav">
-              <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
-              <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
-            </div>
+            <div class="cal-nav"><button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button><button class="cal-nav-btn" onclick="changeMonth(1)">›</button></div>
           </div>
-          <div class="cal-grid">
-            <div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div><div class="cal-day-head">Mer</div>
-            <div class="cal-day-head">Jeu</div><div class="cal-day-head">Ven</div><div class="cal-day-head">Sam</div><div class="cal-day-head">Dim</div>
-          </div>
+          <div class="cal-grid"><div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div><div class="cal-day-head">Mer</div><div class="cal-day-head">Jeu</div><div class="cal-day-head">Ven</div><div class="cal-day-head">Sam</div><div class="cal-day-head">Dim</div></div>
           <div class="cal-grid" id="cal-grid" style="margin-top:4px"></div>
         </div>
       </div>
@@ -650,14 +564,8 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
           <div class="card">
             <div class="card-header"><div class="card-title">📋 Forfaits</div></div>
-            <div style="margin-bottom:8px;padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)">
-              <div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:4px">⚡ Starter</div>
-              <div style="font-size:11px;color:var(--text3)">3 posts/sem · 1 story/jour · Analyse historique · 1 post spécial/sem</div>
-            </div>
-            <div style="padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)">
-              <div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🚀 Pro</div>
-              <div style="font-size:11px;color:var(--text3)">7 posts/sem · Recyclage · DM + commentaires · Posts spéciaux illimités</div>
-            </div>
+            <div style="margin-bottom:8px;padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)"><div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:4px">⚡ Starter</div><div style="font-size:11px;color:var(--text3)">3 posts/sem · 1 story/jour · Analyse historique · 1 post spécial/sem</div></div>
+            <div style="padding:12px;background:var(--bg3);border-radius:var(--r-sm);border:1px solid var(--border)"><div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🚀 Pro</div><div style="font-size:11px;color:var(--text3)">7 posts/sem · Recyclage · DM + commentaires · Posts spéciaux illimités</div></div>
           </div>
         </div>
       </div>
@@ -735,14 +643,25 @@ async function loadClients() {
     if(clients.length>0&&!activeClient){activeClient=clients[0];updateSidebarClient();}
     document.getElementById('nav-client-count').textContent=clients.length;
     document.getElementById('stat-clients').textContent=clients.filter(c=>c.status==='active').length;
-    renderDashboardClients();renderSwitcherList();
-  }catch(e){console.error(e);}
+    renderDashboardClients();
+    renderSwitcherList();
+  } catch(e) { console.error(e); }
 }
 
-function getClientColor(idx){const c=['linear-gradient(135deg,#E1306C,#833AB4)','linear-gradient(135deg,#f97316,#eab308)','linear-gradient(135deg,#14b8a6,#8b5cf6)','linear-gradient(135deg,#3b82f6,#06b6d4)','linear-gradient(135deg,#10b981,#059669)'];return c[idx%c.length];}
-function updateSidebarClient(){if(!activeClient)return;const i=activeClient.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);document.getElementById('sidebar-client-avatar').textContent=i;document.getElementById('sidebar-client-name').textContent=activeClient.name;document.getElementById('sidebar-client-plan').textContent='Plan '+(activeClient.plan||'starter').charAt(0).toUpperCase()+(activeClient.plan||'starter').slice(1);}
+function getClientColor(idx) {
+  const c=['linear-gradient(135deg,#E1306C,#833AB4)','linear-gradient(135deg,#f97316,#eab308)','linear-gradient(135deg,#14b8a6,#8b5cf6)','linear-gradient(135deg,#3b82f6,#06b6d4)','linear-gradient(135deg,#10b981,#059669)'];
+  return c[idx%c.length];
+}
 
-function renderClients(){
+function updateSidebarClient() {
+  if(!activeClient)return;
+  const i=activeClient.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sidebar-client-avatar').textContent=i;
+  document.getElementById('sidebar-client-name').textContent=activeClient.name;
+  document.getElementById('sidebar-client-plan').textContent='Plan '+(activeClient.plan||'starter').charAt(0).toUpperCase()+(activeClient.plan||'starter').slice(1);
+}
+
+function renderClients() {
   const grid=document.getElementById('clients-grid');
   grid.innerHTML=clients.map((c,idx)=>{
     const initials=c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -764,7 +683,7 @@ function renderClients(){
   }).join('')+`<div class="client-card add-client-card" onclick="openModal('modal-add-client')"><div style="font-size:24px">＋</div><div style="font-size:13px;font-weight:500">Ajouter un client</div><div style="font-size:11px;color:var(--text3)">Nouveau compte entreprise</div></div>`;
 }
 
-function renderDashboardClients(){
+function renderDashboardClients() {
   const el=document.getElementById('dashboard-clients');
   if(!el||clients.length===0){if(el)el.innerHTML='<div style="color:var(--text3);font-size:13px;grid-column:1/-1;text-align:center;padding:20px">Aucun client</div>';return;}
   el.innerHTML=clients.map((c,idx)=>{
@@ -778,8 +697,14 @@ function renderDashboardClients(){
   }).join('');
 }
 
-function selectClient(id){activeClient=clients.find(c=>c.id===id||c.id===parseInt(id));if(!activeClient)return;updateSidebarClient();renderClients();renderSwitcherList();renderDashboardClients();closeModal('modal-switch-client');}
-function renderSwitcherList(){
+function selectClient(id) {
+  activeClient=clients.find(c=>c.id===id||c.id===parseInt(id));
+  if(!activeClient)return;
+  updateSidebarClient();renderClients();renderSwitcherList();renderDashboardClients();
+  closeModal('modal-switch-client');
+}
+
+function renderSwitcherList() {
   const el=document.getElementById('client-switch-list');
   el.innerHTML=clients.map((c,idx)=>{
     const initials=c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -792,22 +717,45 @@ function renderSwitcherList(){
   }).join('');
 }
 
-function selectPlan(plan){selectedPlan=plan;document.getElementById('new-client-plan').value=plan;document.getElementById('plan-starter').className='plan-option'+(plan==='starter'?' selected-starter':'');document.getElementById('plan-pro').className='plan-option'+(plan==='pro'?' selected-pro':'');}
-function openChangePlan(cid,cname,cp){changePlanClientId=cid;changePlanSelected=cp;document.getElementById('change-plan-client-name').textContent=cname;selectModalPlan(cp);openModal('modal-change-plan');}
-function selectModalPlan(plan){changePlanSelected=plan;document.getElementById('modal-plan-starter').className='plan-option'+(plan==='starter'?' selected-starter':'');document.getElementById('modal-plan-pro').className='plan-option'+(plan==='pro'?' selected-pro':'');}
+function selectPlan(plan) {
+  selectedPlan=plan;
+  document.getElementById('new-client-plan').value=plan;
+  document.getElementById('plan-starter').className='plan-option'+(plan==='starter'?' selected-starter':'');
+  document.getElementById('plan-pro').className='plan-option'+(plan==='pro'?' selected-pro':'');
+}
 
-async function confirmChangePlan(){
+function openChangePlan(cid,cname,cp) {
+  changePlanClientId=cid;changePlanSelected=cp;
+  document.getElementById('change-plan-client-name').textContent=cname;
+  selectModalPlan(cp);openModal('modal-change-plan');
+}
+
+function selectModalPlan(plan) {
+  changePlanSelected=plan;
+  document.getElementById('modal-plan-starter').className='plan-option'+(plan==='starter'?' selected-starter':'');
+  document.getElementById('modal-plan-pro').className='plan-option'+(plan==='pro'?' selected-pro':'');
+}
+
+async function confirmChangePlan() {
   if(!changePlanClientId)return;
-  try{const r=await fetch(`/api/clients/${changePlanClientId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:changePlanSelected})});if(!r.ok)throw new Error();await loadClients();closeModal('modal-change-plan');renderClients();toast(`Forfait changé en ${changePlanSelected==='pro'?'🚀 Pro':'⚡ Starter'} !`,'success');}
-  catch{toast('Erreur','warn');}
+  try {
+    const r=await fetch(`/api/clients/${changePlanClientId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:changePlanSelected})});
+    if(!r.ok)throw new Error();
+    await loadClients();closeModal('modal-change-plan');renderClients();
+    toast(`Forfait changé en ${changePlanSelected==='pro'?'🚀 Pro':'⚡ Starter'} !`,'success');
+  } catch { toast('Erreur','warn'); }
 }
 
-async function togglePause(clientId,newStatus){
-  try{const r=await fetch(`/api/clients/${clientId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});if(!r.ok)throw new Error();await loadClients();renderClients();toast(newStatus==='paused'?'Service mis en pause ⏸':'Service réactivé ▶','success');}
-  catch{toast('Erreur','warn');}
+async function togglePause(clientId, newStatus) {
+  try {
+    const r=await fetch(`/api/clients/${clientId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})});
+    if(!r.ok)throw new Error();
+    await loadClients();renderClients();
+    toast(newStatus==='paused'?'Service mis en pause ⏸':'Service réactivé ▶','success');
+  } catch { toast('Erreur','warn'); }
 }
 
-async function resetClientPassword(clientId){
+async function resetClientPassword(clientId) {
   const existing=document.getElementById('modal-admin-key');if(existing)existing.remove();
   const modal=document.createElement('div');modal.className='overlay open';modal.id='modal-admin-key';
   modal.innerHTML=`<div class="modal" style="max-width:360px"><div class="modal-header"><div class="modal-title">🔑 Clé administrateur</div><button class="modal-close" onclick="document.getElementById('modal-admin-key').remove()">✕</button></div><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Un mot de passe provisoire sera généré et envoyé par email au client.</p><div class="form-group"><label class="form-label">Clé admin</label><input class="form-input" type="password" id="admin-key-input" placeholder="Entrez votre clé admin…" onkeydown="if(event.key==='Enter')confirmResetPassword('${clientId}')"></div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="document.getElementById('modal-admin-key').remove()">Annuler</button><button class="btn btn-accent" onclick="confirmResetPassword('${clientId}')">Envoyer →</button></div></div>`;
@@ -816,35 +764,35 @@ async function resetClientPassword(clientId){
   setTimeout(()=>document.getElementById('admin-key-input')?.focus(),100);
 }
 
-async function confirmResetPassword(clientId){
+async function confirmResetPassword(clientId) {
   const adminKey=document.getElementById('admin-key-input')?.value;
   if(!adminKey){toast('Entrez la clé admin','warn');return;}
   const btn=event.target;btn.disabled=true;btn.textContent='Envoi…';
-  try{
+  try {
     const r=await fetch('/api/auth/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,adminKey})});
     const data=await r.json();if(!r.ok)throw new Error(data.error);
     document.getElementById('modal-admin-key').remove();
     toast('✅ Mot de passe provisoire envoyé !','success');
-  }catch(e){toast('Erreur : '+e.message,'warn');btn.disabled=false;btn.textContent='Envoyer →';}
+  } catch(e) { toast('Erreur : '+e.message,'warn');btn.disabled=false;btn.textContent='Envoyer →'; }
 }
 
-async function addClient(){
+async function addClient() {
   const name=document.getElementById('new-client-name').value.trim();
   if(!name){toast('Veuillez saisir un nom','warn');return;}
   const email=document.getElementById('new-client-email').value.trim();
-  try{
+  try {
     const r=await fetch('/api/clients',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email:email||null,sector:document.getElementById('new-client-sector').value,instagram:document.getElementById('new-client-ig').value,facebook:document.getElementById('new-client-fb').value,description:document.getElementById('new-client-desc').value,plan:selectedPlan,solo_entrepreneur:true})});
     const data=await r.json();if(!r.ok)throw new Error(data.error);
     await loadClients();closeModal('modal-add-client');renderClients();
     toast(`Client "${name}" créé !`,'success');
-  }catch(e){toast('Erreur: '+e.message,'warn');}
+  } catch(e) { toast('Erreur: '+e.message,'warn'); }
 }
 
-async function loadReports(){
+async function loadReports() {
   if(!activeClient)return;
   document.getElementById('reports-client-label').textContent=`Publications de ${activeClient.name}`;
   document.getElementById('reports-posts-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
-  try{
+  try {
     const r=await fetch(`/api/reports/${activeClient.id}/stats`);
     reportsData=await r.json();
     const{stats,posts,queue}=reportsData;
@@ -853,7 +801,7 @@ async function loadReports(){
       <div class="stat-card" style="--glow-color:rgba(20,184,166,0.08)"><div class="stat-icon">❤️</div><div class="stat-label">Likes total</div><div class="stat-value">${stats.totalLikes.toLocaleString('fr-FR')}</div><div class="stat-delta">Toutes publications</div></div>
       <div class="stat-card" style="--glow-color:rgba(139,92,246,0.08)"><div class="stat-icon">💬</div><div class="stat-label">Commentaires</div><div class="stat-value">${stats.totalComments.toLocaleString('fr-FR')}</div><div class="stat-delta">Toutes publications</div></div>
       <div class="stat-card" style="--glow-color:rgba(34,197,94,0.08)"><div class="stat-icon">📅</div><div class="stat-label">Posts planifiés</div><div class="stat-value">${stats.plannedPosts}</div><div class="stat-delta">En attente</div></div>`;
-    if(stats.beforeIA.count>0||stats.afterIA.count>0){
+    if(stats.beforeIA.count>0||stats.afterIA.count>0) {
       document.getElementById('reports-comparison').style.display='grid';
       document.getElementById('cmp-before-val').textContent=stats.beforeIA.avgEngagement;
       document.getElementById('cmp-before-sub').textContent=`eng. moy · ${stats.beforeIA.count} posts`;
@@ -867,10 +815,10 @@ async function loadReports(){
     buildDashboardChart(stats.evolution);
     renderDashboardTopPosts(stats.topPosts);
     renderReportPosts('all',posts,queue);
-  }catch(e){console.error(e);document.getElementById('reports-posts-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';}
+  } catch(e) { console.error(e); document.getElementById('reports-posts-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>'; }
 }
 
-function buildReportsChart(evolution,metric){
+function buildReportsChart(evolution, metric) {
   currentChartMetric=metric;
   const ctx=document.getElementById('chart-reports').getContext('2d');
   if(reportsChart)reportsChart.destroy();
@@ -881,24 +829,29 @@ function buildReportsChart(evolution,metric){
   ['likes','comments','reach'].forEach(m=>{const btn=document.getElementById(`chart-btn-${m}`);if(btn){btn.style.background=m===metric?'var(--surface2)':'';btn.style.color=m===metric?'var(--text)':'';}});
 }
 
-function buildDashboardChart(evolution){
+function buildDashboardChart(evolution) {
   const ctx=document.getElementById('chart-dashboard').getContext('2d');
   if(dashChart)dashChart.destroy();
   const labels=evolution.slice(-6).map(e=>{const[y,m]=e.month.split('-');return MONTHS_FR[parseInt(m)-1].slice(0,3);});
   dashChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Likes',data:evolution.slice(-6).map(e=>e.likes||0),backgroundColor:'#ff3b6b44',borderColor:'#ff3b6b',borderWidth:1,borderRadius:4},{label:'Commentaires',data:evolution.slice(-6).map(e=>e.comments||0),backgroundColor:'#8b5cf644',borderColor:'#8b5cf6',borderWidth:1,borderRadius:4}]},options:{responsive:true,plugins:{legend:{labels:{color:'#9090aa',font:{size:11}}}},scales:{x:{grid:{color:'#2e2e3e'},ticks:{color:'#5a5a72',font:{size:10}}},y:{grid:{color:'#2e2e3e'},ticks:{color:'#5a5a72',font:{size:10}}}}}});
 }
 
-function switchChart(metric){if(reportsData)buildReportsChart(reportsData.stats.evolution,metric);}
+function switchChart(metric) { if(reportsData)buildReportsChart(reportsData.stats.evolution,metric); }
 
-function renderDashboardTopPosts(topPosts){
+function renderDashboardTopPosts(topPosts) {
   const el=document.getElementById('dashboard-top-posts');
   if(!topPosts||topPosts.length===0){el.innerHTML='<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">Aucun post analysé</div>';return;}
   el.innerHTML=topPosts.slice(0,3).map(p=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openPostDetail('${p.id}','media')"><div style="width:40px;height:40px;border-radius:8px;background:var(--bg4);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px">${p.url?`<img src="${p.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">`:'🖼️'}</div><div style="flex:1;min-width:0"><div style="font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.caption||'—'}</div><div style="font-size:11px;color:var(--text3)">❤️ ${p.likes||0} · 💬 ${p.comments||0}</div></div><div style="font-size:11px;font-weight:700;color:${(p.performance_score||0)>=60?'var(--accent)':'var(--text3)'}">${p.performance_score||0}</div></div>`).join('');
 }
 
-function switchReportTab(tab,el){currentReportTab=tab;document.querySelectorAll('#panel-reports .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');if(reportsData)renderReportPosts(tab,reportsData.posts,reportsData.queue);}
+function switchReportTab(tab, el) {
+  currentReportTab=tab;
+  document.querySelectorAll('#panel-reports .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(reportsData)renderReportPosts(tab,reportsData.posts,reportsData.queue);
+}
 
-function renderReportPosts(tab,posts,queue){
+function renderReportPosts(tab, posts, queue) {
   const grid=document.getElementById('reports-posts-grid');
   let items=[];
   if(tab==='history'||tab==='all'||tab==='top'){const filtered=tab==='top'?[...posts].sort((a,b)=>(b.performance_score||0)-(a.performance_score||0)).slice(0,12):posts;items=filtered.map(p=>({...p,_source:'media'}));}
@@ -917,79 +870,235 @@ function renderReportPosts(tab,posts,queue){
   }).join('');
 }
 
-async function openPostDetail(postId,type){
+// ── MODAL POST DETAIL avec photo picker + publish-now ─────────────────────────
+async function openPostDetail(postId, type) {
   openModal('modal-post-detail');
   document.getElementById('post-detail-title').textContent='Chargement…';
   document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
-  try{
-    const r=await fetch(`/api/reports/post/${postId}?type=${type}`);
-    const post=await r.json();
-    const isQueue=type==='queue';const date=post.original_post_date||post.scheduled_at;
-    const dateStr=date?new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—';
-    const score=post.performance_score||0;
-    document.getElementById('post-detail-title').textContent=isQueue?'📅 Post planifié':'📸 Publication Instagram';
+  try {
+    const r    = await fetch(`/api/reports/post/${postId}?type=${type}`);
+    const post = await r.json();
+    const isQueue  = type==='queue';
+    const date     = post.original_post_date||post.scheduled_at;
+    const dateStr  = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
+    const score    = post.performance_score||0;
+    const mediaUrl = post.media_url||post.url||'';
+
+    document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
+
     document.getElementById('post-detail-content').innerHTML=`
-      ${post.url?`<img class="post-detail-img" src="${post.url}" onerror="this.style.display='none'">`:`<div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>`}
+      ${mediaUrl
+        ? `<div style="position:relative;margin-bottom:16px">
+             <img class="post-detail-img" id="detail-main-img" src="${mediaUrl}" style="display:block" onerror="this.style.display='none'">
+             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')"
+               style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">
+               🖼️ Changer la photo
+             </button>` : ''}
+           </div>`
+        : `<div style="position:relative;margin-bottom:16px">
+             <div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>
+             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')"
+               style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px dashed var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
+               🖼️ Choisir une photo
+             </button>` : ''}
+           </div>`}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
         <span style="font-size:12px;color:var(--text3)">${dateStr}</span>
         ${score>=60?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,59,107,0.12);color:var(--accent);font-weight:600">⭐ Top Content</span>':''}
         ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,0.12);color:var(--teal);font-weight:600">📅 Planifié</span>':''}
       </div>
-      ${score>0?`<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div><div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div></div><div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px"><span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}</div></div>`:''}
+      ${score>0?`
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div>
+        <div class="score-bar">
+          <div class="score-label">Score global</div>
+          <div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div>
+          <div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div>
+        </div>
+        <div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px">
+          <span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}
+        </div>
+      </div>` : ''}
       <div style="margin-bottom:16px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption</div>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
         ${isQueue?`<textarea class="form-input" id="detail-caption-edit" style="margin-top:8px;display:none;min-height:100px">${escHtml(post.caption||'')}</textarea>`:''}
       </div>
       <div id="ai-suggestion-result"></div>
+      <div id="aria-publish-advice" style="display:none"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        ${isQueue?`<button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier</button><button class="btn btn-sm" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button><button class="btn btn-sm btn-ghost" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>`:''}
+        ${isQueue?`
+          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier</button>
+          <button class="btn btn-sm" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button>
+          <button class="btn btn-sm btn-ghost" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
+        `:''}
         <button class="btn btn-sm btn-purple" onclick="openAISuggest('${post.id}','${escHtml(post.caption||'')}','${isQueue?'queue':'media'}')">✨ Suggestion IA</button>
-        ${isQueue?`<button class="btn btn-sm" style="color:var(--accent);border-color:rgba(255,59,107,0.3)" onclick="deletePost('${post.id}')">🗑 Supprimer</button>`:''}
+        ${isQueue?`
+          <button class="btn btn-sm" style="background:rgba(34,197,94,0.15);color:var(--green);border-color:rgba(34,197,94,0.3)" onclick="requestPublishNow('${post.id}')">⚡ Publier maintenant</button>
+          <button class="btn btn-sm" style="color:var(--accent);border-color:rgba(255,59,107,0.3)" onclick="deletePost('${post.id}')">🗑 Supprimer</button>
+        `:''}
       </div>`;
-  }catch{document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';}
+  } catch {
+    document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';
+  }
 }
 
-function toggleCaptionEdit(){document.getElementById('detail-caption-display').style.display='none';document.getElementById('detail-caption-edit').style.display='block';document.getElementById('btn-edit-caption').style.display='none';document.getElementById('btn-save-caption').style.display='flex';document.getElementById('btn-cancel-caption').style.display='flex';document.getElementById('detail-caption-edit').focus();}
-function cancelCaptionEdit(){document.getElementById('detail-caption-display').style.display='block';document.getElementById('detail-caption-edit').style.display='none';document.getElementById('btn-edit-caption').style.display='flex';document.getElementById('btn-save-caption').style.display='none';document.getElementById('btn-cancel-caption').style.display='none';}
+function toggleCaptionEdit() {
+  document.getElementById('detail-caption-display').style.display='none';
+  document.getElementById('detail-caption-edit').style.display='block';
+  document.getElementById('btn-edit-caption').style.display='none';
+  document.getElementById('btn-save-caption').style.display='flex';
+  document.getElementById('btn-cancel-caption').style.display='flex';
+  document.getElementById('detail-caption-edit').focus();
+}
 
-async function savePostCaption(postId){
+function cancelCaptionEdit() {
+  document.getElementById('detail-caption-display').style.display='block';
+  document.getElementById('detail-caption-edit').style.display='none';
+  document.getElementById('btn-edit-caption').style.display='flex';
+  document.getElementById('btn-save-caption').style.display='none';
+  document.getElementById('btn-cancel-caption').style.display='none';
+}
+
+async function savePostCaption(postId) {
   const caption=document.getElementById('detail-caption-edit').value.trim();
   if(!caption){toast('Caption vide','warn');return;}
-  try{const r=await fetch(`/api/reports/post/${postId}/caption`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({caption})});if(!r.ok)throw new Error();document.getElementById('detail-caption-display').textContent=caption;cancelCaptionEdit();toast('Caption mise à jour ✓','success');if(reportsData)loadReports();}
-  catch{toast('Erreur sauvegarde','warn');}
+  try {
+    const r=await fetch(`/api/reports/post/${postId}/caption`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({caption})});
+    if(!r.ok)throw new Error();
+    document.getElementById('detail-caption-display').textContent=caption;
+    cancelCaptionEdit();toast('Caption mise à jour ✓','success');
+    if(reportsData)loadReports();
+  } catch { toast('Erreur sauvegarde','warn'); }
 }
 
-async function deletePost(postId){
+async function deletePost(postId) {
   if(!confirm('Supprimer ce post ?'))return;
-  try{const r=await fetch(`/api/reports/post/${postId}`,{method:'DELETE'});if(!r.ok)throw new Error();closeModal('modal-post-detail');toast('Post supprimé ✓','success');loadReports();}
-  catch{toast('Erreur suppression','warn');}
+  try {
+    const r=await fetch(`/api/reports/post/${postId}`,{method:'DELETE'});
+    if(!r.ok)throw new Error();
+    closeModal('modal-post-detail');toast('Post supprimé ✓','success');loadReports();
+  } catch { toast('Erreur suppression','warn'); }
 }
 
-async function openAISuggest(postId,currentCaption,type){
+async function openAISuggest(postId, currentCaption, type) {
   const resultEl=document.getElementById('ai-suggestion-result');
   const directive=prompt('Directive pour l\'IA (optionnel) :')||'';
   resultEl.innerHTML='<div style="text-align:center;padding:16px"><span class="spinner"></span> L\'IA analyse…</div>';
-  try{
+  try {
     const r=await fetch(`/api/reports/post/${postId}/ai-suggest`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({directive,currentCaption,clientName:activeClient?.name,sector:activeClient?.sector,tone:activeClient?.tone})});
     const data=await r.json();if(!r.ok)throw new Error(data.error);
     resultEl.innerHTML=`<div class="ai-suggestion-box"><div class="ai-suggestion-title">✨ Suggestion de l'IA</div><div style="background:var(--bg3);border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap;margin-bottom:10px" id="ai-new-caption">${escHtml(data.suggestion||'')}</div>${type==='queue'?`<button class="btn btn-sm btn-accent" onclick="applyAISuggestion('${postId}')">✅ Appliquer</button>`:''}</div>`;
-  }catch(e){resultEl.innerHTML=`<div style="color:var(--accent);font-size:13px;padding:12px">Erreur: ${e.message}</div>`;}
+  } catch(e) { resultEl.innerHTML=`<div style="color:var(--accent);font-size:13px;padding:12px">Erreur: ${e.message}</div>`; }
 }
 
-async function applyAISuggestion(postId){
+async function applyAISuggestion(postId) {
   const cap=document.getElementById('ai-new-caption')?.textContent;if(!cap)return;
-  try{const r=await fetch(`/api/reports/post/${postId}/caption`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({caption:cap})});if(!r.ok)throw new Error();document.getElementById('detail-caption-display').textContent=cap;toast('Caption appliquée ✓','success');loadReports();}
-  catch{toast('Erreur','warn');}
+  try {
+    const r=await fetch(`/api/reports/post/${postId}/caption`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({caption:cap})});
+    if(!r.ok)throw new Error();
+    document.getElementById('detail-caption-display').textContent=cap;
+    toast('Caption appliquée ✓','success');loadReports();
+  } catch { toast('Erreur','warn'); }
 }
 
-async function loadMedia(){
+// ── 🆕 PHOTO PICKER (back office) ────────────────────────────────────────────
+async function openPhotoPicker(postId, clientId) {
+  const existing=document.getElementById('modal-photo-picker');if(existing)existing.remove();
+  const overlay=document.createElement('div');overlay.className='overlay open';overlay.id='modal-photo-picker';
+  overlay.innerHTML=`
+    <div class="modal" style="max-width:680px">
+      <div class="modal-header"><div class="modal-title">🖼️ Choisir une photo</div><button class="modal-close" onclick="document.getElementById('modal-photo-picker').remove()">✕</button></div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Sélectionnez une photo de la médiathèque pour ce post.</p>
+      <div id="photo-picker-loading" style="text-align:center;padding:32px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>
+      <div id="photo-picker-grid-admin" class="photo-picker-grid" style="display:none;max-height:360px;grid-auto-rows:100px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="document.getElementById('modal-photo-picker').remove()">Annuler</button></div>
+    </div>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
+  document.body.appendChild(overlay);
+
+  try {
+    const cId=clientId||activeClient?.id;
+    const r=await fetch(`/api/media/${cId}`);
+    const medias=await r.json();
+    const photos=medias.filter(m=>m.type==='photo'&&m.url);
+    document.getElementById('photo-picker-loading').style.display='none';
+    const grid=document.getElementById('photo-picker-grid-admin');grid.style.display='grid';
+    if(!photos.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3)">Aucune photo dans la médiathèque</div>';return;}
+    grid.innerHTML=photos.map(m=>`<div class="photo-picker-item" onclick="applyNewPhoto('${postId}','${m.url}','${m.id}')"><img src="${m.url}" onerror="this.parentElement.style.display='none'"></div>`).join('');
+  } catch(e) { document.getElementById('photo-picker-loading').innerHTML='<div style="color:var(--accent)">Erreur de chargement</div>'; }
+}
+
+async function applyNewPhoto(postId, newUrl, mediaId) {
+  try {
+    const r=await fetch(`/api/queue/${postId}/media`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({media_url:newUrl,media_id:mediaId})});
+    if(!r.ok)throw new Error();
+    const img=document.getElementById('detail-main-img');if(img)img.src=newUrl;
+    document.getElementById('modal-photo-picker')?.remove();
+    toast('Photo mise à jour ✓','success');
+    if(document.getElementById('panel-queue').classList.contains('active'))loadQueue();
+    if(reportsData)loadReports();
+  } catch { toast('Erreur changement photo','warn'); }
+}
+
+// ── 🆕 PUBLICATION FORCÉE (back office) ──────────────────────────────────────
+async function requestPublishNow(postId) {
+  const adviceEl=document.getElementById('aria-publish-advice');
+  adviceEl.style.display='block';
+  adviceEl.innerHTML='<div style="text-align:center;padding:12px"><span class="spinner"></span> Aria analyse le meilleur moment…</div>';
+  try {
+    const r=await fetch(`/api/queue/${postId}/best-hour`);
+    const data=await r.json();
+    if(data.isOptimal) {
+      adviceEl.innerHTML=`
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">✅</span><span style="font-size:12px;font-weight:600;color:var(--green)">Aria — Moment idéal !</span></div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px">${data.ariaMessage}</div>
+          <button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button>
+        </div>`;
+    } else {
+      adviceEl.innerHTML=`
+        <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">🧠</span><span style="font-size:12px;font-weight:600;color:var(--purple)">Aria — Conseil stratégique</span></div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">${data.ariaMessage.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-accent" onclick="confirmPublishNow('${postId}')">⚡ Publier quand même maintenant</button>
+            <button class="btn btn-sm" onclick="document.getElementById('aria-publish-advice').style.display='none'">← Garder la planification</button>
+          </div>
+        </div>`;
+    }
+  } catch(e) {
+    adviceEl.innerHTML=`
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Publier ce post immédiatement sur Instagram ?</div>
+        <button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button>
+      </div>`;
+  }
+}
+
+async function confirmPublishNow(postId) {
+  const btn=event.target;btn.disabled=true;btn.textContent='⏳ Publication en cours…';
+  try {
+    const r=await fetch(`/api/queue/${postId}/publish-now`,{method:'POST'});
+    const data=await r.json();if(!r.ok)throw new Error(data.error);
+    toast('⚡ Publication lancée ! Vérifiez Instagram dans quelques secondes.','success');
+    closeModal('modal-post-detail');
+    setTimeout(()=>{if(reportsData)loadReports();},3000);
+  } catch(e) { toast('Erreur : '+e.message,'warn');btn.disabled=false;btn.textContent='⚡ Publier quand même maintenant'; }
+}
+
+async function loadMedia() {
   if(!activeClient)return;
-  try{const r=await fetch(`/api/media/${activeClient.id}`);mediaItems=await r.json();document.getElementById('nav-media-count').textContent=mediaItems.length;renderMedia('all');document.getElementById('media-client-name').textContent=`Médias de ${activeClient.name}`;}
-  catch(e){console.error(e);}
+  try {
+    const r=await fetch(`/api/media/${activeClient.id}`);
+    mediaItems=await r.json();
+    document.getElementById('nav-media-count').textContent=mediaItems.length;
+    renderMedia('all');
+    document.getElementById('media-client-name').textContent=`Médias de ${activeClient.name}`;
+  } catch(e) { console.error(e); }
 }
 
-function renderMedia(filter){
+function renderMedia(filter) {
   const grid=document.getElementById('media-grid');let items=[...mediaItems];
   if(filter==='photo')items=items.filter(m=>m.type==='photo');
   if(filter==='video')items=items.filter(m=>m.type==='video');
@@ -998,28 +1107,42 @@ function renderMedia(filter){
   grid.innerHTML=items.map(m=>`<div class="media-item" onclick="openPostDetail('${m.id}','media')"><div class="media-thumb">${m.url?`<img src="${m.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">`:(m.type==='video'?'🎬':'🖼️')}</div><div class="media-type-badge type-${m.type}">${m.type}</div>${m.analyse_data?'<div class="media-ai-badge">IA ✓</div>':''}<div class="media-overlay"><div class="media-info">${m.filename||'média'}</div></div></div>`).join('');
 }
 
-function filterMedia(filter,el){document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderMedia(filter);}
-
-async function loadQueue(){
-  if(!activeClient)return;
-  try{const r=await fetch(`/api/queue/${activeClient.id}`).catch(()=>null);if(!r||!r.ok){renderQueueStatic();return;}const queue=await r.json();renderQueueFromData(queue);}
-  catch{renderQueueStatic();}
+function filterMedia(filter,el) {
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderMedia(filter);
 }
 
-function renderQueueFromData(queue){
+async function loadQueue() {
+  if(!activeClient)return;
+  try {
+    const r=await fetch(`/api/queue/${activeClient.id}`).catch(()=>null);
+    if(!r||!r.ok){renderQueueStatic();return;}
+    const queue=await r.json();renderQueueFromData(queue);
+  } catch { renderQueueStatic(); }
+}
+
+function renderQueueFromData(queue) {
   const el=document.getElementById('queue-list');
   if(!queue||queue.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div></div>';return;}
-  const sc={planifie:'qs-scheduled',publie:'qs-published',draft:'qs-draft'};const sl={planifie:'Planifié',publie:'Publié ✓',draft:'Brouillon'};
-  el.innerHTML=queue.map(q=>{const date=q.scheduled_at?new Date(q.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';return `<div class="queue-item" onclick="openPostDetail('${q.id}','queue')"><div class="queue-thumb">${q.media_url?`<img src="${q.media_url}" onerror="this.parentElement.textContent='🖼️'">`:'🖼️'}</div><div class="queue-body"><div class="queue-title">📸 Post · ${q.platform||'instagram'}</div><div class="queue-meta">${activeClient?.name||''}</div><div class="queue-caption">${q.caption||'Caption en cours…'}</div></div><div class="queue-right"><div class="queue-time">${date}</div><div class="queue-status ${sc[q.statut]||'qs-draft'}">${sl[q.statut]||q.statut}</div></div></div>`;}).join('');
+  const sc={planifie:'qs-scheduled',publie:'qs-published',draft:'qs-draft'};
+  const sl={planifie:'Planifié',publie:'Publié ✓',draft:'Brouillon'};
+  el.innerHTML=queue.map(q=>{
+    const date=q.scheduled_at?new Date(q.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+    return `<div class="queue-item" onclick="openPostDetail('${q.id}','queue')">
+      <div class="queue-thumb">${q.media_url?`<img src="${q.media_url}" onerror="this.parentElement.textContent='🖼️'">`:'🖼️'}</div>
+      <div class="queue-body"><div class="queue-title">📸 Post · ${q.platform||'instagram'}</div><div class="queue-meta">${activeClient?.name||''}</div><div class="queue-caption">${q.caption||'Caption en cours…'}</div></div>
+      <div class="queue-right"><div class="queue-time">${date}</div><div class="queue-status ${sc[q.statut]||'qs-draft'}">${sl[q.statut]||q.statut}</div></div>
+    </div>`;
+  }).join('');
 }
 
-function renderQueueStatic(){document.getElementById('queue-list').innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div></div>';}
+function renderQueueStatic() { document.getElementById('queue-list').innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div></div>'; }
 
 let uploadedFiles=[];
 function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover');}
 function dragLeave(){document.getElementById('upload-zone').classList.remove('dragover');}
 function dropFiles(e){e.preventDefault();dragLeave();handleFiles(e.dataTransfer.files);}
-function handleFiles(files){
+
+function handleFiles(files) {
   uploadedFiles=Array.from(files);if(!uploadedFiles.length)return;
   document.getElementById('upload-preview').style.display='block';
   document.getElementById('upload-count').textContent=`${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
@@ -1027,11 +1150,11 @@ function handleFiles(files){
   document.getElementById('btn-analyze').style.display='flex';
 }
 
-async function startAnalysis(){
+async function startAnalysis() {
   if(!activeClient){toast('Sélectionnez un client','warn');return;}
   const btn=document.getElementById('btn-analyze');const fill=document.getElementById('upload-fill');const status=document.getElementById('upload-status');
   btn.disabled=true;btn.textContent='Analyse en cours…';let completed=0;
-  for(const file of uploadedFiles){
+  for(const file of uploadedFiles) {
     const fd=new FormData();fd.append('file',file);fd.append('client_id',activeClient.id);
     try{await fetch('/api/media/upload',{method:'POST',body:fd});completed++;fill.style.width=Math.round(completed/uploadedFiles.length*100)+'%';status.textContent=`${completed}/${uploadedFiles.length} traités…`;}
     catch(e){console.error(e);}
@@ -1041,7 +1164,8 @@ async function startAnalysis(){
 }
 
 function changeMonth(dir){calendarDate.setMonth(calendarDate.getMonth()+dir);buildCalendar();}
-function buildCalendar(){
+
+function buildCalendar() {
   const grid=document.getElementById('cal-grid');const year=calendarDate.getFullYear();const month=calendarDate.getMonth();
   document.getElementById('cal-month-label').textContent=`${MONTHS_FR[month]} ${year}`;grid.innerHTML='';
   const firstDay=(new Date(year,month,1).getDay()+6)%7;const daysInMonth=new Date(year,month+1,0).getDate();const daysInPrev=new Date(year,month,0).getDate();const today=new Date();
@@ -1053,7 +1177,8 @@ function buildCalendar(){
 
 const titles={dashboard:'Vue d\'ensemble',clients:'Gestion des clients',media:'Médiathèque',queue:'File de publication',reports:'Rapports de publications',calendar:'Calendrier éditorial',automation:'Centre d\'automatisation',stories:'Stories fixes'};
 const navMap={dashboard:0,clients:1,media:2,queue:3,reports:4,calendar:5,automation:6,stories:7};
-function nav(page){
+
+function nav(page) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('panel-'+page).classList.add('active');
@@ -1073,8 +1198,10 @@ function nav(page){
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+
 function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function toast(msg,type='info'){
+
+function toast(msg,type='info') {
   const icons={success:'✅',info:'💡',warn:'⚠️'};
   const el=document.createElement('div');el.className=`toast ${type}`;
   el.innerHTML=`<div class="toast-icon">${icons[type]||'ℹ️'}</div><div class="toast-text">${msg}</div>`;
@@ -1085,22 +1212,20 @@ function toast(msg,type='info'){
 // ══════════════════════════════════════════════════════════════
 // STORIES FIXES
 // ══════════════════════════════════════════════════════════════
-let currentStoryType='entreprise', storyTemplatesData=[], storyClientMedias={};
-let selectedPhotoUrl = '';
+let currentStoryType='entreprise', storyTemplatesData=[], selectedPhotoUrl='';
 
-function selectStoryType(type,btn){
+function selectStoryType(type,btn) {
   currentStoryType=type;
-  document.querySelectorAll('.story-type-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  document.querySelectorAll('.story-type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   renderStoryTemplates();
 }
 
-async function loadStoryTemplates(){
+async function loadStoryTemplates() {
   try{const r=await fetch('/api/story-templates');storyTemplatesData=await r.json();renderStoryTemplates();}
   catch(e){console.error(e);}
 }
 
-function renderStoryTemplates(){
+function renderStoryTemplates() {
   const grid=document.getElementById('story-templates-grid');
   const typeLabels={entreprise:{icon:'🏢'},tarifs:{icon:'💰'},temoignage:{icon:'⭐'},avant_apres:{icon:'🔄'}};
   const info=typeLabels[currentStoryType]||{icon:'📸'};
@@ -1116,9 +1241,8 @@ function renderStoryTemplates(){
     const genDate=template?.generated_at?new Date(template.generated_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):null;
     const statusHtml=hasVisuel
       ?`<span class="story-card-status story-status-ok">✅ Visuel généré${genDate?' — '+genDate:''}</span>`
-      :hasContent
-        ?`<span class="story-card-status story-status-missing">⏳ Contenu configuré</span>`
-        :`<span class="story-card-status story-status-none">⚙️ Non configuré</span>`;
+      :hasContent?`<span class="story-card-status story-status-missing">⏳ Contenu configuré</span>`
+               :`<span class="story-card-status story-status-none">⚙️ Non configuré</span>`;
     return `<div class="story-card">
       <div class="story-card-preview">
         ${hasVisuel?`<img src="${template.visuel_url}" onclick="window.open('${template.visuel_url}','_blank')" onerror="this.parentElement.innerHTML='<div class=story-card-preview-placeholder>${info.icon}</div>'">`:`<div class="story-card-preview-placeholder">${info.icon}</div>`}
@@ -1141,12 +1265,12 @@ function renderStoryTemplates(){
   }).join('');
 }
 
-async function openStoryEditor(clientId, type, clientName){
+async function openStoryEditor(clientId, type, clientName) {
   const titles2={entreprise:'🏢 Présentation entreprise',tarifs:'💰 Tarifs & Services',temoignage:'⭐ Témoignage client',avant_apres:'🔄 Avant / Après'};
   document.getElementById('story-modal-title').textContent=`${titles2[type]} — ${clientName}`;
   const existing=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);
   const c2=existing?.content||{};
-  selectedPhotoUrl = c2.photo_url || '';
+  selectedPhotoUrl=c2.photo_url||'';
 
   const forms={
     entreprise:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||clientName)}"></div><div class="form-group"><label class="form-label">Accroche</label><input class="form-input" id="st-sous_titre" value="${escHtml(c2.sous_titre||'')}"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="st-texte">${escHtml(c2.texte||'')}</textarea></div>`,
@@ -1155,19 +1279,18 @@ async function openStoryEditor(clientId, type, clientName){
     avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div>`
   };
 
-  // Charger les photos du client
-  let photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Chargement des photos...</div>';
+  let photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Chargement des photos...</div>';
   try {
-    const mr = await fetch(`/api/media/${clientId}`);
-    const medias = await mr.json();
-const photos = medias.filter(m => m.type==='photo' && m.url && m.url.includes('supabase'));
-    if(photos.length === 0){
-      photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Aucune photo disponible dans la médiathèque</div>';
+    const mr=await fetch(`/api/media/${clientId}`);
+    const medias=await mr.json();
+    const photos=medias.filter(m=>m.type==='photo'&&m.url&&m.url.includes('supabase'));
+    if(!photos.length){
+      photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Aucune photo disponible dans la médiathèque</div>';
     } else {
-      photosHtml = `<div class="photo-picker-grid" id="photo-picker-grid">${photos.map(m=>`<div class="photo-picker-item${selectedPhotoUrl===m.url?' selected':''}" onclick="selectStoryPhoto('${m.url}',this)"><img src="${m.url}" onerror="this.parentElement.style.display='none'"></div>`).join('')}</div>`;
+      photosHtml=`<div class="photo-picker-grid" id="photo-picker-grid">${photos.map(m=>`<div class="photo-picker-item${selectedPhotoUrl===m.url?' selected':''}" onclick="selectStoryPhoto('${m.url}',this)"><img src="${m.url}" onerror="this.parentElement.style.display='none'"></div>`).join('')}</div>`;
     }
   } catch(e) {
-    photosHtml = '<div style="font-size:12px;color:var(--text3);padding:8px">Erreur chargement photos</div>';
+    photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Erreur chargement photos</div>';
   }
 
   document.getElementById('story-modal-body').innerHTML=`
@@ -1184,31 +1307,22 @@ const photos = medias.filter(m => m.type==='photo' && m.url && m.url.includes('s
       <button class="btn btn-purple" onclick="saveStoryTemplate('${clientId}','${type}')">💾 Enregistrer</button>
       <button class="btn btn-accent" onclick="saveAndGenerateStory('${clientId}','${type}')">🎨 Générer le visuel</button>
     </div>`;
-
   openModal('modal-story-template');
 }
 
-function selectStoryPhoto(url, el){
-  selectedPhotoUrl = url;
-  // Mise à jour visuelle
+function selectStoryPhoto(url, el) {
+  selectedPhotoUrl=url;
   document.querySelectorAll('.photo-picker-item').forEach(i=>i.classList.remove('selected'));
-  if(el) el.classList.add('selected');
-  // Mettre à jour la preview et le bouton retirer
-  const previewImg = document.getElementById('st-photo-preview-img');
-  if(url){
-    if(previewImg){ previewImg.src = url; }
-    else {
-      const label = document.querySelector('.form-group:last-of-type .form-label');
-      if(label) label.innerHTML = '📸 Photo de fond <span style="color:var(--green);font-size:10px">✓ Sélectionnée</span>';
-    }
-  }
-  toast(url ? 'Photo sélectionnée ✓' : 'Photo retirée', 'success');
+  if(el)el.classList.add('selected');
+  const previewImg=document.getElementById('st-photo-preview-img');
+  if(previewImg&&url)previewImg.src=url;
+  toast(url?'Photo sélectionnée ✓':'Photo retirée','success');
 }
 
-function collectStoryFormData(type){
+function collectStoryFormData(type) {
   const get=id=>document.getElementById(id)?.value?.trim()||'';
-  const photo_url = selectedPhotoUrl || '';
-  switch(type){
+  const photo_url=selectedPhotoUrl||'';
+  switch(type) {
     case 'entreprise': return{titre:get('st-titre'),sous_titre:get('st-sous_titre'),texte:get('st-texte'),photo_url};
     case 'tarifs':     return{titre:get('st-titre'),services:get('st-services').replace(/\n/g,'<br>'),photo_url};
     case 'temoignage': return{texte:get('st-texte'),nom_client:get('st-nom_client'),note:parseInt(get('st-note')||'5'),photo_url};
@@ -1217,13 +1331,13 @@ function collectStoryFormData(type){
   }
 }
 
-async function saveStoryTemplate(clientId,type){
+async function saveStoryTemplate(clientId, type) {
   const content=collectStoryFormData(type);
   try{const r=await fetch('/api/story-templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});if(!r.ok)throw new Error();await loadStoryTemplates();closeModal('modal-story-template');toast('Template enregistré ✓','success');}
   catch{toast('Erreur sauvegarde','warn');}
 }
 
-async function saveAndGenerateStory(clientId,type){
+async function saveAndGenerateStory(clientId, type) {
   const content=collectStoryFormData(type);
   const btn=event.target;btn.disabled=true;btn.textContent='⏳ Génération...';
   try{const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});const data=await r.json();if(!r.ok)throw new Error(data.error);await loadStoryTemplates();closeModal('modal-story-template');toast('Visuel généré ! 🎨','success');}
@@ -1231,13 +1345,13 @@ async function saveAndGenerateStory(clientId,type){
   finally{btn.disabled=false;btn.textContent='🎨 Générer le visuel';}
 }
 
-async function regenerateStory(clientId,type){
+async function regenerateStory(clientId, type) {
   toast('Régénération...','info');
   try{const t=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content:t?.content||{}})});if(!r.ok)throw new Error();await loadStoryTemplates();toast('Visuel régénéré ✓','success');}
   catch{toast('Erreur régénération','warn');}
 }
 
-async function toggleStoryTemplate(clientId,type,actif){
+async function toggleStoryTemplate(clientId, type, actif) {
   try{await fetch('/api/story-templates/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,actif})});await loadStoryTemplates();toast(actif?'Story activée ▶':'Story désactivée ⏸','success');}
   catch{toast('Erreur','warn');}
 }

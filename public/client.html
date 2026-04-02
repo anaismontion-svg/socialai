@@ -103,8 +103,8 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .modal-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
 .modal-close{width:28px;height:28px;border-radius:50%;background:var(--surface);border:none;color:var(--chalk2);font-size:14px;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--border2);color:var(--chalk)}
-.post-detail-img{width:100%;max-height:300px;object-fit:cover;border-radius:var(--r);margin-bottom:16px}
-.post-detail-placeholder{width:100%;height:180px;background:var(--ink3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:16px}
+.post-detail-img{width:100%;max-height:300px;object-fit:cover;border-radius:var(--r);display:block}
+.post-detail-placeholder{width:100%;height:180px;background:var(--ink3);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:48px}
 
 /* STATS ENGAGEMENT */
 .engagement-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
@@ -181,15 +181,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 /* AI SUGGEST BOX */
 .ai-suggestion-box{background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:16px;margin-top:12px}
 .ai-suggestion-title{font-size:12px;font-weight:600;color:var(--purple);margin-bottom:10px}
-.ai-explain-item{display:flex;gap:8px;margin-bottom:6px;font-size:12px;color:var(--chalk2)}
-.ai-explain-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:5px}
-
-/* SCORE */
-.score-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.score-label{font-size:12px;color:var(--chalk2);width:100px;flex-shrink:0}
-.score-bg{flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden}
-.score-fill{height:100%;border-radius:3px}
-.score-val{font-size:11px;font-weight:600;width:36px;text-align:right;flex-shrink:0}
 
 /* CHAT STRATÉGIQUE */
 .chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:500px;background:var(--ink2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
@@ -261,6 +252,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   .engagement-grid{grid-template-columns:repeat(2,1fr)}
   .nav-tabs{padding:0 12px}
 }
+
 /* ARIA GRANDE SUR LE CÔTÉ */
 .page-layout{display:flex;align-items:flex-start;gap:0;position:relative}
 .aria-side{width:200px;flex-shrink:0;position:sticky;top:80px;display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:20px}
@@ -274,7 +266,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 .aria-side-cta{margin-top:8px}
 .content-area{flex:1;min-width:0;padding-left:20px}
 @keyframes ariaEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-/* Retirer les anciens aria-widget inline */
 .aria-widget{display:none}
 @media(max-width:768px){
   .aria-side{display:none}
@@ -299,7 +290,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 <!-- MODAL ARIA — CONSEILLÈRE STRATÉGIQUE IA -->
 <div class="overlay" id="modal-aria">
   <div class="modal" style="max-width:680px;padding:0;overflow:hidden;max-height:85vh;display:flex;flex-direction:column">
-    <!-- Header -->
     <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(77,166,255,0.05));flex-shrink:0">
       <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🧠</div>
       <div style="flex:1">
@@ -314,11 +304,8 @@ textarea.form-input{resize:vertical;min-height:80px}
         <button class="modal-close" onclick="closeModal('modal-aria')">✕</button>
       </div>
     </div>
-    <!-- Messages -->
     <div id="aria-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:300px"></div>
-    <!-- Suggestions -->
     <div id="aria-suggestions" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 8px"></div>
-    <!-- Zone de saisie -->
     <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-shrink:0">
       <textarea id="aria-input"
         style="flex:1;background:var(--ink3);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;color:var(--chalk);font-size:13px;resize:none;max-height:100px;min-height:42px;font-family:'Bricolage Grotesque',sans-serif;line-height:1.5;outline:none;transition:border-color 0.15s"
@@ -425,8 +412,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB DASHBOARD ════ -->
   <div class="tab-content active" id="tab-dashboard">
-
-    <!-- ARIA DASHBOARD -->
     <div class="aria-widget">
       <img src="/aria/aria-dashboard.png" class="aria-img" alt="Aria">
       <div class="aria-bubble">
@@ -439,81 +424,42 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
 
     <div class="stats-row" id="stats-row">
-      <div class="stat-pill">
-        <div class="stat-pill-val" id="stat-total">—</div>
-        <div class="stat-pill-lbl">Posts planifiés</div>
-      </div>
-      <div class="stat-pill">
-        <div class="stat-pill-val" id="stat-reach">—</div>
-        <div class="stat-pill-lbl">Reach moyen</div>
-        <div class="stat-pill-sub">30 derniers jours</div>
-      </div>
-      <div class="stat-pill">
-        <div class="stat-pill-val" id="stat-engagement">—</div>
-        <div class="stat-pill-lbl">Engagement</div>
-        <div class="stat-pill-sub">Taux moyen</div>
-      </div>
-      <div class="stat-pill">
-        <div class="stat-pill-val" id="stat-medias">—</div>
-        <div class="stat-pill-lbl">Médias dispo</div>
-        <div class="stat-pill-sub">Pour publication</div>
-      </div>
+      <div class="stat-pill"><div class="stat-pill-val" id="stat-total">—</div><div class="stat-pill-lbl">Posts planifiés</div></div>
+      <div class="stat-pill"><div class="stat-pill-val" id="stat-reach">—</div><div class="stat-pill-lbl">Reach moyen</div><div class="stat-pill-sub">30 derniers jours</div></div>
+      <div class="stat-pill"><div class="stat-pill-val" id="stat-engagement">—</div><div class="stat-pill-lbl">Engagement</div><div class="stat-pill-sub">Taux moyen</div></div>
+      <div class="stat-pill"><div class="stat-pill-val" id="stat-medias">—</div><div class="stat-pill-lbl">Médias dispo</div><div class="stat-pill-sub">Pour publication</div></div>
     </div>
 
-    <!-- Prochain post -->
     <div class="s-header">
       <div class="s-title">🔜 Prochain post planifié</div>
       <button class="btn btn-sm" onclick="switchTab('planned')">Voir tous →</button>
     </div>
     <div id="next-post-preview" style="margin-bottom:24px"></div>
 
-    <!-- Top posts -->
     <div class="s-header">
       <div class="s-title">⭐ Vos meilleurs posts</div>
       <button class="btn btn-sm" onclick="switchTab('history')">Voir tout →</button>
     </div>
     <div class="post-grid-client" id="top-posts-grid" style="margin-bottom:24px"></div>
 
-    <!-- Aide rapide -->
     <div class="help-section">
-      <div class="s-header" style="margin-bottom:16px">
-        <div class="s-title">💬 Besoin d'aide ?</div>
-      </div>
+      <div class="s-header" style="margin-bottom:16px"><div class="s-title">💬 Besoin d'aide ?</div></div>
       <div class="help-grid">
-        <div class="help-card" onclick="setHelpSubject('modification_post')">
-          <div class="help-card-icon">✏️</div>
-          <div class="help-card-title">Modifier un post</div>
-          <div class="help-card-desc">Changer le contenu d'un post planifié</div>
-        </div>
-        <div class="help-card" onclick="setHelpSubject('contenu_urgent')">
-          <div class="help-card-icon">⚡</div>
-          <div class="help-card-title">Contenu urgent</div>
-          <div class="help-card-desc">Publier quelque chose rapidement</div>
-        </div>
-        <div class="help-card" onclick="openAriaChat()" style="border-color:rgba(167,139,250,0.3);background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(77,166,255,0.04))">
-          <div class="help-card-icon">🎯</div>
-          <div class="help-card-title">Question stratégie</div>
-          <div class="help-card-desc">Parler avec Aria, votre IA stratégique</div>
-          <div style="font-size:10px;color:var(--purple);margin-top:6px;font-weight:600">✨ Conseillère IA</div>
-        </div>
-        <div class="help-card" onclick="setHelpSubject('autre')">
-          <div class="help-card-icon">💬</div>
-          <div class="help-card-title">Autre demande</div>
-          <div class="help-card-desc">Toute autre question ou demande</div>
-        </div>
+        <div class="help-card" onclick="setHelpSubject('modification_post')"><div class="help-card-icon">✏️</div><div class="help-card-title">Modifier un post</div><div class="help-card-desc">Changer le contenu d'un post planifié</div></div>
+        <div class="help-card" onclick="setHelpSubject('contenu_urgent')"><div class="help-card-icon">⚡</div><div class="help-card-title">Contenu urgent</div><div class="help-card-desc">Publier quelque chose rapidement</div></div>
+        <div class="help-card" onclick="openAriaChat()" style="border-color:rgba(167,139,250,0.3);background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(77,166,255,0.04))"><div class="help-card-icon">🎯</div><div class="help-card-title">Question stratégie</div><div class="help-card-desc">Parler avec Aria, votre IA stratégique</div><div style="font-size:10px;color:var(--purple);margin-top:6px;font-weight:600">✨ Conseillère IA</div></div>
+        <div class="help-card" onclick="setHelpSubject('autre')"><div class="help-card-icon">💬</div><div class="help-card-title">Autre demande</div><div class="help-card-desc">Toute autre question ou demande</div></div>
       </div>
     </div>
   </div>
 
   <!-- ════ TAB PLANIFIÉS ════ -->
   <div class="tab-content" id="tab-planned">
-
-    <!-- ARIA PLANNED -->
     <div class="aria-widget">
       <img src="/aria/aria-planned.png" class="aria-img" alt="Aria">
       <div class="aria-bubble">
         <div class="aria-bubble-name">✨ Aria</div>
-        <div class="aria-bubble-text">Voici vos posts planifiés. Cliquez sur l'un d'eux pour modifier la caption ou demander une suggestion IA 📅</div>
+        <div class="aria-bubble-text">Voici vos posts planifiés. Cliquez pour modifier la photo, la caption ou publier immédiatement 📅</div>
       </div>
     </div>
 
@@ -521,7 +467,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div class="s-title">📅 Publications planifiées</div>
       <div class="s-count" id="posts-count">0</div>
     </div>
-    <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Cliquez sur une publication pour la consulter, modifier la caption ou demander une suggestion IA.</p>
+    <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Cliquez sur une publication pour la consulter, modifier la photo, la caption ou la publier immédiatement.</p>
     <div id="planned-grid">
       <div class="loading-screen">
         <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
@@ -532,8 +478,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB HISTORIQUE ════ -->
   <div class="tab-content" id="tab-history">
-
-    <!-- ARIA HISTORY -->
     <div class="aria-widget">
       <img src="/aria/aria-history.png" class="aria-img" alt="Aria">
       <div class="aria-bubble">
@@ -548,7 +492,6 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Vos publications Instagram avec leurs statistiques d'engagement.</p>
 
-    <!-- Engagement global -->
     <div class="engagement-grid" id="engagement-grid" style="display:none">
       <div class="eng-card"><div class="eng-val" id="eng-likes">—</div><div class="eng-lbl">❤️ Likes</div></div>
       <div class="eng-card"><div class="eng-val" id="eng-comments">—</div><div class="eng-lbl">💬 Commentaires</div></div>
@@ -561,8 +504,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB MÉDIAS ════ -->
   <div class="tab-content" id="tab-medias">
-
-    <!-- ARIA MEDIA -->
     <div class="aria-widget">
       <img src="/aria/aria-media.png" class="aria-img" alt="Aria">
       <div class="aria-bubble">
@@ -577,7 +518,6 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <p style="font-size:12px;color:var(--chalk3);margin-bottom:16px">Uploadez vos photos et vidéos. L'IA les analyse automatiquement et les utilise pour créer vos publications.</p>
 
-    <!-- Zone d'upload -->
     <div class="upload-zone-big" id="upload-zone-big"
       ondragover="handleDragOver(event)"
       ondragleave="handleDragLeave(event)"
@@ -590,16 +530,12 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div style="font-size:11px;color:var(--chalk3);margin-top:8px">L'IA analyse chaque média et calcule son potentiel viral</div>
     </div>
 
-    <!-- Queue d'upload -->
     <div id="upload-queue" style="margin-bottom:16px"></div>
-
-    <!-- Grille médias -->
     <div id="media-loading" style="display:none" class="loading-screen" style="min-height:200px">
       <div class="spinner" style="width:24px;height:24px;border-width:3px"></div>
       <div>Chargement…</div>
     </div>
     <div class="media-grid" id="media-grid"></div>
-
     <div id="media-empty" class="empty" style="display:none">
       <div class="empty-icon">🖼️</div>
       <div class="empty-title">Aucun média</div>
@@ -609,8 +545,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 
   <!-- ════ TAB POST SPÉCIAL ════ -->
   <div class="tab-content" id="tab-special">
-
-    <!-- ARIA SPECIAL -->
     <div class="aria-widget">
       <img src="/aria/aria-special.png" class="aria-img" alt="Aria">
       <div class="aria-bubble">
@@ -628,10 +562,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 
       <div id="quota-section" style="display:none">
         <div class="quota-bar-wrap">
-          <div class="quota-label">
-            <span>Posts spéciaux cette semaine</span>
-            <span id="quota-text">0 / 1</span>
-          </div>
+          <div class="quota-label"><span>Posts spéciaux cette semaine</span><span id="quota-text">0 / 1</span></div>
           <div class="quota-bar"><div class="quota-fill" id="quota-fill" style="width:0%"></div></div>
         </div>
       </div>
@@ -675,6 +606,32 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="locked-icon">⏳</div>
         <div class="locked-title">Quota hebdomadaire atteint</div>
         <div class="locked-sub">Votre forfait Starter inclut 1 post spécial par semaine.<br>Renouvellement chaque lundi.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ TAB CONSEILLER IA ════ -->
+  <div class="tab-content" id="tab-strategie">
+    <div class="chat-wrap">
+      <div class="chat-header">
+        <div class="chat-avatar">🎯</div>
+        <div>
+          <div class="chat-name">Conseiller Stratégie Digitale</div>
+          <div class="chat-desc">IA spécialisée community management Instagram</div>
+        </div>
+        <button class="btn btn-sm" onclick="resetChat()" style="margin-left:auto;font-size:10px">↺ Réinitialiser</button>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-wrap">
+        <div id="chat-quick-actions" class="chat-actions"></div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chat-input"
+            placeholder="Posez votre question stratégique…"
+            rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+          <button class="chat-send" id="chat-send-btn" onclick="sendChatMessage()">➤</button>
+        </div>
       </div>
     </div>
   </div>
@@ -744,6 +701,10 @@ function switchTab(tab) {
     }
   });
   updateAriaSide(tab);
+  if (tab === 'strategie') {
+    window._plannedPosts = posts || [];
+    startChat();
+  }
 }
 
 // ── Load Posts ────────────────────────────────────────────────────────────────
@@ -867,9 +828,7 @@ function renderPlannedGrid() {
     const date = p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
     return `
     <div class="post-item-client" onclick="openPostDetail('${p.id}','queue')">
-      ${p.media_url
-        ? `<img src="${p.media_url}" onerror="this.style.display='none'">`
-        : `<div class="post-item-client-placeholder">${p.type==='reel'?'🎬':p.type==='carousel'?'🎠':'📅'}<span>${date}</span></div>`}
+      ${p.media_url ? `<img src="${p.media_url}" onerror="this.style.display='none'">` : `<div class="post-item-client-placeholder">${p.type==='reel'?'🎬':p.type==='carousel'?'🎠':'📅'}<span>${date}</span></div>`}
       <div class="post-item-client-badge badge-planned">📅 ${date}</div>
       <div class="post-item-client-overlay">
         <div style="font-size:10px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.caption||'—')}</div>
@@ -969,15 +928,12 @@ async function handleMediaUpload(files) {
       </div>
       <div class="upload-progress-bar"><div class="upload-progress-fill" id="${id}_bar"></div></div>
     </div>`;
-
     const bar    = document.getElementById(id+'_bar');
     const status = document.getElementById(id+'_status');
     bar.style.width = '30%';
-
     const formData = new FormData();
     formData.append('file', file);
     formData.append('client_id', clientId);
-
     try {
       bar.style.width = '60%';
       status.textContent = 'Upload en cours…';
@@ -1009,24 +965,38 @@ async function deleteMedia(mediaId, e) {
   } catch { toast('Erreur suppression','err'); }
 }
 
-// ── Modal Détail Post ─────────────────────────────────────────────────────────
+// ── Modal Détail Post — AVEC PHOTO PICKER + PUBLISH NOW ──────────────────────
 async function openPostDetail(postId, type) {
   openModal('modal-post-detail');
   document.getElementById('post-detail-title').textContent='Chargement…';
   document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
   try {
-    const r = await fetch(`/api/reports/post/${postId}?type=${type}`);
+    const r    = await fetch(`/api/reports/post/${postId}?type=${type}`);
     const post = await r.json();
-    const isQueue = type==='queue';
-    const date = post.original_post_date||post.scheduled_at;
-    const dateStr = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
-    const score = post.performance_score||0;
+    const isQueue  = type==='queue';
+    const date     = post.original_post_date||post.scheduled_at;
+    const dateStr  = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
+    const score    = post.performance_score||0;
+    const mediaUrl = post.media_url||post.url||'';
 
     document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
+
     document.getElementById('post-detail-content').innerHTML=`
-      ${post.media_url||post.url
-        ?`<img class="post-detail-img" src="${post.media_url||post.url}" onerror="this.style.display='none'">`
-        :`<div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>`}
+      ${mediaUrl
+        ? `<div style="position:relative;margin-bottom:16px">
+             <img class="post-detail-img" id="detail-main-img" src="${mediaUrl}" style="display:block" onerror="this.style.display='none'">
+             ${isQueue ? `<button onclick="openClientPhotoPicker('${postId}')"
+               style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.75);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;backdrop-filter:blur(4px)">
+               🖼️ Changer la photo
+             </button>` : ''}
+           </div>`
+        : `<div style="position:relative;margin-bottom:16px">
+             <div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>
+             ${isQueue ? `<button onclick="openClientPhotoPicker('${postId}')"
+               style="width:100%;margin-top:8px;padding:10px;background:var(--ink3);border:1px dashed var(--border2);border-radius:var(--r);color:var(--chalk3);font-size:12px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">
+               🖼️ Choisir une photo depuis ma médiathèque
+             </button>` : ''}
+           </div>`}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
         <span style="font-size:12px;color:var(--chalk3)">${dateStr}</span>
         ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(0,212,170,0.12);color:var(--mint);font-weight:600">📅 Planifié</span>':''}
@@ -1047,6 +1017,7 @@ async function openPostDetail(postId, type) {
         ${isQueue?`<textarea class="form-input" id="detail-caption-edit" style="margin-top:8px;display:none;min-height:100px">${escHtml(post.caption||'')}</textarea>`:''}
       </div>
       <div id="ai-suggestion-result-client"></div>
+      <div id="client-aria-publish-advice" style="display:none"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
         ${isQueue?`
           <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier la caption</button>
@@ -1054,14 +1025,17 @@ async function openPostDetail(postId, type) {
           <button class="btn btn-ghost btn-sm" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
         `:''}
         <button class="btn btn-sm btn-purple" onclick="openAISuggestClient('${post.id}','${escHtml(post.caption||'')}','${type}')">✨ Suggestion IA</button>
-        ${isQueue?`<button class="btn btn-sm btn-danger" onclick="deletePost('${post.id}')">🗑️ Supprimer</button>`:''}
+        ${isQueue?`
+          <button class="btn btn-sm" style="background:rgba(0,212,170,0.15);color:var(--mint);border-color:rgba(0,212,170,0.3)" onclick="requestClientPublishNow('${post.id}')">⚡ Publier maintenant</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePost('${post.id}')">🗑️ Supprimer</button>
+        `:''}
       </div>`;
   } catch(e) {
     document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--chalk3)">Erreur de chargement</div>';
   }
 }
 
-function toggleCaptionEdit(){
+function toggleCaptionEdit() {
   document.getElementById('detail-caption-display').style.display='none';
   document.getElementById('detail-caption-edit').style.display='block';
   document.getElementById('btn-edit-caption').style.display='none';
@@ -1070,7 +1044,7 @@ function toggleCaptionEdit(){
   document.getElementById('detail-caption-edit').focus();
 }
 
-function cancelCaptionEdit(){
+function cancelCaptionEdit() {
   document.getElementById('detail-caption-display').style.display='block';
   document.getElementById('detail-caption-edit').style.display='none';
   document.getElementById('btn-edit-caption').style.display='flex';
@@ -1078,35 +1052,35 @@ function cancelCaptionEdit(){
   document.getElementById('btn-cancel-caption').style.display='none';
 }
 
-async function savePostCaption(postId){
+async function savePostCaption(postId) {
   const caption=document.getElementById('detail-caption-edit').value.trim();
   if(!caption){toast('Caption vide','err');return;}
-  try{
+  try {
     const r=await fetch(`/api/portal/posts/${postId}/caption`,{method:'PATCH',headers:authHeaders(),body:JSON.stringify({caption})});
     if(!r.ok)throw new Error();
     document.getElementById('detail-caption-display').textContent=caption;
     cancelCaptionEdit();
     toast('Caption mise à jour ✓','ok');
     loadPosts();
-  }catch{toast('Erreur sauvegarde','err');}
+  } catch{toast('Erreur sauvegarde','err');}
 }
 
-async function deletePost(postId){
+async function deletePost(postId) {
   if(!confirm('Supprimer ce post planifié ?'))return;
-  try{
+  try {
     const r=await fetch(`/api/queue/${postId}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
     if(!r.ok)throw new Error();
     closeModal('modal-post-detail');
     toast('Post supprimé','ok');
     await loadPosts();
-  }catch{toast('Erreur suppression','err');}
+  } catch{toast('Erreur suppression','err');}
 }
 
-async function openAISuggestClient(postId, currentCaption, type){
+async function openAISuggestClient(postId, currentCaption, type) {
   const resultEl=document.getElementById('ai-suggestion-result-client');
   const directive=prompt('Directive optionnelle :\nEx: "Plus émotionnelle", "Optimise les hashtags", "Plus courte"')||'';
   resultEl.innerHTML='<div style="text-align:center;padding:16px"><span class="spinner"></span> L\'IA analyse…</div>';
-  try{
+  try {
     const r=await fetch(`/api/reports/post/${postId}/ai-suggest`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({directive,currentCaption})
@@ -1119,21 +1093,171 @@ async function openAISuggestClient(postId, currentCaption, type){
         <div style="background:var(--ink3);border:1px solid rgba(167,139,250,0.2);border-radius:var(--r);padding:12px;font-size:13px;color:var(--chalk2);line-height:1.6;white-space:pre-wrap;margin-bottom:10px" id="ai-client-new-caption">${escHtml(data.suggestion||'')}</div>
         ${type==='queue'?`<button class="btn btn-sm btn-rose" onclick="applyClientAISuggestion('${postId}')">✅ Appliquer cette caption</button>`:''}
       </div>`;
-  }catch(e){
+  } catch(e) {
     resultEl.innerHTML=`<div style="color:var(--rose);font-size:13px;padding:12px">Erreur: ${e.message}</div>`;
   }
 }
 
-async function applyClientAISuggestion(postId){
+async function applyClientAISuggestion(postId) {
   const newCaption=document.getElementById('ai-client-new-caption')?.textContent;
   if(!newCaption)return;
-  try{
+  try {
     const r=await fetch(`/api/portal/posts/${postId}/caption`,{method:'PATCH',headers:authHeaders(),body:JSON.stringify({caption:newCaption})});
     if(!r.ok)throw new Error();
     document.getElementById('detail-caption-display').textContent=newCaption;
     toast('Caption appliquée ✓','ok');
     loadPosts();
-  }catch{toast('Erreur','err');}
+  } catch{toast('Erreur','err');}
+}
+
+// ── 🆕 PHOTO PICKER ───────────────────────────────────────────────────────────
+async function openClientPhotoPicker(postId) {
+  const existing=document.getElementById('modal-client-photo-picker');
+  if(existing)existing.remove();
+
+  const overlay=document.createElement('div');
+  overlay.className='overlay open';
+  overlay.id='modal-client-photo-picker';
+  overlay.innerHTML=`
+    <div class="modal" style="max-width:660px">
+      <div class="modal-header">
+        <div class="modal-title">🖼️ Choisir une photo</div>
+        <button class="modal-close" onclick="document.getElementById('modal-client-photo-picker').remove()">✕</button>
+      </div>
+      <p style="font-size:12px;color:var(--chalk3);margin-bottom:14px">Sélectionnez une photo depuis votre médiathèque pour remplacer le visuel de ce post.</p>
+      <div id="client-photo-picker-loading" style="text-align:center;padding:32px;color:var(--chalk3)">
+        <div class="spinner" style="width:24px;height:24px;border-width:3px;margin:0 auto 10px"></div>
+        <div>Chargement de vos photos…</div>
+      </div>
+      <div id="client-photo-picker-grid"
+        style="display:none;grid-template-columns:repeat(4,1fr);gap:8px;max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:10px;background:var(--ink3)">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="document.getElementById('modal-client-photo-picker').remove()">Annuler</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+
+  try {
+    const r      = await fetch(`/api/media/${clientId}`, { headers: { Authorization:`Bearer ${token}` } });
+    const medList = await r.json();
+    const photos  = medList.filter(m => m.type==='photo' && m.url);
+
+    document.getElementById('client-photo-picker-loading').style.display='none';
+    const grid = document.getElementById('client-photo-picker-grid');
+    grid.style.display='grid';
+
+    if (!photos.length) {
+      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--chalk3)"><div style="font-size:32px;margin-bottom:8px">📷</div><div>Aucune photo dans votre médiathèque.</div><div style="font-size:11px;margin-top:4px">Uploadez des photos dans l\'onglet "Mes médias".</div></div>';
+      return;
+    }
+
+    grid.innerHTML = photos.map(m => `
+      <div onclick="applyClientNewPhoto('${postId}','${m.url}','${m.id}')"
+        style="border-radius:8px;overflow:hidden;aspect-ratio:1;cursor:pointer;border:2px solid transparent;transition:all 0.15s;position:relative"
+        onmouseover="this.style.borderColor='var(--rose)';this.style.transform='scale(1.02)'"
+        onmouseout="this.style.borderColor='transparent';this.style.transform='scale(1)'">
+        <img src="${m.url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'">
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('client-photo-picker-loading').innerHTML='<div style="color:var(--rose)">Erreur de chargement de vos photos.</div>';
+  }
+}
+
+async function applyClientNewPhoto(postId, newUrl, mediaId) {
+  try {
+    const r=await fetch(`/api/queue/${postId}/media`, {
+      method:'PATCH',
+      headers:authHeaders(),
+      body:JSON.stringify({media_url:newUrl, media_id:mediaId})
+    });
+    if(!r.ok)throw new Error();
+    const img=document.getElementById('detail-main-img');
+    if(img) img.src=newUrl;
+    document.getElementById('modal-client-photo-picker')?.remove();
+    toast('Photo mise à jour ✓','ok');
+    await loadPosts();
+  } catch { toast('Erreur lors du changement de photo','err'); }
+}
+
+// ── 🆕 PUBLICATION FORCÉE AVEC CONSEIL ARIA ───────────────────────────────────
+async function requestClientPublishNow(postId) {
+  const adviceEl=document.getElementById('client-aria-publish-advice');
+  adviceEl.style.display='block';
+  adviceEl.innerHTML=`
+    <div style="text-align:center;padding:12px;color:var(--chalk3)">
+      <div class="spinner" style="margin:0 auto 6px"></div>
+      <div style="font-size:12px">Aria analyse le meilleur moment…</div>
+    </div>`;
+
+  try {
+    const r    = await fetch(`/api/queue/${postId}/best-hour`);
+    const data = await r.json();
+
+    if (data.isOptimal) {
+      adviceEl.innerHTML=`
+        <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.25);border-radius:var(--r2);padding:16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--mint),var(--sky));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✅</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--chalk)">Aria — Moment idéal !</div>
+              <div style="font-size:11px;color:var(--mint)">Heure optimale confirmée</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--chalk2);line-height:1.6;margin-bottom:12px">${data.ariaMessage}</div>
+          <button class="btn btn-sm" style="background:var(--mint);color:var(--ink);border-color:var(--mint);font-weight:600" onclick="confirmClientPublishNow('${postId}')">
+            ⚡ Publier maintenant
+          </button>
+        </div>`;
+    } else {
+      adviceEl.innerHTML=`
+        <div style="background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(255,77,109,0.05));border:1px solid rgba(167,139,250,0.3);border-radius:var(--r2);padding:16px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧠</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--chalk)">Aria — Conseil stratégique</div>
+              <div style="font-size:11px;color:var(--purple)">IA · Community management</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--chalk2);line-height:1.6;margin-bottom:14px">${data.ariaMessage.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--chalk)">$1</strong>')}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-rose" onclick="confirmClientPublishNow('${postId}')">
+              ⚡ Publier quand même maintenant
+            </button>
+            <button class="btn btn-sm" style="color:var(--chalk3)" onclick="document.getElementById('client-aria-publish-advice').style.display='none'">
+              ← Garder la planification
+            </button>
+          </div>
+        </div>`;
+    }
+  } catch(e) {
+    adviceEl.innerHTML=`
+      <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:var(--r2);padding:14px;margin-top:8px">
+        <div style="font-size:13px;color:var(--chalk2);margin-bottom:10px">Publier ce post immédiatement sur Instagram ?</div>
+        <button class="btn btn-sm" style="background:var(--mint);color:var(--ink);border-color:var(--mint)" onclick="confirmClientPublishNow('${postId}')">
+          ⚡ Publier maintenant
+        </button>
+      </div>`;
+  }
+}
+
+async function confirmClientPublishNow(postId) {
+  const btn=event.target;
+  btn.disabled=true;
+  btn.textContent='⏳ Publication en cours…';
+  try {
+    const r=await fetch(`/api/queue/${postId}/publish-now`, {method:'POST', headers:authHeaders()});
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error);
+    toast('⚡ Publication lancée ! Votre post arrive sur Instagram dans quelques instants.','ok');
+    closeModal('modal-post-detail');
+    setTimeout(()=>loadPosts(), 4000);
+  } catch(e) {
+    toast('Erreur : '+(e.message||'impossible de publier'),'err');
+    btn.disabled=false;
+    btn.textContent='⚡ Publier quand même maintenant';
+  }
 }
 
 // ── Aide CM ───────────────────────────────────────────────────────────────────
@@ -1178,20 +1302,20 @@ function updateSpecialSection() {
   }
 }
 
-function toggleAI(){
+function toggleAI() {
   aiEnabled=!aiEnabled;
   document.getElementById('ai-toggle').classList.toggle('active',aiEnabled);
   document.getElementById('manual-caption-section').style.display=aiEnabled?'none':'block';
   document.getElementById('ai-preview').style.display='none';
 }
 
-function handleSpecialFile(input){
+function handleSpecialFile(input) {
   if(!input.files[0])return;
   document.getElementById('special-file-name').textContent=`📎 ${input.files[0].name}`;
   document.getElementById('special-file-name').style.display='block';
 }
 
-async function submitSpecialPost(){
+async function submitSpecialPost() {
   const message=document.getElementById('special-message').value.trim();
   if(!message){toast('Décrivez votre besoin','err');return;}
   const dateVal=document.getElementById('special-date').value;
@@ -1200,26 +1324,26 @@ async function submitSpecialPost(){
   const scheduled_at=dateVal?new Date(`${dateVal}T${timeVal}`).toISOString():null;
   const btn=document.getElementById('btn-submit-special');
   btn.innerHTML='<span class="spinner"></span> Envoi…'; btn.disabled=true;
-  try{
+  try {
     const r=await fetch(`/api/portal/${clientId}/special-post`,{
       method:'POST',headers:authHeaders(),
       body:JSON.stringify({message,scheduled_at,let_ai_decide:aiEnabled,manual_caption:aiEnabled?null:manualCaption})
     });
     const data=await r.json();
-    if(!r.ok){
+    if(!r.ok) {
       if(data.error==='limite_atteinte'){toast(data.message,'warn');await loadSpecialQuota();}
       else toast(data.error||'Erreur','err');
       return;
     }
-    if(aiEnabled&&data.caption){
+    if(aiEnabled&&data.caption) {
       document.getElementById('ai-preview-text').textContent=data.caption;
       document.getElementById('ai-preview').style.display='block';
     }
     toast('Demande envoyée ! 🚀','ok');
     document.getElementById('special-message').value='';
     await Promise.all([loadPosts(),loadSpecialQuota()]);
-  }catch{toast('Erreur lors de l\'envoi','err');}
-  finally{btn.textContent='🚀 Envoyer la demande';btn.disabled=false;}
+  } catch { toast('Erreur lors de l\'envoi','err'); }
+  finally { btn.textContent='🚀 Envoyer la demande'; btn.disabled=false; }
 }
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
@@ -1232,7 +1356,7 @@ function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')})});
-function toast(msg,type='info'){
+function toast(msg,type='info') {
   const icons={ok:'✅',err:'❌',info:'💡',warn:'⚠️'};
   const el=document.createElement('div');
   el.className=`toast ${type}`;
@@ -1242,7 +1366,7 @@ function toast(msg,type='info'){
 }
 
 // ══════════════════════════════════════════════════════════════
-// ARIA — CONSEILLÈRE STRATÉGIQUE IA
+// ARIA — CONSEILLÈRE STRATÉGIQUE IA (modal)
 // ══════════════════════════════════════════════════════════════
 let ariaHistory = [];
 let ariaLoading = false;
@@ -1260,7 +1384,6 @@ function openAriaChat() {
 function startAriaConversation() {
   const name = localStorage.getItem('portal_client_name') || 'votre compte';
   const ctx = buildAriaContext();
-
   const intro = `Bonjour ! Je suis **Aria**, votre conseillère en stratégie digitale. 🎯
 
 J'ai accès aux données de votre compte **${name}** :
@@ -1269,7 +1392,6 @@ J'ai accès aux données de votre compte **${name}** :
 • ${ctx.avgLikes} likes en moyenne par post
 
 Pour vous proposer la meilleure stratégie, commençons par l'essentiel : **quel est votre objectif principal sur Instagram en ce moment ?**`;
-
   addAriaMessage('ai', intro);
   showAriaSuggestions([
     '🚀 Gagner plus de followers',
@@ -1300,7 +1422,6 @@ function addAriaMessage(role, content, extraHtml='') {
   const el = document.createElement('div');
   const isUser = role === 'user';
   const time = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-
   el.style.cssText = `display:flex;gap:10px;align-items:flex-start;animation:tin 0.3s ease;${isUser?'flex-direction:row-reverse':''}`;
   el.innerHTML = `
     <div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:${isUser?'linear-gradient(135deg,var(--rose),var(--amber))':'linear-gradient(135deg,var(--purple),var(--sky))'}">
@@ -1314,7 +1435,6 @@ function addAriaMessage(role, content, extraHtml='') {
       </div>
       <div style="font-size:10px;color:var(--chalk3);margin-top:3px;${isUser?'text-align:right':''}">${time}</div>
     </div>`;
-
   document.getElementById('aria-messages').appendChild(el);
   document.getElementById('aria-messages').scrollTop = 99999;
   ariaHistory.push({ role: role === 'ai' ? 'assistant' : 'user', content });
@@ -1357,16 +1477,13 @@ async function sendAriaMessage() {
   const input = document.getElementById('aria-input');
   const msg = input.value.trim();
   if (!msg || ariaLoading) return;
-
   input.value = '';
   input.style.height = 'auto';
   document.getElementById('aria-send-btn').disabled = true;
   document.getElementById('aria-suggestions').innerHTML = '';
   ariaLoading = true;
-
   addAriaMessage('user', msg);
   showAriaTyping();
-
   try {
     const ctx = buildAriaContext();
     const systemPrompt = `Tu es Aria, consultante experte en stratégie digitale Instagram pour SocialAI.
@@ -1390,14 +1507,9 @@ TON RÔLE :
 1. Poser des questions ciblées (max 2 à la fois) pour comprendre objectifs et obstacles
 2. Analyser les données du compte pour des recommandations personnalisées
 3. Proposer un plan d'action concret et priorisé
-4. IMPORTANT : quand tu proposes un plan, propose aussi des reformulations spécifiques pour les posts planifiés en cours, en respectant la philosophie contenu
+4. Quand tu proposes un plan : "**Modification suggérée pour [date]** : [nouvelle caption proposée]"
 
-FORMAT :
-- **gras** pour les points importants
-- Listes avec • pour les actions
-- Quand tu proposes de modifier des posts planifiés : indique clairement "**Modification suggérée pour [date]** : [nouvelle caption proposée]"
-- Sois concise, pratique, humaine
-
+FORMAT : **gras** pour les points importants, listes avec •, concise et humaine.
 PHASE ACTUELLE : ${ariaHistory.length < 4 ? 'discovery (poser des questions)' : ariaHistory.length < 8 ? 'analysis (approfondir)' : 'recommendation (plan + modifications posts)'}`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1410,40 +1522,30 @@ PHASE ACTUELLE : ${ariaHistory.length < 4 ? 'discovery (poser des questions)' : 
         messages: [...ariaHistory.slice(-12), { role:'user', content:msg }]
       })
     });
-
     const data = await response.json();
     const reply = data.content?.[0]?.text || "Je rencontre une difficulté. Réessayez dans un instant.";
-
     document.getElementById('aria-typing')?.remove();
 
-    // Détecter les modifications de posts suggérées
     const postModifs = extractPostModifications(reply);
     let extraHtml = '';
     if (postModifs.length > 0) {
       extraHtml = buildPostModifButtons(postModifs);
     } else if (reply.length > 400) {
-      // Long message = probablement un plan
       extraHtml = `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
         <button onclick="sendPlanToCM()" style="font-size:11px;padding:5px 12px;border-radius:var(--r);background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.3);color:var(--purple);cursor:pointer;font-family:'Bricolage Grotesque',sans-serif">📩 Envoyer ce plan à mon CM</button>
       </div>`;
     }
-
     addAriaMessage('ai', reply, extraHtml);
-
-    // Suggestions contextuelles
     showAriaSuggestions(getAriaSuggestions(reply));
-
   } catch(err) {
     document.getElementById('aria-typing')?.remove();
     addAriaMessage('ai', 'Je rencontre une difficulté technique. Réessayez dans quelques secondes.');
   }
-
   ariaLoading = false;
   document.getElementById('aria-send-btn').disabled = false;
 }
 
 function extractPostModifications(reply) {
-  // Cherche les patterns "Modification suggérée pour [date] : [caption]"
   const modifs = [];
   const regex = /\*\*Modification[^:]*?(\d+[^\*]*?)\*\*\s*:?\s*([^\n\*]{20,})/gi;
   let match;
@@ -1503,18 +1605,14 @@ async function sendPlanToCM() {
 
 function getAriaSuggestions(reply) {
   const r = reply.toLowerCase();
-  if (r.includes('objectif') || r.includes('priorité')) {
+  if (r.includes('objectif') || r.includes('priorité'))
     return ['🚀 Avoir plus de visibilité', '🤝 Fidéliser ma communauté', '📞 Générer des contacts'];
-  }
-  if (r.includes('cible') || r.includes('audience') || r.includes('clientèle')) {
+  if (r.includes('cible') || r.includes('audience') || r.includes('clientèle'))
     return ['👶 Familles avec enfants', '🐱 Amoureux des animaux', '💎 Clientèle premium'];
-  }
-  if (r.includes('contenu') || r.includes('post') || r.includes('publication')) {
+  if (r.includes('contenu') || r.includes('post') || r.includes('publication'))
     return ['📸 Plus de photos lifestyle', '🎬 Développer les Reels', '💬 Créer de l\'interaction'];
-  }
-  if (r.includes('plan') || r.includes('action') || r.includes('modifier')) {
+  if (r.includes('plan') || r.includes('action') || r.includes('modifier'))
     return ['✅ Appliquer ce plan', '🔧 Modifier mes posts', '📩 Envoyer à mon CM'];
-  }
   return [];
 }
 
@@ -1529,7 +1627,6 @@ function resetAriaChat() {
   startAriaConversation();
 }
 
-// Ajouter l'animation typing dans le CSS dynamiquement
 const styleSheet = document.createElement('style');
 styleSheet.textContent = '@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}} @keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0.4}}';
 document.head.appendChild(styleSheet);
@@ -1537,7 +1634,7 @@ document.head.appendChild(styleSheet);
 // ── Aria côté — change selon l'onglet ────────────────────────────────────────
 const ARIA_TABS = {
   dashboard: { img:'/aria/aria-dashboard.png', text:'Bonjour ! Je surveille votre compte en permanence 📊' },
-  planned:   { img:'/aria/aria-planned.png',   text:'Vos posts planifiés — cliquez pour modifier ou suggérer à l\'IA 📅' },
+  planned:   { img:'/aria/aria-planned.png',   text:'Vos posts planifiés — modifiez la photo, la caption ou publiez immédiatement 📅' },
   history:   { img:'/aria/aria-history.png',   text:'J\'analyse vos publications pour identifier ce qui performe 📈' },
   medias:    { img:'/aria/aria-media.png',      text:'Uploadez vos photos — je calcule leur potentiel viral instantanément 📸' },
   special:   { img:'/aria/aria-special.png',   text:'Un événement à annoncer ? Je prépare tout pour vous 🚀' },
@@ -1552,7 +1649,6 @@ function updateAriaSide(tab) {
   if (txt) txt.textContent = cfg.text;
 }
 
-// ── Message dynamique Aria Dashboard ─────────────────────────────────────────
 function updateAriaDashboardMsg() {
   const txt = document.getElementById('aria-side-text');
   if (!txt) return;
@@ -1565,85 +1661,41 @@ function updateAriaDashboardMsg() {
   } else txt.textContent = `${n} publications planifiées pour vous. Je gère tout ${name} ! 📅`;
 }
 
-// ── Aussi mettre à jour l'avatar Aria dans le header du modal ─────────────────
 function updateAriaChatAvatar() {
   const el = document.querySelector('#modal-aria [style*="gradient"]');
   if (el) { el.innerHTML=`<img src="/aria/aria-chat.png" style="width:100%;height:100%;object-fit:contain" alt="Aria">`; el.style.background='transparent'; }
 }
 
 // ══════════════════════════════════════════════════════════════
-// ARIA ONBOARDING — Visite guidée au premier login
-// À injecter dans client.html juste avant init()
+// ONBOARDING — Visite guidée au premier login
 // ══════════════════════════════════════════════════════════════
-
 const ONBOARDING_KEY = 'socialai_onboarding_done_' + (localStorage.getItem('portal_client_id')||'');
 
 const ONBOARDING_STEPS = [
-  {
-    tab:    null,
-    img:    '/aria/aria-special.png',
-    title:  'Bonjour, je suis Aria ! 🐰',
-    text:   `Je suis votre assistante IA personnelle chez SocialAI.\n\nJe gère votre présence sur Instagram et Facebook à votre place : publications, réponses aux messages, analyse des performances...\n\nLaissez-moi vous faire visiter votre espace ! 👇`,
-    cta:    'Commencer la visite →',
-    highlight: null
-  },
-  {
-    tab:    'dashboard',
-    img:    '/aria/aria-dashboard.png',
-    title:  '📊 Votre Dashboard',
-    text:   `C'est votre vue d'ensemble.\n\nVous voyez ici :\n• Vos posts planifiés\n• Votre reach et engagement moyen\n• Votre prochain post à publier\n• Vos meilleures publications`,
-    cta:    'Suivant →',
-    highlight: '#tab-dashboard'
-  },
-  {
-    tab:    'planned',
-    img:    '/aria/aria-planned.png',
-    title:  '📅 Posts planifiés',
-    text:   `Ici vous retrouvez tous les posts que j'ai préparés et planifiés pour vous.\n\nVous pouvez :\n• Voir l'aperçu de chaque publication\n• Modifier la caption si vous voulez y mettre votre touche\n• Me demander une suggestion IA\n• Supprimer un post si besoin`,
-    cta:    'Suivant →',
-    highlight: 'button[onclick*="planned"]'
-  },
-  {
-    tab:    'history',
-    img:    '/aria/aria-history.png',
-    title:  '📸 Historique',
-    text:   `Toutes vos publications Instagram importées sont ici.\n\nJ'analyse leurs performances pour apprendre ce qui fonctionne le mieux chez vous.\n\nLes ⭐ TOP sont les posts que j'utilise comme modèle pour les prochaines publications !`,
-    cta:    'Suivant →',
-    highlight: 'button[onclick*="history"]'
-  },
-  {
-    tab:    'medias',
-    img:    '/aria/aria-media.png',
-    title:  '🖼️ Vos médias',
-    text:   `C'est votre stock de photos et vidéos.\n\nUploadez vos images ici — je les analyse automatiquement et calcule leur potentiel viral.\n\nPlus vous m'en donnez, plus vos publications seront variées et authentiques !`,
-    cta:    'Suivant →',
-    highlight: 'button[onclick*="medias"]'
-  },
-  {
-    tab:    'special',
-    img:    '/aria/aria-special.png',
-    title:  '🚀 Post spécial',
-    text:   `Un événement à annoncer ? Une nouveauté ?\n\nDécrivez-moi simplement ce que vous voulez partager, et je rédige la caption parfaite avec les bons hashtags et la meilleure heure de publication.`,
-    cta:    'Suivant →',
-    highlight: 'button[onclick*="special"]'
-  },
-  {
-    tab:    'dashboard',
-    img:    '/aria/aria-chat.png',
-    title:  '🎯 Conseiller IA',
-    text:   `Et enfin, vous pouvez me parler directement !\n\nJe suis votre consultante stratégie digitale.\n\nPosez-moi vos questions, je vous propose un plan d'action personnalisé et je peux même modifier vos posts planifiés en fonction de votre stratégie.`,
-    cta:    'Suivant →',
-    highlight: 'button[onclick*="strategie"]'
-  },
-  {
-    tab:    'dashboard',
-    img:    '/aria/aria-special.png',
-    title:  'Vous êtes prêt(e) ! 🎉',
-    text:   `Votre espace SocialAI est prêt.\n\nJe m'occupe de tout en coulisses — publications automatiques, réponses aux messages, analyse des performances.\n\nVous n'avez qu'à profiter des résultats ! Si vous avez une question, je suis là 🐰`,
-    cta:    '✨ Accéder à mon espace',
-    highlight: null,
-    finale: true
-  }
+  { tab:null, img:'/aria/aria-special.png', title:'Bonjour, je suis Aria ! 🐰',
+    text:`Je suis votre assistante IA personnelle chez SocialAI.\n\nJe gère votre présence sur Instagram et Facebook à votre place : publications, réponses aux messages, analyse des performances...\n\nLaissez-moi vous faire visiter votre espace ! 👇`,
+    cta:'Commencer la visite →', highlight:null },
+  { tab:'dashboard', img:'/aria/aria-dashboard.png', title:'📊 Votre Dashboard',
+    text:`C'est votre vue d'ensemble.\n\nVous voyez ici :\n• Vos posts planifiés\n• Votre reach et engagement moyen\n• Votre prochain post à publier\n• Vos meilleures publications`,
+    cta:'Suivant →', highlight:'#tab-dashboard' },
+  { tab:'planned', img:'/aria/aria-planned.png', title:'📅 Posts planifiés',
+    text:`Ici vous retrouvez tous les posts que j'ai préparés.\n\nVous pouvez :\n• Changer la photo d'un post ✨ NEW\n• Modifier la caption\n• Me demander une suggestion IA\n• Publier immédiatement ⚡ NEW`,
+    cta:'Suivant →', highlight:'button[onclick*="planned"]' },
+  { tab:'history', img:'/aria/aria-history.png', title:'📸 Historique',
+    text:`Toutes vos publications Instagram importées sont ici.\n\nJ'analyse leurs performances pour apprendre ce qui fonctionne le mieux chez vous.\n\nLes ⭐ TOP sont les posts que j'utilise comme modèle !`,
+    cta:'Suivant →', highlight:'button[onclick*="history"]' },
+  { tab:'medias', img:'/aria/aria-media.png', title:'🖼️ Vos médias',
+    text:`C'est votre stock de photos et vidéos.\n\nUploadez vos images ici — je les analyse automatiquement et calcule leur potentiel viral.\n\nPlus vous m'en donnez, plus vos publications seront variées et authentiques !`,
+    cta:'Suivant →', highlight:'button[onclick*="medias"]' },
+  { tab:'special', img:'/aria/aria-special.png', title:'🚀 Post spécial',
+    text:`Un événement à annoncer ? Une nouveauté ?\n\nDécrivez-moi simplement ce que vous voulez partager, et je rédige la caption parfaite avec les bons hashtags et la meilleure heure de publication.`,
+    cta:'Suivant →', highlight:'button[onclick*="special"]' },
+  { tab:'dashboard', img:'/aria/aria-chat.png', title:'🎯 Conseiller IA',
+    text:`Et enfin, vous pouvez me parler directement !\n\nJe suis votre consultante stratégie digitale.\n\nPosez-moi vos questions, je vous propose un plan d'action personnalisé et je peux même modifier vos posts planifiés en fonction de votre stratégie.`,
+    cta:'Suivant →', highlight:'button[onclick*="strategie"]' },
+  { tab:'dashboard', img:'/aria/aria-special.png', title:'Vous êtes prêt(e) ! 🎉',
+    text:`Votre espace SocialAI est prêt.\n\nJe m'occupe de tout en coulisses — publications automatiques, réponses aux messages, analyse des performances.\n\nVous n'avez qu'à profiter des résultats ! Si vous avez une question, je suis là 🐰`,
+    cta:'✨ Accéder à mon espace', highlight:null, finale:true }
 ];
 
 let onboardingStep = 0;
@@ -1651,9 +1703,7 @@ let onboardingActive = false;
 
 function checkOnboarding() {
   const done = localStorage.getItem(ONBOARDING_KEY);
-  if (!done) {
-    setTimeout(() => startOnboarding(), 800);
-  }
+  if (!done) { setTimeout(() => startOnboarding(), 800); }
 }
 
 function startOnboarding() {
@@ -1664,158 +1714,76 @@ function startOnboarding() {
 }
 
 function createOnboardingOverlay() {
-  // Supprimer si existe déjà
   document.getElementById('onboarding-overlay')?.remove();
-
   const overlay = document.createElement('div');
   overlay.id = 'onboarding-overlay';
-  overlay.style.cssText = `
-    position:fixed;inset:0;z-index:9999;
-    pointer-events:none;
-  `;
-
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;';
   overlay.innerHTML = `
-    <div style="
-      position:fixed;bottom:24px;left:24px;
-      width:380px;max-width:calc(100vw - 48px);
-      background:#1a1a26;
-      border:1px solid rgba(167,139,250,0.4);
-      border-radius:20px;
-      box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 30px rgba(167,139,250,0.15);
-      animation:slideUpBottom 0.5s ease;
-      display:flex;flex-direction:row;align-items:flex-end;
-      overflow:hidden;
-      pointer-events:auto;
-    ">
-      <!-- Aria à gauche -->
-      <div style="
-        width:110px;flex-shrink:0;
-        background:linear-gradient(160deg,rgba(167,139,250,0.12),rgba(77,166,255,0.06));
-        display:flex;align-items:flex-end;justify-content:center;
-        overflow:hidden;min-height:160px;
-      ">
-        <img id="ob-aria-img" src="/aria/aria-special.png" style="
-          width:105px;height:auto;object-fit:contain;object-position:bottom;
-          filter:drop-shadow(0 -4px 16px rgba(167,139,250,0.5));
-          transition:opacity 0.3s ease,transform 0.3s ease;
-          display:block;margin-bottom:-2px;
-        " alt="Aria">
+    <div style="position:fixed;bottom:24px;left:24px;width:380px;max-width:calc(100vw - 48px);background:#1a1a26;border:1px solid rgba(167,139,250,0.4);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 30px rgba(167,139,250,0.15);animation:slideUpBottom 0.5s ease;display:flex;flex-direction:row;align-items:flex-end;overflow:hidden;pointer-events:auto;">
+      <div style="width:110px;flex-shrink:0;background:linear-gradient(160deg,rgba(167,139,250,0.12),rgba(77,166,255,0.06));display:flex;align-items:flex-end;justify-content:center;overflow:hidden;min-height:160px;">
+        <img id="ob-aria-img" src="/aria/aria-special.png" style="width:105px;height:auto;object-fit:contain;object-position:bottom;filter:drop-shadow(0 -4px 16px rgba(167,139,250,0.5));transition:opacity 0.3s ease,transform 0.3s ease;display:block;margin-bottom:-2px;" alt="Aria">
       </div>
-
-      <!-- Texte à droite -->
       <div style="flex:1;padding:16px 16px 16px 12px;display:flex;flex-direction:column;min-width:0">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div id="ob-title" style="
-            font-size:14px;font-weight:700;
-            color:#f5f4f0;font-family:'Bricolage Grotesque',sans-serif;
-            line-height:1.3;flex:1;
-          "></div>
-        </div>
-        <div id="ob-text" style="
-          font-size:11.5px;color:#c8c6be;line-height:1.65;
-          white-space:pre-line;margin-bottom:14px;
-        "></div>
+        <div id="ob-title" style="font-size:14px;font-weight:700;color:#f5f4f0;font-family:'Bricolage Grotesque',sans-serif;line-height:1.3;margin-bottom:8px;"></div>
+        <div id="ob-text" style="font-size:11.5px;color:#c8c6be;line-height:1.65;white-space:pre-line;margin-bottom:14px;"></div>
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
-          <button id="ob-cta" onclick="nextOnboardingStep()" style="
-            flex:1;padding:9px;
-            background:linear-gradient(135deg,#a78bfa,#4da6ff);
-            border:none;border-radius:8px;color:white;
-            font-size:12px;font-weight:600;cursor:pointer;
-            font-family:'Bricolage Grotesque',sans-serif;
-          "></button>
-          <button onclick="skipOnboarding()" style="
-            padding:9px 12px;background:transparent;
-            border:1px solid #3a3a50;border-radius:8px;
-            color:#7a7870;font-size:10px;cursor:pointer;
-            font-family:'Bricolage Grotesque',sans-serif;
-          ">Passer</button>
+          <button id="ob-cta" onclick="nextOnboardingStep()" style="flex:1;padding:9px;background:linear-gradient(135deg,#a78bfa,#4da6ff);border:none;border-radius:8px;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;"></button>
+          <button onclick="skipOnboarding()" style="padding:9px 12px;background:transparent;border:1px solid #3a3a50;border-radius:8px;color:#7a7870;font-size:10px;cursor:pointer;font-family:'Bricolage Grotesque',sans-serif;">Passer</button>
         </div>
-        <!-- Indicateur d'étapes -->
         <div id="ob-steps" style="display:flex;gap:4px;justify-content:center"></div>
       </div>
-    </div>
-  `;
-
+    </div>`;
   document.body.appendChild(overlay);
 }
 
 function showOnboardingStep(stepIndex) {
   const step = ONBOARDING_STEPS[stepIndex];
   if (!step) { finishOnboarding(); return; }
-
-  // Changer l'image avec transition
   const img = document.getElementById('ob-aria-img');
   const title = document.getElementById('ob-title');
-  const text = document.getElementById('ob-text');
-  const cta = document.getElementById('ob-cta');
+  const text  = document.getElementById('ob-text');
+  const cta   = document.getElementById('ob-cta');
   const stepsEl = document.getElementById('ob-steps');
-
-  if (img) {
-    img.style.opacity = '0';
-    img.style.transform = 'translateY(10px)';
-    setTimeout(() => {
-      img.src = step.img;
-      img.style.opacity = '1';
-      img.style.transform = 'translateY(0)';
-    }, 200);
-  }
-
-  // Animer le texte
+  if (img) { img.style.opacity='0'; img.style.transform='translateY(10px)'; setTimeout(()=>{img.src=step.img;img.style.opacity='1';img.style.transform='translateY(0)';},200); }
   if (title) { title.style.opacity='0'; setTimeout(()=>{title.innerHTML=step.title;title.style.opacity='1';title.style.transition='opacity 0.3s';},150); }
   if (text)  { text.style.opacity='0';  setTimeout(()=>{text.textContent=step.text;text.style.opacity='1';text.style.transition='opacity 0.3s';},200); }
   if (cta)   cta.textContent = step.cta;
-
-  // Indicateurs d'étapes
   if (stepsEl) {
-    stepsEl.innerHTML = ONBOARDING_STEPS.map((_, i) =>
+    stepsEl.innerHTML = ONBOARDING_STEPS.map((_,i) =>
       `<div style="width:${i===stepIndex?'20':'6'}px;height:6px;border-radius:3px;background:${i===stepIndex?'var(--purple)':'rgba(167,139,250,0.3)'};transition:all 0.3s"></div>`
     ).join('');
   }
-
-  // Changer l'onglet en arrière-plan si spécifié
   if (step.tab) {
-    // Switcher l'onglet en arrière-plan (sans fermer l'overlay)
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + step.tab)?.classList.add('active');
     updateAriaSide(step.tab);
   }
-
-  // Highlight de l'onglet concerné
   clearHighlights();
-  if (step.highlight) {
-    setTimeout(() => highlightElement(step.highlight), 300);
-  }
-
-  // Confettis sur la dernière étape
-  if (step.finale) {
-    setTimeout(() => launchConfetti(), 400);
-  }
+  if (step.highlight) { setTimeout(() => highlightElement(step.highlight), 300); }
+  if (step.finale)    { setTimeout(() => launchConfetti(), 400); }
 }
 
 function highlightElement(selector) {
   const el = document.querySelector(selector);
   if (!el) return;
   el.style.boxShadow = '0 0 0 3px var(--purple), 0 0 20px rgba(167,139,250,0.5)';
-  el.style.position = 'relative';
-  el.style.zIndex = '501';
+  el.style.position  = 'relative';
+  el.style.zIndex    = '501';
   el.setAttribute('data-highlighted', 'true');
 }
 
 function clearHighlights() {
   document.querySelectorAll('[data-highlighted]').forEach(el => {
     el.style.boxShadow = '';
-    el.style.zIndex = '';
+    el.style.zIndex    = '';
     el.removeAttribute('data-highlighted');
   });
 }
 
 function nextOnboardingStep() {
   onboardingStep++;
-  if (onboardingStep >= ONBOARDING_STEPS.length) {
-    finishOnboarding();
-  } else {
-    showOnboardingStep(onboardingStep);
-  }
+  if (onboardingStep >= ONBOARDING_STEPS.length) { finishOnboarding(); }
+  else { showOnboardingStep(onboardingStep); }
 }
 
 function skipOnboarding() {
@@ -1834,7 +1802,6 @@ function finishOnboarding() {
   }
   localStorage.setItem(ONBOARDING_KEY, 'true');
   onboardingActive = false;
-  // Retour au dashboard
   switchTab('dashboard');
 }
 
@@ -1842,28 +1809,17 @@ function launchConfetti() {
   const colors = ['#a78bfa','#ff4d6d','#00d4aa','#ffb340','#4da6ff'];
   for (let i = 0; i < 60; i++) {
     const confetti = document.createElement('div');
-    confetti.style.cssText = `
-      position:fixed;width:8px;height:8px;border-radius:2px;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      left:${Math.random()*100}%;top:-10px;
-      z-index:600;pointer-events:none;
-      animation:confettiFall ${1.5+Math.random()*2}s ease-in ${Math.random()*0.5}s forwards;
-      transform:rotate(${Math.random()*360}deg);
-    `;
+    confetti.style.cssText = `position:fixed;width:8px;height:8px;border-radius:2px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;top:-10px;z-index:600;pointer-events:none;animation:confettiFall ${1.5+Math.random()*2}s ease-in ${Math.random()*0.5}s forwards;transform:rotate(${Math.random()*360}deg);`;
     document.body.appendChild(confetti);
     setTimeout(() => confetti.remove(), 4000);
   }
 }
 
-// Styles animation
 const obStyle = document.createElement('style');
 obStyle.textContent = `
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes slideUpBottom{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes confettiFall{
-    0%{transform:translateY(0) rotate(0deg);opacity:1}
-    100%{transform:translateY(100vh) rotate(720deg);opacity:0}
-  }
+  @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
   #ob-aria-img{transition:opacity 0.3s ease,transform 0.3s ease}
   #ob-cta:hover{opacity:0.85}
 `;
@@ -1872,10 +1828,10 @@ document.head.appendChild(obStyle);
 init();
 
 // ══════════════════════════════════════════════════════════════
-// CONSEILLER STRATÉGIQUE IA
+// CONSEILLER STRATÉGIQUE IA (onglet tab-strategie)
 // ══════════════════════════════════════════════════════════════
-let chatHistory = [];
-let chatWaiting = false;
+let chatHistory   = [];
+let chatWaiting   = false;
 let proposedChanges = null;
 
 const SYSTEM_PROMPT = `Tu es un expert en stratégie digitale et community management Instagram, spécialisé pour les petites entreprises françaises.
@@ -1901,8 +1857,8 @@ POSTS PLANIFIÉS :
 {{PLANNED_POSTS}}`;
 
 function getSystemPrompt() {
-  const name    = localStorage.getItem('portal_client_name') || 'Client';
-  const posts   = (window._plannedPosts || []).slice(0, 5).map((p, i) =>
+  const name  = localStorage.getItem('portal_client_name') || 'Client';
+  const postsStr = (window._plannedPosts || []).slice(0, 5).map((p, i) =>
     `${i+1}. ID:${p.id} | ${new Date(p.scheduled_at).toLocaleDateString('fr-FR')} | "${(p.caption||'').slice(0,60)}..."`
   ).join('\n') || 'Aucun post planifié';
   return SYSTEM_PROMPT
@@ -1910,7 +1866,7 @@ function getSystemPrompt() {
     .replace('{{CLIENT_SECTOR}}', 'Non renseigné')
     .replace('{{CLIENT_TONE}}', 'Chaleureux et professionnel')
     .replace('{{CLIENT_DESC}}', '')
-    .replace('{{PLANNED_POSTS}}', posts);
+    .replace('{{PLANNED_POSTS}}', postsStr);
 }
 
 function addChatMsg(role, content) {
@@ -1923,7 +1879,6 @@ function renderChatMessages() {
   if (!el) return;
   el.innerHTML = chatHistory.map(m => {
     const isUser = m.role === 'user';
-    // Masquer les JSON de modifications dans l'affichage
     const displayContent = m.content
       .replace(/MODIFICATIONS_POSTS:.*?:FIN_MODIFICATIONS/gs, '✅ Modifications proposées pour vos posts planifiés (voir bouton ci-dessous)')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -1934,7 +1889,6 @@ function renderChatMessages() {
     </div>`;
   }).join('');
 
-  // Bouton d'application si des modifications sont proposées
   const lastMsg = chatHistory[chatHistory.length - 1];
   if (lastMsg?.role === 'assistant') {
     const match = lastMsg.content.match(/MODIFICATIONS_POSTS:(.*?):FIN_MODIFICATIONS/s);
@@ -1953,14 +1907,13 @@ function renderChatMessages() {
       } catch(e) {}
     }
   }
-
   el.scrollTop = el.scrollHeight;
   renderQuickActions();
 }
 
 function renderQuickActions() {
   const el = document.getElementById('chat-quick-actions');
-  if (!el || chatHistory.length > 2) { if (el) el.innerHTML = ''; return; }
+  if (!el || chatHistory.length > 2) { if(el) el.innerHTML=''; return; }
   const suggestions = [
     'Je veux plus de visibilité',
     'Comment toucher plus de monde ?',
@@ -1982,16 +1935,12 @@ async function sendChatMessage() {
   const input = document.getElementById('chat-input');
   const text  = input.value.trim();
   if (!text || chatWaiting) return;
-
   input.value = '';
   input.style.height = 'auto';
   addChatMsg('user', text);
   chatWaiting = true;
-
   const btn = document.getElementById('chat-send-btn');
   btn.disabled = true;
-
-  // Afficher l'indicateur de frappe
   const messagesEl = document.getElementById('chat-messages');
   const typingEl   = document.createElement('div');
   typingEl.className = 'chat-msg ai';
@@ -1999,7 +1948,6 @@ async function sendChatMessage() {
   typingEl.innerHTML = `<div class="chat-msg-avatar">🎯</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
   messagesEl.appendChild(typingEl);
   messagesEl.scrollTop = messagesEl.scrollHeight;
-
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2011,18 +1959,14 @@ async function sendChatMessage() {
         messages:   chatHistory.map(m => ({ role: m.role, content: m.content }))
       })
     });
-
-    const data = await res.json();
+    const data  = await res.json();
     const reply = data.content?.[0]?.text || 'Désolé, je n\'ai pas pu répondre.';
-
     typingEl.remove();
     addChatMsg('assistant', reply);
-
   } catch(e) {
     typingEl.remove();
     addChatMsg('assistant', 'Une erreur s\'est produite. Veuillez réessayer.');
   }
-
   chatWaiting = false;
   btn.disabled = false;
 }
@@ -2047,7 +1991,7 @@ async function applyStrategyChanges() {
 }
 
 function resetChat() {
-  chatHistory  = [];
+  chatHistory     = [];
   proposedChanges = null;
   const el = document.getElementById('chat-messages');
   if (el) el.innerHTML = '';
@@ -2059,7 +2003,6 @@ async function startChat() {
   chatWaiting = true;
   const btn = document.getElementById('chat-send-btn');
   if (btn) btn.disabled = true;
-
   const messagesEl = document.getElementById('chat-messages');
   if (!messagesEl) return;
   const typingEl = document.createElement('div');
@@ -2067,7 +2010,6 @@ async function startChat() {
   typingEl.id = 'chat-typing-init';
   typingEl.innerHTML = `<div class="chat-msg-avatar">🎯</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
   messagesEl.appendChild(typingEl);
-
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2076,22 +2018,18 @@ async function startChat() {
         model:      'claude-sonnet-4-20250514',
         max_tokens: 400,
         system:     getSystemPrompt(),
-        messages:   [{
-          role:    'user',
-          content: 'Bonjour, je souhaite améliorer ma stratégie sur Instagram.'
-        }]
+        messages:   [{ role:'user', content:'Bonjour, je souhaite améliorer ma stratégie sur Instagram.' }]
       })
     });
     const data  = await res.json();
     const reply = data.content?.[0]?.text || 'Bonjour ! Comment puis-je vous aider avec votre stratégie Instagram ?';
     typingEl.remove();
-    chatHistory.push({ role: 'user', content: 'Bonjour, je souhaite améliorer ma stratégie sur Instagram.' });
+    chatHistory.push({ role:'user', content:'Bonjour, je souhaite améliorer ma stratégie sur Instagram.' });
     addChatMsg('assistant', reply);
   } catch(e) {
     typingEl.remove();
     addChatMsg('assistant', 'Bonjour ! Je suis votre conseiller stratégie digitale. Quel est votre principal objectif sur Instagram en ce moment ?');
   }
-
   chatWaiting = false;
   if (btn) btn.disabled = false;
 }
@@ -2101,7 +2039,6 @@ const _origSwitchTab = switchTab;
 window.switchTab = function(tab) {
   _origSwitchTab(tab);
   if (tab === 'strategie') {
-    // Stocker les posts pour le contexte
     window._plannedPosts = posts || [];
     startChat();
   }
