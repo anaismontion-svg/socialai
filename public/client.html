@@ -95,9 +95,9 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .score-low{background:rgba(255,77,109,0.85);color:white}
 
 /* ── PHOTO PICKER — FIX CHEVAUCHEMENT ── */
-.photo-picker-item{border-radius:8px;overflow:hidden;aspect-ratio:1/1;cursor:pointer;border:2px solid transparent;transition:all 0.15s;background:var(--ink)}
+.photo-picker-item{position:relative;height:0;padding-bottom:100%;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.15s;background:var(--ink)}
 .photo-picker-item:hover{border-color:var(--rose);transform:scale(1.03)}
-.photo-picker-item img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-picker-item img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
