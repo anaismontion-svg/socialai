@@ -95,9 +95,9 @@ input,textarea,select{font-family:'Bricolage Grotesque',sans-serif;outline:none}
 .score-low{background:rgba(255,77,109,0.85);color:white}
 
 /* ── PHOTO PICKER — FIX CHEVAUCHEMENT ── */
-.photo-picker-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1/1;cursor:pointer;border:2px solid transparent;transition:all 0.15s;background:var(--ink)}
+.photo-picker-item{border-radius:8px;overflow:hidden;aspect-ratio:1/1;cursor:pointer;border:2px solid transparent;transition:all 0.15s;background:var(--ink)}
 .photo-picker-item:hover{border-color:var(--rose);transform:scale(1.03)}
-.photo-picker-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.photo-picker-item img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
@@ -1135,7 +1135,7 @@ async function openClientPhotoPicker(postId) {
         <div>Chargement de vos photos…</div>
       </div>
       <div id="client-photo-picker-grid"
-        style="display:none;grid-template-columns:repeat(4,1fr);gap:8px;max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:10px;background:var(--ink3)">
+        style="display:none;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);padding:10px;background:var(--ink3)">
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
         <button class="btn" onclick="document.getElementById('modal-client-photo-picker').remove()">Annuler</button>
