@@ -1415,7 +1415,6 @@ let ariaInitialized = false;
 
 function openAriaChat() {
   openModal('modal-aria');
-  updateAriaChatAvatar();
   if (!ariaInitialized) {
     ariaInitialized = true;
     setTimeout(() => startAriaConversation(), 300);
