@@ -1552,7 +1552,7 @@ TON RÔLE :
 FORMAT : **gras** pour les points importants, listes avec •, concise et humaine.
 PHASE ACTUELLE : ${ariaHistory.length < 4 ? 'discovery (poser des questions)' : ariaHistory.length < 8 ? 'analysis (approfondir)' : 'recommendation (plan + modifications posts)'}`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/aria/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1989,7 +1989,7 @@ async function sendChatMessage() {
   messagesEl.appendChild(typingEl);
   messagesEl.scrollTop = messagesEl.scrollHeight;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/aria/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2051,7 +2051,7 @@ async function startChat() {
   typingEl.innerHTML = `<div class="chat-msg-avatar">🎯</div><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
   messagesEl.appendChild(typingEl);
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('/api/aria/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
