@@ -29,9 +29,11 @@ app.use('/api/story-templates', require('./routes/story-templates'));
 app.use('/api/romi',            require('./routes/romi'));
 app.use('/api/romi-auth',       require('./routes/romi-auth').router);
 app.use('/api/templates',       require('./routes/templateRoutes'));
+app.use('/api/aria',            require('./routes/aria'));
 
-// ── Route meta APRÈS les pages statiques ─────────────────────────────────────
-app.use('/',                    require('./routes/meta'));
+// ── Route meta — uniquement sur /auth et /webhook ────────────────────────────
+app.use('/auth',                require('./routes/meta'));
+app.use('/webhook',             require('./routes/meta'));
 
 // ── Fallback SPA back office ──────────────────────────────────────────────────
 app.use((req, res) => {
