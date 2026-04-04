@@ -30,6 +30,7 @@ app.use('/api/romi',            require('./routes/romi'));
 app.use('/api/romi-auth',       require('./routes/romi-auth').router);
 app.use('/api/templates',       require('./routes/templateRoutes'));
 app.use('/api/aria',            require('./routes/aria'));
+app.use('/api/google-reviews',  require('./routes/google-reviews'));
 
 // ── Route meta — uniquement sur /auth et /webhook ────────────────────────────
 app.use('/auth',                require('./routes/meta'));
