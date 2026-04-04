@@ -1,6 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { generateCaption, getTopPosts } = require('./publisher');
 const Anthropic = require('@anthropic-ai/sdk');
+const { getNextReviewForClient } = require('./google-reviews');
 
 const supabase      = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -195,7 +196,6 @@ async function cleanDuplicateStories(clientId) {
     'story_template_temoignage',
     'story_template_avant_apres',
     'story_repost_post',
-    // Anciens noms pour nettoyage
     'story_chats_chatons',
     'story_qui_sommes_nous',
     'story_accompagnement',
@@ -232,7 +232,7 @@ async function cleanDuplicateStories(clientId) {
 // ─────────────────────────────────────────────
 // GÉNÉRATION CAPTION DEPUIS TEMPLATE
 // ─────────────────────────────────────────────
-async function generateCaptionFromTemplate(type, content, clientName) {
+async function generateCaptionFromTemplate(type, content, clientName, googleReview = null) {
   const prompts = {
     entreprise: `Tu gères le compte Instagram de ${clientName}.
 Génère une caption courte pour une story de présentation de l'entreprise.
@@ -251,7 +251,13 @@ Informations :
 Règles : max 2 phrases, 1-2 emojis, ton accessible et valorisant, jamais commercial.
 Retourne uniquement la caption.`,
 
-    temoignage: `Tu gères le compte Instagram de ${clientName}.
+    temoignage: googleReview
+      ? `Tu gères le compte Instagram de ${clientName}.
+Génère une caption courte pour une story témoignage client basée sur cet avis Google 5 étoiles :
+Avis de ${googleReview.author} : "${googleReview.text}"
+Règles : max 2 phrases, 1-2 emojis, met en valeur la satisfaction client, cite le prénom si possible.
+Retourne uniquement la caption.`
+      : `Tu gères le compte Instagram de ${clientName}.
 Génère une caption courte pour une story témoignage client.
 Témoignage : "${content.texte || ''}"
 Client : ${content.nom_client || ''} — Note : ${content.note || 5}/5 étoiles
@@ -289,7 +295,6 @@ const TEMPLATE_SOURCES = [
 async function scheduleFixedStoriesForClient(client) {
   if (client.status === 'paused') return;
 
-  // Charger tous les templates validés pour ce client
   const { data: templates } = await supabase
     .from('story_templates')
     .select('*')
@@ -301,7 +306,6 @@ async function scheduleFixedStoriesForClient(client) {
     return;
   }
 
-  // Déterminer la base de la prochaine série
   const { data: lastStory } = await supabase
     .from('queue')
     .select('scheduled_at, published_at, statut')
@@ -333,7 +337,6 @@ async function scheduleFixedStoriesForClient(client) {
   let storyPlanifiees = 0;
 
   for (const slot of TEMPLATE_SOURCES) {
-    // Trouver le template correspondant
     const template = templates.find(t => t.type === slot.type);
     if (!template) {
       console.log(`⏭️ ${client.name} — template "${slot.type}" non trouvé ou inactif`);
@@ -350,14 +353,22 @@ async function scheduleFixedStoriesForClient(client) {
     }
 
     try {
-      // Visuel depuis le template validé
       const visualUrl = template.visuel_url || template.content?.photo_url || null;
 
-      // Caption générée depuis le contenu du template
+      // Pour les témoignages → récupérer un avis Google si disponible
+      let googleReview = null;
+      if (slot.type === 'temoignage' && client.google_place_id) {
+        googleReview = await getNextReviewForClient(client.id, client.google_place_id);
+        if (googleReview) {
+          console.log(`⭐ Avis Google récupéré pour ${client.name} : ${googleReview.author}`);
+        }
+      }
+
       const caption = await generateCaptionFromTemplate(
         slot.type,
         template.content || {},
-        client.name
+        client.name,
+        googleReview
       );
 
       await supabase.from('queue').insert({
@@ -371,18 +382,17 @@ async function scheduleFixedStoriesForClient(client) {
         source:       slot.source,
       });
 
-      console.log(`📸 Story "${slot.type}" planifiée pour ${client.name} avec le template validé`);
+      console.log(`📸 Story "${slot.type}" planifiée pour ${client.name}${googleReview ? ' — avis Google ⭐' : ' — template validé'}`);
       storyPlanifiees++;
     } catch(err) {
       console.error(`❌ Erreur story ${slot.source}:`, err.message);
     }
   }
 
-  // Story repost du dernier post (toujours active)
   await planifierStoryRepost(client, new Date(serieBase.getTime() + 12 * 60 * 60 * 1000));
 
   if (storyPlanifiees > 0) {
-    console.log(`✅ ${client.name} — ${storyPlanifiees} story(s) planifiée(s) depuis les templates`);
+    console.log(`✅ ${client.name} — ${storyPlanifiees} story(s) planifiée(s)`);
   } else {
     console.log(`ℹ️ ${client.name} — Toutes les stories sont déjà planifiées`);
   }
@@ -574,20 +584,20 @@ async function schedulePostsForClient(client) {
           { likes: recyclable.likes, comments: recyclable.comments, reach: recyclable.reach });
         postType = 'recycled';
         await supabase.from('media').update({
-          recycled:    true,
-          reserved:    true,
-          reserved_at: new Date().toISOString(),
+          recycled:     true,
+          reserved:     true,
+          reserved_at:  new Date().toISOString(),
           last_used_at: new Date().toISOString(),
-          use_count:   (recyclable.use_count || 0) + 1
+          use_count:    (recyclable.use_count || 0) + 1
         }).eq('id', recyclable.id);
       }
     }
 
     if (!media) {
-      media    = await getAvailableMedia(client.id);
+      media          = await getAvailableMedia(client.id);
       const topPosts = await getTopPosts(client.id);
-      caption  = await generateCaption(client, 'image', topPosts);
-      postType = 'post';
+      caption        = await generateCaption(client, 'image', topPosts);
+      postType       = 'post';
     }
 
     if (!media?.url) { console.warn(`⚠️ ${client.name} — aucun média disponible, post ignoré`); continue; }
