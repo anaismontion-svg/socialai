@@ -88,11 +88,9 @@ router.get('/', async (req, res) => {
 });
 
 // ── POST /api/clients ─────────────────────────────────────────────────────────
-// Crée le client + génère mot de passe provisoire + envoie email de bienvenue
 router.post('/', async (req, res) => {
-  const { name, sector, instagram, facebook, tone, plan, email, description, solo_entrepreneur } = req.body;
+  const { name, sector, instagram, facebook, tone, plan, email, description, solo_entrepreneur, google_place_id } = req.body;
 
-  // Générer le mot de passe provisoire
   const tempPassword = generateTempPassword();
   const tempHash = hashPassword(tempPassword);
 
@@ -103,15 +101,16 @@ router.post('/', async (req, res) => {
     facebook,
     tone,
     plan,
-    description: description || '',
-    solo_entrepreneur: solo_entrepreneur !== false,
-    status: 'active',
+    description:        description || '',
+    solo_entrepreneur:  solo_entrepreneur !== false,
+    google_place_id:    google_place_id || null,
+    status:             'active',
     // Auth
-    email: email ? email.toLowerCase().trim() : null,
+    email:              email ? email.toLowerCase().trim() : null,
     temp_password_hash: tempHash,
-    password_hash: null,
-    portal_access: email ? true : false,
-    first_login: true
+    password_hash:      null,
+    portal_access:      email ? true : false,
+    first_login:        true
   };
 
   const { data, error } = await supabase
@@ -123,14 +122,13 @@ router.post('/', async (req, res) => {
 
   const client = data[0];
 
-  // Envoyer l'email de bienvenue si un email est fourni
   if (email) {
     await sendWelcomeEmail({ ...client, email }, tempPassword);
   }
 
   res.json({
     ...client,
-    tempPassword: email ? undefined : tempPassword // Retourner le mdp provisoire seulement si pas d'email
+    tempPassword: email ? undefined : tempPassword
   });
 });
 
@@ -139,13 +137,11 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const updates = { ...req.body };
 
-  // Si l'email est mis à jour et qu'il n'y avait pas d'accès avant → activer le portail
   if (updates.email) {
     updates.email = updates.email.toLowerCase().trim();
     updates.portal_access = true;
   }
 
-  // Ne jamais écraser le hash via cette route
   delete updates.password_hash;
   delete updates.temp_password_hash;
 
@@ -168,7 +164,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ── POST /api/clients/:id/resend-welcome ──────────────────────────────────────
-// Renvoie les identifiants par email (admin)
 router.post('/:id/resend-welcome', async (req, res) => {
   const { id } = req.params;
   const { adminKey } = req.body;
