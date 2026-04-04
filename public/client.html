@@ -1685,7 +1685,7 @@ function updateAriaSide(tab) {
   const cfg = ARIA_TABS[tab] || ARIA_TABS.dashboard;
   const img = document.getElementById('aria-side-img');
   const txt = document.getElementById('aria-side-text');
-  if (img) { img.style.opacity='0'; setTimeout(()=>{img.src=cfg.img;img.style.opacity='1';},200); }
+  if (img) { img.style.opacity='0'; setTimeout(()=>{img.style.backgroundImage=`url('${cfg.img}')`;img.style.opacity='1';},200); }
   if (txt) txt.textContent = cfg.text;
 }
 
