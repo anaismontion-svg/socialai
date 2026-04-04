@@ -1,11 +1,14 @@
+
 const { createClient } = require('@supabase/supabase-js');
 const { generateCaption, getTopPosts } = require('./publisher');
 const Anthropic = require('@anthropic-ai/sdk');
+const axios = require('axios');
 const { getNextReviewForClient } = require('./google-reviews');
 
 const supabase      = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const supabaseAdmin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const anthropic     = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const ASSEMBLER_URL = process.env.ASSEMBLER_URL || 'http://localhost:5001';
 
 // ─────────────────────────────────────────────
 // FORFAITS
@@ -283,6 +286,36 @@ Retourne uniquement la caption.`,
 }
 
 // ─────────────────────────────────────────────
+// GÉNÉRATION VISUEL VIA ASSEMBLER
+// ─────────────────────────────────────────────
+async function generateStoryVisual(client, storyType, templateContent, photoUrl) {
+  try {
+    const response = await axios.post(
+      `${ASSEMBLER_URL}/story`,
+      {
+        client_id:   client.id,
+        client_name: client.name,
+        branding:    client.branding || {},
+        story_type:  storyType,
+        content: {
+          ...templateContent,
+          photo_url: photoUrl  // ← photo du jour injectée
+        }
+      },
+      { timeout: 60000 }
+    );
+    if (response.data.success) {
+      console.log(`🎨 Visuel généré par l'Assembler pour story "${storyType}"`);
+      return response.data.url;
+    }
+    throw new Error(response.data.error || 'Assembler error');
+  } catch(e) {
+    console.warn(`⚠️ Assembler indisponible pour "${storyType}": ${e.message} — fallback photo brute`);
+    return photoUrl; // fallback : photo brute sans composition
+  }
+}
+
+// ─────────────────────────────────────────────
 // STORIES DEPUIS TEMPLATES VALIDÉS
 // ─────────────────────────────────────────────
 const TEMPLATE_SOURCES = [
@@ -353,9 +386,25 @@ async function scheduleFixedStoriesForClient(client) {
     }
 
     try {
-      const visualUrl = template.visuel_url || template.content?.photo_url || null;
+      // 1. Choisir une photo différente chaque jour
+      const media = await getMediaRotation(client.id, slot.source);
 
-      // Pour les témoignages → récupérer un avis Google si disponible
+      // 2. Générer le visuel via l'Assembler (photo du jour + template)
+      let visualUrl = null;
+      if (media?.url) {
+        visualUrl = await generateStoryVisual(
+          client,
+          slot.type,
+          template.content || {},
+          media.url
+        );
+      } else {
+        // Pas de photo dispo → utiliser le visuel statique du template
+        visualUrl = template.visuel_url || null;
+        console.warn(`⚠️ ${client.name} — Pas de photo dispo pour "${slot.type}", visuel statique utilisé`);
+      }
+
+      // 3. Pour les témoignages → récupérer un avis Google si disponible
       let googleReview = null;
       if (slot.type === 'temoignage' && client.google_place_id) {
         googleReview = await getNextReviewForClient(client.id, client.google_place_id);
@@ -364,6 +413,7 @@ async function scheduleFixedStoriesForClient(client) {
         }
       }
 
+      // 4. Générer la caption depuis le contenu du template
       const caption = await generateCaptionFromTemplate(
         slot.type,
         template.content || {},
@@ -373,6 +423,7 @@ async function scheduleFixedStoriesForClient(client) {
 
       await supabase.from('queue').insert({
         client_id:    client.id,
+        media_id:     media?.id || null,
         media_url:    visualUrl,
         caption,
         scheduled_at: scheduledAt.toISOString(),
@@ -382,7 +433,7 @@ async function scheduleFixedStoriesForClient(client) {
         source:       slot.source,
       });
 
-      console.log(`📸 Story "${slot.type}" planifiée pour ${client.name}${googleReview ? ' — avis Google ⭐' : ' — template validé'}`);
+      console.log(`📸 Story "${slot.type}" planifiée pour ${client.name}${googleReview ? ' — avis Google ⭐' : ' — photo du jour 🖼️'}`);
       storyPlanifiees++;
     } catch(err) {
       console.error(`❌ Erreur story ${slot.source}:`, err.message);
@@ -392,7 +443,7 @@ async function scheduleFixedStoriesForClient(client) {
   await planifierStoryRepost(client, new Date(serieBase.getTime() + 12 * 60 * 60 * 1000));
 
   if (storyPlanifiees > 0) {
-    console.log(`✅ ${client.name} — ${storyPlanifiees} story(s) planifiée(s)`);
+    console.log(`✅ ${client.name} — ${storyPlanifiees} story(s) planifiée(s) avec visuels générés`);
   } else {
     console.log(`ℹ️ ${client.name} — Toutes les stories sont déjà planifiées`);
   }
