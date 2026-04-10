@@ -176,7 +176,7 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
     );
     return { success: true, postId: publishRes.data.id };
   } catch (err) {
-    console.error('❌ Erreur publication story:', err.response?.data || err.message);
+    console.error('❌ Erreur publication story:', JSON.stringify(err.response?.data || err.message, null, 2));
     return { success: false, error: err.response?.data?.error?.message || err.message };
   }
 }
