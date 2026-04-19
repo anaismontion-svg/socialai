@@ -134,25 +134,6 @@
   .swatch:hover { transform: scale(1.2); }
   .swatch-label { font-size: 11px; color: #aaa; }
 
-  /* Color picker popup */
-  .color-picker-wrap {
-    position: absolute;
-    bottom: 36px;
-    left: 0;
-    z-index: 100;
-    background: #fff;
-    border: 1px solid #e8e4e0;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    display: none;
-  }
-  .color-picker-wrap.open { display: block; }
-  .color-picker-wrap input[type="color"] {
-    width: 80px; height: 36px;
-    border: none; cursor: pointer; border-radius: 6px;
-  }
-
   /* ── Section édition ── */
   .edit-section {
     background: #fff;
@@ -187,6 +168,31 @@
     font-size: 13px;
     color: #1a1a1a;
     background: #fff;
+  }
+
+  /* ── Feed Style Section ── */
+  .feed-style-section {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8e4e0;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .feed-style-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .feed-style-section > p {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+  .feed-style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
   }
 
   /* ── Boutons ── */
@@ -235,7 +241,7 @@
     <h1>Bienvenue sur SocialAI ✨</h1>
     <p>Choisissez l'identité visuelle de vos publications</p>
   </div>
-  <span class="step-badge">Étape 1 / 1 — Configuration</span>
+  <span class="step-badge" id="step-badge">Étape 1 / 2 — Identité visuelle</span>
 </div>
 
 <!-- Loading -->
@@ -252,6 +258,7 @@
     <p>Choisissez le thème qui correspond le mieux à votre univers. Vous pourrez personnaliser les couleurs.</p>
   </div>
 
+  <!-- ÉTAPE 1 : Thèmes visuels -->
   <div class="themes-grid" id="themesGrid"></div>
 
   <!-- Édition couleurs -->
@@ -260,10 +267,108 @@
     <div class="edit-grid" id="editGrid"></div>
   </div>
 
+  <!-- ÉTAPE 2 : Style de feed -->
+  <div class="feed-style-section" id="feedStyleSection" style="display:none">
+    <h3>📱 Quel style de feed souhaitez-vous ?</h3>
+    <p>Ce choix définit la répartition automatique de vos publications Instagram.</p>
+
+    <div class="feed-style-grid">
+
+      <!-- Style A -->
+      <div class="theme-card" id="feed-A" onclick="selectFeedStyle('A')">
+        <div style="height:160px;background:#f8f0eb;display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:8px;border-radius:12px 12px 0 0;overflow:hidden">
+          <div style="background:#e8d5c4;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8b5e52;text-align:center;padding:4px;font-style:italic">"Citation"</div>
+          <div style="background:#d4b8a0;border-radius:4px"></div>
+          <div style="background:#c9a882;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;text-align:center;padding:4px;font-style:italic">"Citation"</div>
+          <div style="background:#dcc5b0;border-radius:4px"></div>
+          <div style="background:#e8d5c4;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#8b5e52;text-align:center;padding:4px;font-style:italic">"Citation"</div>
+          <div style="background:#d4b8a0;border-radius:4px"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">Style A — Citations alternées</div>
+          <div class="theme-desc">50% citations · 17% photos · 17% carrousels · 16% reels<br><br>Idéal pour un feed inspirant et élégant.</div>
+        </div>
+      </div>
+
+      <!-- Style B -->
+      <div class="theme-card" id="feed-B" onclick="selectFeedStyle('B')">
+        <div style="height:160px;background:#f0f4f8;display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:8px;border-radius:12px 12px 0 0;overflow:hidden">
+          <div style="background:#b8cce4;border-radius:4px"></div>
+          <div style="background:#9ab5d4;border-radius:4px"></div>
+          <div style="background:#b8cce4;border-radius:4px"></div>
+          <div style="background:#9ab5d4;border-radius:4px"></div>
+          <div style="background:#c5d8e8;border-radius:4px"></div>
+          <div style="background:#9ab5d4;border-radius:4px"></div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">Style B — Photos pures</div>
+          <div class="theme-desc">33% photos · 33% carrousels · 34% reels<br><br>Idéal pour mettre en valeur vos visuels et votre univers.</div>
+        </div>
+      </div>
+
+      <!-- Style C -->
+      <div class="theme-card" id="feed-C" onclick="selectFeedStyle('C')">
+        <div style="height:160px;background:#f5f0fa;display:flex;align-items:center;justify-content:center;border-radius:12px 12px 0 0">
+          <div style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">⚙️</div>
+            <div style="font-size:13px;color:#9b7ebd;font-weight:600">Personnalisé</div>
+          </div>
+        </div>
+        <div class="theme-info">
+          <div class="theme-name">Style C — Mix personnalisé</div>
+          <div class="theme-desc">Définissez vous-même la répartition de vos formats de publication.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sliders Style C -->
+    <div id="feedStyleC-config" style="display:none;background:#f8f5ff;border-radius:12px;padding:20px;margin-top:8px">
+      <p style="font-size:13px;font-weight:600;margin-bottom:16px;color:#9b7ebd">Répartition personnalisée (total = 100%)</p>
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px">
+            📷 Photos simples <span id="val-single">25%</span>
+          </label>
+          <input type="range" min="0" max="100" value="25" id="slider-single"
+            oninput="updateSlider('single')"
+            style="width:100%;accent-color:#9b7ebd">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px">
+            🎠 Carrousels <span id="val-carousel">25%</span>
+          </label>
+          <input type="range" min="0" max="100" value="25" id="slider-carousel"
+            oninput="updateSlider('carousel')"
+            style="width:100%;accent-color:#9b7ebd">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px">
+            🎬 Reels <span id="val-reel">25%</span>
+          </label>
+          <input type="range" min="0" max="100" value="25" id="slider-reel"
+            oninput="updateSlider('reel')"
+            style="width:100%;accent-color:#9b7ebd">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px">
+            💬 Citations <span id="val-citation">25%</span>
+          </label>
+          <input type="range" min="0" max="100" value="25" id="slider-citation"
+            oninput="updateSlider('citation')"
+            style="width:100%;accent-color:#9b7ebd">
+        </div>
+        <div id="slider-total-warning" style="font-size:12px;color:#e24b4a;font-weight:500;display:none">
+          ⚠️ Le total doit être égal à 100% (actuellement : <span id="slider-total-val">100</span>%)
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="actions">
     <button class="btn btn-outline" onclick="regenerate()">↻ Régénérer 4 nouveaux thèmes</button>
     <button class="btn btn-primary" id="btnValidate" onclick="validate()" disabled>
-      Valider ce thème →
+      Valider et continuer →
     </button>
   </div>
 </div>
@@ -272,9 +377,11 @@
 
 <script>
 const CLIENT_ID = new URLSearchParams(location.search).get('client_id') || localStorage.getItem('client_id');
-let proposals     = [];
-let selectedIndex = null;
+let proposals      = [];
+let selectedIndex  = null;
 let editedBranding = null;
+let selectedFeedStyle = 'B';
+let feedStyleCustom   = { single: 25, carousel: 25, reel: 25, citation: 25 };
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
@@ -282,7 +389,6 @@ async function init() {
     document.getElementById('loading').innerHTML = '<p style="color:#e24b4a">Lien invalide. Contactez votre community manager.</p>';
     return;
   }
-
   try {
     const res  = await fetch(`/api/branding/proposals/${CLIENT_ID}`);
     const data = await res.json();
@@ -327,14 +433,19 @@ function selectTheme(i) {
   selectedIndex  = i;
   editedBranding = JSON.parse(JSON.stringify(proposals[i]));
 
-  document.querySelectorAll('.theme-card').forEach((c, idx) => {
+  document.querySelectorAll('.theme-card:not([id^="feed-"])').forEach((c, idx) => {
     c.classList.toggle('selected', idx === i);
   });
 
   document.getElementById('btnValidate').disabled = false;
+  document.getElementById('step-badge').textContent = 'Étape 2 / 2 — Style de feed';
   renderEditSection();
   document.getElementById('editSection').classList.add('visible');
-  document.getElementById('editSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Afficher l'étape 2
+  document.getElementById('feedStyleSection').style.display = 'block';
+  selectFeedStyle('B'); // B par défaut
+  document.getElementById('feedStyleSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ── Section d'édition des couleurs ───────────────────────────────────────────
@@ -368,31 +479,54 @@ function renderEditSection() {
     <div class="edit-field">
       <label>Tagline</label>
       <input type="text" value="${t.tagline}"
-        oninput="editedBranding.tagline = this.value"
-        style="padding:8px 10px;border:1px solid #e8e4e0;border-radius:8px;font-size:13px;width:100%">
+        oninput="editedBranding.tagline = this.value">
     </div>
   `;
 }
 
 function updateColor(key, value) {
   editedBranding.palette[key] = value;
-  // Mettre à jour l'aperçu de la card sélectionnée en live
   const card = document.getElementById(`card-${selectedIndex}`);
-  if (key === 'primary') {
-    card.querySelector('.preview-title').style.color = value;
-  }
-  if (key === 'dark') {
-    card.querySelector('.theme-preview').style.background = value;
-  }
+  if (key === 'primary') card.querySelector('.preview-title').style.color = value;
+  if (key === 'dark')    card.querySelector('.theme-preview').style.background = value;
 }
 
-// ── Valider le thème ──────────────────────────────────────────────────────────
+// ── Feed Style ────────────────────────────────────────────────────────────────
+function selectFeedStyle(style) {
+  selectedFeedStyle = style;
+  ['A','B','C'].forEach(s => {
+    const el = document.getElementById(`feed-${s}`);
+    if (el) el.classList.toggle('selected', s === style);
+  });
+  document.getElementById('feedStyleC-config').style.display = style === 'C' ? 'block' : 'none';
+}
+
+function updateSlider(type) {
+  feedStyleCustom[type] = parseInt(document.getElementById(`slider-${type}`).value);
+  document.getElementById(`val-${type}`).textContent = feedStyleCustom[type] + '%';
+  const total = Object.values(feedStyleCustom).reduce((a, b) => a + b, 0);
+  document.getElementById('slider-total-val').textContent = total;
+  document.getElementById('slider-total-warning').style.display = total !== 100 ? 'block' : 'none';
+}
+
+// ── Valider ───────────────────────────────────────────────────────────────────
 async function validate() {
   if (selectedIndex === null) return;
+
+  // Vérifier Style C
+  if (selectedFeedStyle === 'C') {
+    const total = Object.values(feedStyleCustom).reduce((a, b) => a + b, 0);
+    if (total !== 100) {
+      showToast('⚠️ Le total des pourcentages doit être égal à 100%');
+      return;
+    }
+  }
+
   document.getElementById('btnValidate').textContent = 'Enregistrement…';
   document.getElementById('btnValidate').disabled = true;
 
   try {
+    // 1. Sauvegarder le branding
     const res = await fetch(`/api/branding/choose/${CLIENT_ID}`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -401,20 +535,32 @@ async function validate() {
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
-    showToast('✅ Thème enregistré ! Redirection…');
+    // 2. Sauvegarder le feed style
+    const res2 = await fetch(`/api/clients/${CLIENT_ID}`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        feed_style:        selectedFeedStyle,
+        feed_style_custom: feedStyleCustom
+      })
+    });
+    if (!res2.ok) throw new Error('Erreur sauvegarde feed style');
+
+    showToast('✅ Configuration enregistrée ! Redirection…');
     setTimeout(() => { location.href = '/client.html'; }, 1800);
 
   } catch(err) {
     showToast('❌ Erreur : ' + err.message);
-    document.getElementById('btnValidate').textContent = 'Valider ce thème →';
+    document.getElementById('btnValidate').textContent = 'Valider et continuer →';
     document.getElementById('btnValidate').disabled = false;
   }
 }
 
 // ── Régénérer ─────────────────────────────────────────────────────────────────
 async function regenerate() {
-  document.getElementById('main').style.display   = 'none';
+  document.getElementById('main').style.display    = 'none';
   document.getElementById('loading').style.display = 'flex';
+  document.getElementById('step-badge').textContent = 'Étape 1 / 2 — Identité visuelle';
   selectedIndex = null;
 
   try {

@@ -1,6 +1,6 @@
 // routes/pipeline.js — Orchestrateur génération automatique de contenu IA
-// Gère : single, story, carousel, citation
-// Feed pattern dynamique basé sur les performances réelles
+// Gère : single, story, carousel, reel, citation
+// Feed pattern dynamique basé sur le style choisi par le client (A/B/C)
 // Recyclage automatique des médias selon l'ancienneté du compte
 
 const express  = require('express');
@@ -15,34 +15,37 @@ const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KE
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// STYLES DE FEED
+// A = Citations alternées : 50% citations · 17% single · 17% carousel · 16% reel
+// B = Photos pures        : 33% single · 33% carousel · 34% reel
+// C = Mix personnalisé    : défini par le client
+// ─────────────────────────────────────────────────────────────────────────────
+const FEED_STYLES = {
+  A: { single: 17, carousel: 17, reel: 16, citation: 50 },
+  B: { single: 33, carousel: 33, reel: 34, citation: 0  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Calcule l'intervalle de recyclage selon l'ancienneté du compte client
-// < 3 mois  → 60 jours
-// < 1 an    → 120 jours
-// ≥ 3 ans   → 180 jours (6 mois)
 // ─────────────────────────────────────────────────────────────────────────────
 function getRecycleInterval(client) {
   const createdAt = client.created_at ? new Date(client.created_at) : new Date();
   const ageMs     = Date.now() - createdAt.getTime();
   const ageDays   = ageMs / (1000 * 60 * 60 * 24);
 
-  if (ageDays < 90)  return 60;   // < 3 mois  → 60 jours
-  if (ageDays < 365) return 120;  // < 1 an    → 120 jours
-  return 180;                     // ≥ 1 an    → 180 jours (6 mois)
+  if (ageDays < 90)  return 60;
+  if (ageDays < 365) return 120;
+  return 180;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Recycle automatiquement les médias dont used_at est plus vieux
-// que l'intervalle calculé pour ce client
-// Retourne le nombre de médias recyclés
+// Recycle automatiquement les médias si stock faible
 // ─────────────────────────────────────────────────────────────────────────────
 async function autoRecycleIfNeeded(client) {
   const intervalDays = getRecycleInterval(client);
   const cutoff = new Date(Date.now() - intervalDays * 24 * 60 * 60 * 1000).toISOString();
-
-  // Compter combien de médias sont disponibles AVANT recyclage
   const stock = await countAvailableMedia(client.id);
 
-  // Seuil bas : si moins de 5 médias disponibles → déclencher le recyclage
   if (stock >= 5) return 0;
 
   console.log(`♻️  ${client.name} — stock faible (${stock}), recyclage médias > ${intervalDays}j...`);
@@ -64,69 +67,73 @@ async function autoRecycleIfNeeded(client) {
   if (count > 0) {
     console.log(`✅ ${count} médias recyclés pour ${client.name} (intervalle ${intervalDays}j)`);
   } else {
-    console.warn(`⚠️ Aucun média recyclable pour ${client.name} — tous utilisés récemment`);
+    console.warn(`⚠️ Aucun média recyclable pour ${client.name}`);
   }
-
   return count;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Analyse les performances récentes pour décider du prochain format
-// Logique : on regarde les 10 derniers posts publiés, on calcule
-// l'engagement moyen par format, et on choisit ce qui performe le mieux
-// tout en respectant la règle : pas 2 citations consécutives
+// DÉCISION DU FORMAT selon le feed_style du client
+// Lit le style A/B/C et calcule le déficit pour équilibrer la rotation
 // ─────────────────────────────────────────────────────────────────────────────
 async function decideNextFormat(clientId) {
+  // Récupérer le feed_style du client
+  const { data: clientData } = await supabase
+    .from('clients')
+    .select('feed_style, feed_style_custom')
+    .eq('id', clientId)
+    .single();
+
+  const feedStyle = clientData?.feed_style || 'B';
+  const custom    = clientData?.feed_style_custom || { single: 25, carousel: 25, reel: 25, citation: 25 };
+
+  // Ratio cible selon le style
+  const ratio = feedStyle === 'C' ? custom : (FEED_STYLES[feedStyle] || FEED_STYLES.B);
+
+  // Récupérer les posts récents pour calculer le déficit
   const { data: recentPosts } = await supabase
     .from('queue')
-    .select('type, likes, comments, reach, saves, source')
+    .select('type')
     .eq('client_id', clientId)
-    .eq('statut', 'publie')
-    .order('published_at', { ascending: false })
-    .limit(10);
+    .in('statut', ['publie', 'planifie'])
+    .order('created_at', { ascending: false })
+    .limit(20);
 
-  const lastPost = recentPosts?.[0];
-  const lastType = lastPost?.type || null;
+  const lastType = recentPosts?.[0]?.type;
 
+  // Au démarrage → suivre l'ordre naturel du ratio
   if (!recentPosts || recentPosts.length < 3) {
-    const defaults = ['single', 'citation', 'single', 'carousel', 'citation', 'story'];
-    const idx      = (recentPosts?.length || 0) % defaults.length;
-    return defaults[idx];
+    const sorted = Object.entries(ratio)
+      .filter(([, v]) => v > 0)
+      .sort(([, a], [, b]) => b - a);
+    return sorted[0]?.[0] || 'single';
   }
 
-  const scores = {};
-  const counts = {};
-
+  // Compter les formats récents
+  const counts = { single: 0, carousel: 0, reel: 0, citation: 0 };
   for (const post of recentPosts) {
-    const type  = post.type || 'single';
-    const score = (post.likes || 0) * 1
-                + (post.comments || 0) * 3
-                + (post.saves || 0) * 5
-                + (post.reach || 0) * 0.01;
-
-    if (!scores[type]) { scores[type] = 0; counts[type] = 0; }
-    scores[type] += score;
-    counts[type] += 1;
+    const t = post.type;
+    if (t === 'post' || t === 'single') counts.single++;
+    else if (t === 'carousel')          counts.carousel++;
+    else if (t === 'reel')              counts.reel++;
+    else if (t === 'citation')          counts.citation++;
   }
 
-  const averages = {};
-  for (const type of Object.keys(scores)) {
-    averages[type] = scores[type] / counts[type];
+  // Calculer le déficit par rapport au ratio cible
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+  const deficits = {};
+  for (const [type, target] of Object.entries(ratio)) {
+    if (target === 0) continue;
+    const current = (counts[type] / total) * 100;
+    deficits[type] = target - current;
   }
 
-  const allFormats = ['single', 'story', 'carousel', 'citation'];
-  const available  = allFormats.filter(f => {
-    if (f === 'citation' && lastType === 'citation') return false;
-    return true;
-  });
+  // Ne pas répéter le même format 2 fois de suite
+  const candidates = Object.entries(deficits)
+    .filter(([type]) => type !== lastType)
+    .sort(([, a], [, b]) => b - a);
 
-  available.sort((a, b) => (averages[b] || 50) - (averages[a] || 50));
-
-  if (available.length > 1 && Math.random() < 0.2) {
-    return available[1];
-  }
-
-  return available[0];
+  return candidates[0]?.[0] || 'single';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -156,7 +163,7 @@ RÈGLES ÉDITORIALES ABSOLUES :
 - Toujours inspirer, valoriser le savoir-faire, inviter doucement au contact
 - Style : "Si vous rêvez de X, nous sommes là", "Le bonheur c'est...", "Chaque Y mérite..."
 - Maximum 20 mots pour la citation
-- Une sous-ligne optionnelle de max 8 mots (peut inclure "Contactez-nous" ou "On vous attend")
+- Une sous-ligne optionnelle de max 8 mots
 
 Réponds UNIQUEMENT en JSON valide :
 {
@@ -276,155 +283,290 @@ async function generateForClient(client) {
     return { skipped: true, reason: 'branding_pending' };
   }
 
-  // 2. Décider du format selon les performances
+  // 2. Décider du format selon le feed_style du client
   let format = await decideNextFormat(client.id);
-
-  // 3. Si citation → vérifier le ratio (max 30% ce mois)
-  if (format === 'citation') {
-    const ratio = await getCitationRatioThisMonth(client.id);
-    if (ratio >= 0.30) {
-      console.log(`📊 Trop de citations ce mois (${Math.round(ratio*100)}%) → fallback photo`);
-      format = 'single';
-    }
-  }
-
   console.log(`📐 Format décidé : ${format}`);
 
-  // 4. Générer selon le format
   const topPosts = await getTopPosts(client.id);
   let queueData  = {};
 
-  // ── CAS CITATION — pas de photo ────────────────────────────────────────────
+  // ── CAS CITATION ────────────────────────────────────────────────────────────
   if (format === 'citation') {
-    const citationData = await generateCitation(client, topPosts);
+    // Vérifier ratio max 50% ce mois pour éviter la surcharge
+    const ratio = await getCitationRatioThisMonth(client.id);
+    if (ratio >= 0.55) {
+      console.log(`📊 Trop de citations ce mois (${Math.round(ratio*100)}%) → fallback single`);
+      format = 'single';
+    } else {
+      const citationData = await generateCitation(client, topPosts);
 
-    const { count: citCount } = await supabase
-      .from('queue')
-      .select('*', { count: 'exact', head: true })
-      .eq('client_id', client.id)
-      .eq('type', 'citation');
+      const { count: citCount } = await supabase
+        .from('queue')
+        .select('*', { count: 'exact', head: true })
+        .eq('client_id', client.id)
+        .eq('type', 'citation');
 
-    const variant      = (citCount || 0) % 3;
-    const scheduledAt  = computeScheduledAt(null, client);
-    let   visualUrl    = null;
+      const variant      = (citCount || 0) % 3;
+      const scheduledAt  = computeScheduledAt(null, client);
+      let   visualUrl    = null;
 
-    const assemblerOk = await checkAssemblerHealth();
-    if (assemblerOk) {
-      try {
-        const urls = await assembleVisuals({
-          client,
-          mediaList:    [],
-          format:       'citation',
-          titre:        '',
-          caption:      citationData.caption_post,
-          citation_text: citationData.citation,
-          sous_titre:   citationData.sous_titre,
-          variant
-        });
-        visualUrl = urls?.[0] || null;
-      } catch(err) {
-        console.error(`⚠️ Assembleur citation: ${err.message}`);
+      const assemblerOk = await checkAssemblerHealth();
+      if (assemblerOk) {
+        try {
+          const urls = await assembleVisuals({
+            client,
+            mediaList:     [],
+            format:        'citation',
+            titre:         '',
+            caption:       citationData.caption_post,
+            citation_text: citationData.citation,
+            sous_titre:    citationData.sous_titre,
+            variant
+          });
+          visualUrl = urls?.[0] || null;
+        } catch(err) {
+          console.error(`⚠️ Assembleur citation: ${err.message}`);
+        }
       }
+
+      queueData = {
+        client_id:    client.id,
+        type:         'citation',
+        statut:       'planifie',
+        caption:      citationData.caption_post,
+        scheduled_at: scheduledAt,
+        source:       'ai_auto',
+        media_url:    visualUrl,
+      };
+
+      const { data: queueItem, error } = await supabase
+        .from('queue').insert([queueData]).select();
+      if (error) throw new Error(`Erreur queue citation : ${error.message}`);
+
+      console.log(`✅ ${client.name} — citation planifiée pour ${scheduledAt}`);
+      return {
+        success:     true,
+        client:      client.name,
+        format:      'citation',
+        scheduledAt,
+        queueId:     queueItem[0].id
+      };
     }
+  }
 
-    queueData = {
-      client_id:    client.id,
-      type:         'citation',
-      statut:       'planifie',
-      caption:      citationData.caption_post,
-      scheduled_at: scheduledAt,
-      source:       'ai_auto',
-      media_url:    visualUrl,
-    };
+  // ── CAS REEL ────────────────────────────────────────────────────────────────
+  if (format === 'reel') {
+    await autoRecycleIfNeeded(client);
 
-  // ── CAS PHOTO (single, story, carousel) ───────────────────────────────────
-  } else {
+    // Chercher une vidéo disponible
+    const { data: videos } = await supabase
+      .from('media')
+      .select('*')
+      .eq('client_id', client.id)
+      .eq('type', 'video')
+      .eq('used', false)
+      .eq('reserved', false)
+      .order('created_at', { ascending: true })
+      .limit(5);
 
-    // ✨ RECYCLAGE AUTOMATIQUE si stock faible
+    if (!videos || videos.length === 0) {
+      console.warn(`⚠️ ${client.name} — Aucune vidéo disponible pour reel → fallback single`);
+      format = 'single';
+    } else {
+      const video = videos[Math.floor(Math.random() * videos.length)];
+
+      // Réserver le média
+      await supabase.from('media').update({
+        reserved:    true,
+        reserved_at: new Date().toISOString()
+      }).eq('id', video.id);
+
+      const caption     = await generateCaption(client, 'reel', topPosts);
+      const scheduledAt = computeScheduledAt(video.analyse_data, client);
+
+      // Marquer comme utilisé
+      await supabase.from('media').update({
+        used:         true,
+        reserved:     false,
+        reserved_at:  null,
+        last_used_at: new Date().toISOString(),
+        use_count:    (video.use_count || 0) + 1
+      }).eq('id', video.id);
+
+      queueData = {
+        client_id:    client.id,
+        type:         'reel',
+        statut:       'planifie',
+        caption,
+        scheduled_at: scheduledAt,
+        source:       'ai_auto',
+        media_id:     video.id,
+        media_url:    video.url,
+        music_url:    null,
+        music_title:  null,
+      };
+
+      const { data: queueItem, error } = await supabase
+        .from('queue').insert([queueData]).select();
+      if (error) throw new Error(`Erreur queue reel : ${error.message}`);
+
+      console.log(`✅ ${client.name} — reel planifié pour ${scheduledAt}`);
+      return {
+        success:     true,
+        client:      client.name,
+        format:      'reel',
+        scheduledAt,
+        queueId:     queueItem[0].id
+      };
+    }
+  }
+
+  // ── CAS CAROUSEL ────────────────────────────────────────────────────────────
+  if (format === 'carousel') {
     await autoRecycleIfNeeded(client);
 
     const stock = await countAvailableMedia(client.id);
     if (stock === 0) {
-      const intervalDays = getRecycleInterval(client);
-      console.warn(`⚠️ Contenu faible pour ${client.name} (0 médias restants) — tous utilisés dans les ${intervalDays}j`);
+      console.warn(`⚠️ Stock vide pour ${client.name} → skipped`);
       return { skipped: true, reason: 'stock_vide' };
     }
 
-    if (stock <= 2) {
-      console.warn(`⚠️ Contenu faible pour ${client.name} (${stock} médias restants)`);
-    }
+    // Aria décide combien de photos selon le stock disponible
+    const nbPhotos = stock >= 5 ? Math.floor(Math.random() * 3) + 3  // 3, 4 ou 5
+                   : stock >= 3 ? 3
+                   : stock >= 2 ? 2
+                   : 1;
 
-    const countMap = { single: 1, story: 1, carousel: 3 };
-    const count    = countMap[format] || 1;
-
-    const mediaList    = await selectBestMedia(client.id, { count, format });
-    const primaryMedia = mediaList[0];
-    let   titre, caption, titres, captions;
-
-    if (format === 'carousel') {
-      const texts = await generateCarouselTexts(client, mediaList, topPosts);
-      titres   = texts.titres;
-      captions = texts.captions;
-      titre    = titres[0];
-      caption  = texts.caption_principale
-                 || await generateCaption(client, 'carousel', topPosts);
+    if (nbPhotos < 2) {
+      console.warn(`⚠️ ${client.name} — Pas assez de photos pour carousel → fallback single`);
+      format = 'single';
     } else {
-      const mediaType = format === 'story' ? 'story verticale' : 'post carré';
-      caption = await generateCaption(client, mediaType, topPosts);
-      titre   = caption.split(/[.!?]/)[0].replace(/[#@]/g,'').trim().slice(0, 60);
-    }
+      const mediaList    = await selectBestMedia(client.id, { count: nbPhotos, format: 'carousel' });
+      const primaryMedia = mediaList[0];
 
-    const scheduledAt = computeScheduledAt(primaryMedia.analyse_data, client);
-    let   visualUrls  = null;
+      const texts        = await generateCarouselTexts(client, mediaList, topPosts);
+      const titre        = texts.titres[0];
+      const caption      = texts.caption_principale || await generateCaption(client, 'carousel', topPosts);
+      const titres       = texts.titres;
+      const captions     = texts.captions;
 
-    const assemblerOk = await checkAssemblerHealth();
-    if (assemblerOk) {
-      try {
-        visualUrls = await assembleVisuals({
-          client, mediaList, format, titre, caption, titres, captions
-        });
-        console.log(`🎨 ${visualUrls.length} visuel(s) pour ${client.name}`);
-      } catch(err) {
-        console.error(`⚠️ Assembleur: ${err.message}`);
+      const scheduledAt  = computeScheduledAt(primaryMedia.analyse_data, client);
+      let   visualUrls   = null;
+
+      const assemblerOk = await checkAssemblerHealth();
+      if (assemblerOk) {
+        try {
+          visualUrls = await assembleVisuals({
+            client, mediaList, format: 'carousel', titre, caption, titres, captions
+          });
+          console.log(`🎨 ${visualUrls.length} visuel(s) carousel pour ${client.name}`);
+        } catch(err) {
+          console.error(`⚠️ Assembleur carousel: ${err.message}`);
+        }
       }
-    } else {
-      console.warn(`⚠️ Assembleur indisponible — utilisation des URLs média originales`);
+
+      const finalMediaUrl  = visualUrls?.[0]  || primaryMedia.url || null;
+      const finalMediaUrls = visualUrls        || mediaList.map(m => m.url).filter(Boolean);
+
+      if (!finalMediaUrl) {
+        console.error(`❌ Aucune URL média pour carousel ${client.name}`);
+        return { skipped: true, reason: 'no_media_url' };
+      }
+
+      await markAsUsed(mediaList.map(m => m.id));
+
+      queueData = {
+        client_id:    client.id,
+        type:         'carousel',
+        statut:       'planifie',
+        caption,
+        scheduled_at: scheduledAt,
+        source:       'ai_auto',
+        media_id:     primaryMedia.id,
+        media_ids:    mediaList.map(m => m.id),
+        media_url:    finalMediaUrl,
+        media_urls:   finalMediaUrls,
+      };
+
+      const { data: queueItem, error } = await supabase
+        .from('queue').insert([queueData]).select();
+      if (error) throw new Error(`Erreur queue carousel : ${error.message}`);
+
+      console.log(`✅ ${client.name} — carousel ${nbPhotos} photos planifié pour ${scheduledAt}`);
+      return {
+        success:     true,
+        client:      client.name,
+        format:      'carousel',
+        nbPhotos,
+        scheduledAt,
+        queueId:     queueItem[0].id
+      };
     }
-
-    const finalMediaUrl  = visualUrls?.[0]  || primaryMedia.url || null;
-    const finalMediaUrls = visualUrls        || mediaList.map(m => m.url).filter(Boolean);
-
-    if (!finalMediaUrl) {
-      console.error(`❌ Aucune URL média disponible pour ${client.name} — post ignoré`);
-      return { skipped: true, reason: 'no_media_url' };
-    }
-
-    await markAsUsed(mediaList.map(m => m.id));
-
-    queueData = {
-      client_id:    client.id,
-      type:         format === 'carousel' ? 'carousel' : format === 'story' ? 'story' : 'post',
-      statut:       'planifie',
-      caption,
-      scheduled_at: scheduledAt,
-      source:       'ai_auto',
-      media_id:     primaryMedia.id,
-      media_ids:    mediaList.map(m => m.id),
-      media_url:    finalMediaUrl,
-      media_urls:   finalMediaUrls,
-    };
   }
+
+  // ── CAS SINGLE (photo simple) — fallback final ────────────────────────────
+  await autoRecycleIfNeeded(client);
+
+  const stock = await countAvailableMedia(client.id);
+  if (stock === 0) {
+    const intervalDays = getRecycleInterval(client);
+    console.warn(`⚠️ Contenu faible pour ${client.name} (0 médias restants) — tous utilisés dans les ${intervalDays}j`);
+    return { skipped: true, reason: 'stock_vide' };
+  }
+
+  if (stock <= 2) {
+    console.warn(`⚠️ Contenu faible pour ${client.name} (${stock} médias restants)`);
+  }
+
+  const mediaList    = await selectBestMedia(client.id, { count: 1, format: 'single' });
+  const primaryMedia = mediaList[0];
+  const caption      = await generateCaption(client, 'post carré', topPosts);
+  const titre        = caption.split(/[.!?]/)[0].replace(/[#@]/g,'').trim().slice(0, 60);
+  const scheduledAt  = computeScheduledAt(primaryMedia.analyse_data, client);
+  let   visualUrls   = null;
+
+  const assemblerOk = await checkAssemblerHealth();
+  if (assemblerOk) {
+    try {
+      visualUrls = await assembleVisuals({
+        client, mediaList, format: 'single', titre, caption
+      });
+    } catch(err) {
+      console.error(`⚠️ Assembleur single: ${err.message}`);
+    }
+  }
+
+  const finalMediaUrl = visualUrls?.[0] || primaryMedia.url || null;
+  if (!finalMediaUrl) {
+    console.error(`❌ Aucune URL média pour ${client.name}`);
+    return { skipped: true, reason: 'no_media_url' };
+  }
+
+  await markAsUsed(mediaList.map(m => m.id));
+
+  queueData = {
+    client_id:    client.id,
+    type:         'post',
+    statut:       'planifie',
+    caption,
+    scheduled_at: scheduledAt,
+    source:       'ai_auto',
+    media_id:     primaryMedia.id,
+    media_ids:    mediaList.map(m => m.id),
+    media_url:    finalMediaUrl,
+    media_urls:   [finalMediaUrl],
+  };
 
   const { data: queueItem, error } = await supabase
     .from('queue').insert([queueData]).select();
   if (error) throw new Error(`Erreur queue : ${error.message}`);
 
-  console.log(`✅ ${client.name} — ${format} planifié pour ${queueData.scheduled_at}`);
+  console.log(`✅ ${client.name} — single planifié pour ${scheduledAt}`);
   return {
     success:     true,
     client:      client.name,
-    format,
-    scheduledAt: queueData.scheduled_at,
+    format:      'single',
+    scheduledAt,
     queueId:     queueItem[0].id
   };
 }
@@ -507,7 +649,6 @@ router.get('/health', async (req, res) => {
   res.json({ pipeline: 'ok', assembler: assemblerOk ? 'ok' : 'unavailable' });
 });
 
-// Route pour forcer le recyclage manuel d'un client
 router.post('/recycle/:clientId', async (req, res) => {
   try {
     const { data: client } = await supabase
