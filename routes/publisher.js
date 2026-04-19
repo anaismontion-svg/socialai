@@ -6,6 +6,34 @@ const nodemailer = require('nodemailer');
 const supabase  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// ─────────────────────────────────────────────
+// LIMITES STRICTES PAR JOUR
+// ─────────────────────────────────────────────
+const LIMITES_JOUR = {
+  post:    1,  // max 1 post par jour
+  story:   4,  // max 4 stories par jour
+  reel:    1,
+  special: 1,
+};
+
+async function countPublicationsAujourdhui(clientId, type) {
+  const debut = new Date();
+  debut.setHours(0, 0, 0, 0);
+  const fin = new Date();
+  fin.setHours(23, 59, 59, 999);
+
+  const { count } = await supabase
+    .from('queue')
+    .select('*', { count: 'exact', head: true })
+    .eq('client_id', clientId)
+    .eq('type', type)
+    .eq('statut', 'publie')
+    .gte('scheduled_at', debut.toISOString())
+    .lte('scheduled_at', fin.toISOString());
+
+  return count || 0;
+}
+
 async function sendLowContentAlert(client) {
   try {
     const transporter = nodemailer.createTransport({
@@ -137,35 +165,17 @@ async function publishCarouselToInstagram(accessToken, igAccountId, mediaUrls, c
   }
 }
 
-// ─────────────────────────────────────────────
-// PUBLICATION STORY — CORRIGÉE
-// - Vérification stricte de l'URL avant envoi
-// - Détection automatique image/vidéo
-// ─────────────────────────────────────────────
 async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, mediaType) {
   try {
-    // Refus strict si URL invalide
     if (!mediaUrl || typeof mediaUrl !== 'string' || !mediaUrl.startsWith('http')) {
       throw new Error(`URL média invalide pour la story: "${mediaUrl}"`);
     }
-
-    // Détection automatique du type
-    const isVideo = mediaType === 'video' ||
-      /\.(mp4|mov|avi|webm)(\?|$)/i.test(mediaUrl);
-
-    const params = {
-      media_type:   'STORIES',
-      access_token: accessToken,
-    };
-    if (isVideo) {
-      params.video_url = mediaUrl;
-    } else {
-      params.image_url = mediaUrl;
-    }
+    const isVideo = mediaType === 'video' || /\.(mp4|mov|avi|webm)(\?|$)/i.test(mediaUrl);
+    const params = { media_type: 'STORIES', access_token: accessToken };
+    if (isVideo) { params.video_url = mediaUrl; } else { params.image_url = mediaUrl; }
 
     const containerRes = await axios.post(
-      `https://graph.instagram.com/v19.0/${igAccountId}/media`, null,
-      { params }
+      `https://graph.instagram.com/v19.0/${igAccountId}/media`, null, { params }
     );
     const containerId = containerRes.data.id;
     console.log(`  ⏳ Container story créé (${containerId}), attente...`);
@@ -181,9 +191,6 @@ async function publishStoryToInstagram(accessToken, igAccountId, mediaUrl, media
   }
 }
 
-// ─────────────────────────────────────────────
-// MARQUER LE MÉDIA COMME UTILISÉ
-// ─────────────────────────────────────────────
 async function markMediaAsUsed(mediaId) {
   if (!mediaId) return;
   try {
@@ -196,7 +203,6 @@ async function markMediaAsUsed(mediaId) {
       last_used_at: new Date().toISOString(),
       use_count:    (current?.use_count || 0) + 1
     }).eq('id', mediaId);
-    console.log(`🔒 Média ${mediaId} marqué utilisé (use_count: ${(current?.use_count || 0) + 1})`);
   } catch(err) {
     console.error(`❌ Erreur markMediaAsUsed ${mediaId}:`, err.message);
   }
@@ -204,6 +210,7 @@ async function markMediaAsUsed(mediaId) {
 
 // ─────────────────────────────────────────────
 // MOTEUR PRINCIPAL DE PUBLICATION
+// avec limites strictes par jour
 // ─────────────────────────────────────────────
 async function processQueue() {
   const now = new Date();
@@ -230,6 +237,9 @@ async function processQueue() {
 
   console.log(`📤 ${items.length} publication(s) à traiter...`);
 
+  // Compteurs par client pour cette session
+  const sessionCount = {};
+
   for (const item of items) {
     const client = item.clients;
     if (!client) continue;
@@ -238,6 +248,31 @@ async function processQueue() {
       const socialAccount = accountsByClient[client.id];
       if (!socialAccount) {
         console.warn(`⚠️ Pas de compte Instagram pour ${client.name}`);
+        continue;
+      }
+
+      // ── VÉRIFICATION LIMITE QUOTIDIENNE ──────────────────────────────────
+      const typeNorm = ['post', 'recycled', 'special'].includes(item.type) ? 'post' : item.type;
+      const limite = LIMITES_JOUR[typeNorm] || 1;
+
+      // Compter les publications du jour depuis la DB
+      const dejaPublieeDB = await countPublicationsAujourdhui(client.id, item.type);
+
+      // Compter aussi les publications de cette session
+      const keySession = `${client.id}_${typeNorm}`;
+      const dejaPublieeSession = sessionCount[keySession] || 0;
+
+      const totalPubliee = dejaPublieeDB + dejaPublieeSession;
+
+      if (totalPubliee >= limite) {
+        console.warn(`🚫 ${client.name} — Limite atteinte pour "${typeNorm}" (${totalPubliee}/${limite}) — item ignoré`);
+        // Repousser l'item à demain pour ne pas le republier
+        const demain = new Date();
+        demain.setDate(demain.getDate() + 1);
+        demain.setHours(9, 0, 0, 0);
+        await supabase.from('queue').update({
+          scheduled_at: demain.toISOString()
+        }).eq('id', item.id);
         continue;
       }
 
@@ -259,40 +294,31 @@ async function processQueue() {
           medias?.forEach(m => mediaIdsUsed.push(m.id));
         }
         if (mediaUrls.length < 2) throw new Error('Carousel requiert au moins 2 slides');
-        console.log(`🎠 Publication carousel ${mediaUrls.length} slides pour ${client.name}`);
         result = await publishCarouselToInstagram(
           socialAccount.access_token, socialAccount.account_id, mediaUrls, caption
         );
 
       } else if (item.type === 'story') {
         let storyUrl = item.media_url;
-
-        // Récupérer l'URL depuis la table media si absente
         if (!storyUrl && item.media_id) {
           const { data: media } = await supabase
             .from('media').select('url, type').eq('id', item.media_id).single();
           if (media?.url) storyUrl = media.url;
         }
-
-        // ── Refus strict si pas d'URL valide ──
         if (!storyUrl || !storyUrl.startsWith('http')) {
-          console.warn(`⚠️ ${client.name} — Story ignorée (pas de média valide) — source: ${item.source}`);
+          console.warn(`⚠️ ${client.name} — Story ignorée (pas de média valide)`);
           await supabase.from('queue').update({
             statut: 'erreur',
             error_message: 'Aucun média disponible pour cette story'
           }).eq('id', item.id);
           continue;
         }
-
         console.log(`📖 Publication story pour ${client.name} (source: ${item.source})`);
         const isVideo = /\.(mp4|mov|avi|webm)(\?|$)/i.test(storyUrl);
         result = await publishStoryToInstagram(
           socialAccount.access_token, socialAccount.account_id,
-          storyUrl,
-          isVideo ? 'video' : 'image'
+          storyUrl, isVideo ? 'video' : 'image'
         );
-
-        // Ne pas marquer comme utilisé pour les reposts
         if (item.media_id && item.source !== 'story_repost_post') {
           mediaIdsUsed.push(item.media_id);
         }
@@ -324,7 +350,10 @@ async function processQueue() {
           await markMediaAsUsed(mediaId);
         }
 
-        console.log(`✅ Publié pour ${client.name} — ${item.type}${mediaIdsUsed.length ? ` (${mediaIdsUsed.length} média(s) marqué(s) utilisé(s))` : ''}`);
+        // Incrémenter le compteur de session
+        sessionCount[keySession] = (sessionCount[keySession] || 0) + 1;
+
+        console.log(`✅ Publié pour ${client.name} — ${item.type} (${totalPubliee + 1}/${limite} aujourd'hui)`);
 
       } else {
         if (item.media_id) {

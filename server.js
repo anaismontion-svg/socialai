@@ -32,7 +32,7 @@ app.use('/api/templates',       require('./routes/templateRoutes'));
 app.use('/api/aria',            require('./routes/aria'));
 app.use('/api/google-reviews',  require('./routes/google-reviews'));
 
-// ── Route meta — uniquement sur /auth et /webhook ────────────────────────────
+// ── Route meta ────────────────────────────────────────────────────────────────
 app.use('/auth',                require('./routes/meta'));
 app.use('/webhook',             require('./routes/meta'));
 
@@ -41,30 +41,59 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ── Moteur de publication ─────────────────────────────────────────────────────
+// ── Moteur de publication — toutes les 5 minutes avec limite quotidienne ──────
 const { processQueue, checkLowContent } = require('./routes/publisher');
-processQueue();
-checkLowContent();
-setInterval(processQueue,    60 * 1000);
+
+// Compteur de publications par jour par client
+const dailyPublicationCount = {};
+
+function resetDailyCounters() {
+  Object.keys(dailyPublicationCount).forEach(k => delete dailyPublicationCount[k]);
+  console.log('🔄 Compteurs quotidiens réinitialisés');
+}
+
+// Réinitialiser les compteurs à minuit
+const now = new Date();
+const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+setTimeout(() => {
+  resetDailyCounters();
+  setInterval(resetDailyCounters, 24 * 60 * 60 * 1000);
+}, msUntilMidnight);
+
+// Publisher toutes les 5 minutes (pas 1 minute)
+setTimeout(() => processQueue(), 30 * 1000); // attendre 30s au démarrage
+setInterval(processQueue, 5 * 60 * 1000);
 setInterval(checkLowContent, 6 * 60 * 60 * 1000);
 
-// ── Pipeline génération IA — toutes les 3h ────────────────────────────────────
+// ── Pipeline génération IA — toutes les 6h (pas 3h) ──────────────────────────
 const { runAIPipeline } = require('./routes/pipeline');
-runAIPipeline();
-setInterval(runAIPipeline, 3 * 60 * 60 * 1000);
+setTimeout(() => runAIPipeline(), 2 * 60 * 1000); // attendre 2min au démarrage
+setInterval(runAIPipeline, 6 * 60 * 60 * 1000);
 
 // ── Mise à jour métriques posts — toutes les 6h ───────────────────────────────
 const { syncPostMetrics } = require('./routes/feed');
 setInterval(syncPostMetrics, 6 * 60 * 60 * 1000);
 
-// ── Planificateur automatique — toutes les 24h ────────────────────────────────
+// ── Planificateur — toutes les 24h UNIQUEMENT, pas au démarrage ───────────────
 const { runScheduler } = require('./routes/scheduler');
-runScheduler();
-setInterval(runScheduler, 24 * 60 * 60 * 1000);
+// Lancer le scheduler à 2h du matin uniquement
+function scheduleNextRun() {
+  const now = new Date();
+  const next2am = new Date(now);
+  next2am.setHours(2, 0, 0, 0);
+  if (next2am <= now) next2am.setDate(next2am.getDate() + 1);
+  const msUntil2am = next2am.getTime() - now.getTime();
+  console.log(`🗓️ Prochain scheduler à 2h du matin (dans ${Math.round(msUntil2am / 1000 / 60)} minutes)`);
+  setTimeout(() => {
+    runScheduler();
+    setInterval(runScheduler, 24 * 60 * 60 * 1000);
+  }, msUntil2am);
+}
+scheduleNextRun();
 
 // ── Synchronisation Instagram ─────────────────────────────────────────────────
 const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
-(async () => {
+setTimeout(async () => {
   try {
     console.log('🔄 Démarrage sync historique Instagram...');
     await syncAllClients();
@@ -72,7 +101,8 @@ const { syncAllClients, updateAllStats } = require('./routes/instagram-sync');
   } catch (err) {
     console.error('❌ Erreur sync Instagram:', err.message);
   }
-})();
+}, 5 * 60 * 1000); // attendre 5min avant la sync
+
 setInterval(async () => {
   try { await updateAllStats(); }
   catch (err) { console.error('❌ Erreur stats Instagram:', err.message); }
