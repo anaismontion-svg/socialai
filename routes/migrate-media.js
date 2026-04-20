@@ -32,7 +32,7 @@ async function migrateInstagramMedia() {
     .from('media')
     .select('id, url, client_id, type')
     .like('url', '%instagram%')
-    .limit(500); // Tout traiter d'un coup
+    .limit(50); // 50 par batch pour ne pas surcharger Railway
 
   if (error || !medias?.length) {
     console.log('✅ Aucun média Instagram à migrer');
@@ -69,11 +69,10 @@ async function migrateInstagramMedia() {
         .update({ url: publicUrl })
         .eq('id', media.id);
 
-      console.log(`✅ Migré : ${media.id}`);
       success++;
     } catch (e) {
       if (e.message.includes('403')) {
-        // URL expirée → supprimer de la BDD directement
+        // URL expirée → supprimer proprement de la BDD
         await supabase.from('media').delete().eq('id', media.id);
         expired++;
       } else {
@@ -83,7 +82,7 @@ async function migrateInstagramMedia() {
     }
   }
 
-  console.log(`✅ Migration terminée: ${success} migrés ✅ | ${expired} expirés supprimés 🗑️ | ${failed} autres erreurs ❌`);
+  console.log(`✅ Batch terminé: ${success} migrés ✅ | ${expired} expirés supprimés 🗑️ | ${failed} erreurs ❌`);
 }
 
 module.exports = { migrateInstagramMedia };
