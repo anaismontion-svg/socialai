@@ -223,8 +223,8 @@ textarea.form-input{resize:vertical;min-height:80px}
 .empty-sub{font-size:13px}
 .spinner{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,59,107,0.2);border-top-color:var(--accent);animation:spin 0.7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-bar{height:2px;background:var(--surface);border-radius:1px;overflow:hidden}
-.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:1px;transition:width 0.3s ease}
+.loading-bar{height:6px;background:var(--surface);border-radius:3px;overflow:hidden}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:3px;transition:width 0.4s ease}
 .toast-container{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);min-width:260px;animation:slideInRight 0.3s ease}
 @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
@@ -276,6 +276,13 @@ textarea.form-input{resize:vertical;min-height:80px}
 .photo-picker-item.selected{border-color:var(--accent)}
 .photo-picker-item.selected::after{content:'✓';position:absolute;inset:0;background:rgba(255,59,107,0.5);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700}
 .photo-picker-item img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Upload file item */
+.upload-file-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px}
+.upload-file-icon{font-size:20px;flex-shrink:0}
+.upload-file-name{font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upload-file-size{font-size:11px;color:var(--text3);flex-shrink:0}
+.upload-file-status{font-size:11px;flex-shrink:0;font-weight:500}
 </style>
 </head>
 <body>
@@ -319,11 +326,11 @@ textarea.form-input{resize:vertical;min-height:80px}
       <div><label class="form-label">Facebook</label><input class="form-input" id="new-client-fb" type="text" placeholder="@compte"></div>
     </div>
     <div class="form-group">
-  <label class="form-label">🗺️ Google Place ID <span style="color:var(--text3);font-weight:400">(pour récupérer les avis automatiquement)</span></label>
-  <input class="form-input" id="new-client-place-id" type="text" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4">
-  <div style="font-size:11px;color:var(--text3);margin-top:4px">Trouvez l'ID sur <a href="https://developers.google.com/maps/documentation/javascript/place-id" target="_blank" style="color:var(--purple)">Google Place ID Finder →</a></div>
-</div>
-<div class="form-group"><label class="form-label">Description / Ton</label><textarea class="form-input" id="new-client-desc" placeholder="Ton chaleureux, passionné..."></textarea></div>
+      <label class="form-label">🗺️ Google Place ID <span style="color:var(--text3);font-weight:400">(pour récupérer les avis automatiquement)</span></label>
+      <input class="form-input" id="new-client-place-id" type="text" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83frY4">
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Trouvez l'ID sur <a href="https://developers.google.com/maps/documentation/javascript/place-id" target="_blank" style="color:var(--purple)">Google Place ID Finder →</a></div>
+    </div>
+    <div class="form-group"><label class="form-label">Description / Ton</label><textarea class="form-input" id="new-client-desc" placeholder="Ton chaleureux, passionné..."></textarea></div>
     <div class="form-group">
       <label class="form-label">Forfait</label>
       <div class="plan-selector">
@@ -364,25 +371,49 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- MODAL UPLOAD -->
+<!-- MODAL UPLOAD — VERSION AMÉLIORÉE avec barre de progression par fichier -->
 <div class="overlay" id="modal-upload">
   <div class="modal" style="max-width:600px">
-    <div class="modal-header"><div class="modal-title">📤 Ajouter des médias</div><button class="modal-close" onclick="closeModal('modal-upload')">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title">📤 Ajouter des médias</div>
+      <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
+    </div>
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="dragOver(event)" ondrop="dropFiles(event)" ondragleave="dragLeave()">
       <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)">
       <div class="upload-icon">🗂️</div>
       <div class="upload-title">Glissez vos fichiers ici</div>
       <div class="upload-sub">ou cliquez pour sélectionner</div>
-      <div class="upload-formats"><span class="format-tag">JPG / PNG</span><span class="format-tag">MP4 / MOV</span><span class="format-tag">GIF</span><span class="format-tag">WebP</span></div>
+      <div class="upload-formats">
+        <span class="format-tag">JPG / PNG</span>
+        <span class="format-tag">MP4 / MOV</span>
+        <span class="format-tag">GIF</span>
+        <span class="format-tag">WebP</span>
+        <span class="format-tag">Max 100MB/vidéo</span>
+      </div>
     </div>
+
+    <!-- Liste des fichiers sélectionnés -->
     <div id="upload-preview" style="margin-top:16px;display:none">
-      <div style="font-size:13px;font-weight:500;margin-bottom:8px" id="upload-count"></div>
-      <div id="upload-list" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-      <div style="margin-top:12px"><div class="loading-bar"><div class="loading-fill" id="upload-fill" style="width:0%"></div></div><div style="font-size:11px;color:var(--text3);margin-top:4px" id="upload-status">Prêt à analyser</div></div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:10px" id="upload-count"></div>
+      <div id="upload-file-list"></div>
+
+      <!-- Barre de progression globale -->
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;color:var(--text2)" id="upload-status">Prêt à importer</div>
+          <div style="font-size:12px;color:var(--text3)" id="upload-percent">0%</div>
+        </div>
+        <div class="loading-bar">
+          <div class="loading-fill" id="upload-fill" style="width:0%"></div>
+        </div>
+      </div>
     </div>
+
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-      <button class="btn" onclick="closeModal('modal-upload')">Fermer</button>
-      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">🤖 Analyser →</button>
+      <button class="btn" id="btn-close-upload" onclick="closeModal('modal-upload')">Fermer</button>
+      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">
+        📤 Importer →
+      </button>
     </div>
   </div>
 </div>
@@ -531,7 +562,7 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div class="section-sub">Vue d'ensemble des publications planifiées.</div>
         <div class="card">
           <div class="cal-header">
-            <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600" id="cal-month-label">Mars 2026</div>
+            <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600" id="cal-month-label">Avril 2026</div>
             <div class="cal-nav"><button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button><button class="cal-nav-btn" onclick="changeMonth(1)">›</button></div>
           </div>
           <div class="cal-grid"><div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div><div class="cal-day-head">Mer</div><div class="cal-day-head">Jeu</div><div class="cal-day-head">Ven</div><div class="cal-day-head">Sam</div><div class="cal-day-head">Dim</div></div>
@@ -875,7 +906,6 @@ function renderReportPosts(tab, posts, queue) {
   }).join('');
 }
 
-// ── MODAL POST DETAIL avec photo picker + publish-now ─────────────────────────
 async function openPostDetail(postId, type) {
   openModal('modal-post-detail');
   document.getElementById('post-detail-title').textContent='Chargement…';
@@ -888,42 +918,23 @@ async function openPostDetail(postId, type) {
     const dateStr  = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
     const score    = post.performance_score||0;
     const mediaUrl = post.media_url||post.url||'';
-
     document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
-
     document.getElementById('post-detail-content').innerHTML=`
       ${mediaUrl
         ? `<div style="position:relative;margin-bottom:16px">
              <img class="post-detail-img" id="detail-main-img" src="${mediaUrl}" style="display:block" onerror="this.style.display='none'">
-             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')"
-               style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">
-               🖼️ Changer la photo
-             </button>` : ''}
+             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Changer la photo</button>` : ''}
            </div>`
         : `<div style="position:relative;margin-bottom:16px">
              <div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>
-             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')"
-               style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px dashed var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">
-               🖼️ Choisir une photo
-             </button>` : ''}
+             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px dashed var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Choisir une photo</button>` : ''}
            </div>`}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
         <span style="font-size:12px;color:var(--text3)">${dateStr}</span>
         ${score>=60?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,59,107,0.12);color:var(--accent);font-weight:600">⭐ Top Content</span>':''}
         ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,0.12);color:var(--teal);font-weight:600">📅 Planifié</span>':''}
       </div>
-      ${score>0?`
-      <div style="margin-bottom:16px">
-        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div>
-        <div class="score-bar">
-          <div class="score-label">Score global</div>
-          <div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div>
-          <div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div>
-        </div>
-        <div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px">
-          <span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}
-        </div>
-      </div>` : ''}
+      ${score>0?`<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div><div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div></div><div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px"><span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}</div></div>` : ''}
       <div style="margin-bottom:16px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption</div>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
@@ -932,16 +943,9 @@ async function openPostDetail(postId, type) {
       <div id="ai-suggestion-result"></div>
       <div id="aria-publish-advice" style="display:none"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        ${isQueue?`
-          <button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier</button>
-          <button class="btn btn-sm" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button>
-          <button class="btn btn-sm btn-ghost" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>
-        `:''}
+        ${isQueue?`<button class="btn btn-sm" id="btn-edit-caption" onclick="toggleCaptionEdit()">✏️ Modifier</button><button class="btn btn-sm" id="btn-save-caption" style="display:none" onclick="savePostCaption('${post.id}')">💾 Enregistrer</button><button class="btn btn-sm btn-ghost" id="btn-cancel-caption" style="display:none" onclick="cancelCaptionEdit()">Annuler</button>`:''}
         <button class="btn btn-sm btn-purple" onclick="openAISuggest('${post.id}','${escHtml(post.caption||'')}','${isQueue?'queue':'media'}')">✨ Suggestion IA</button>
-        ${isQueue?`
-          <button class="btn btn-sm" style="background:rgba(34,197,94,0.15);color:var(--green);border-color:rgba(34,197,94,0.3)" onclick="requestPublishNow('${post.id}')">⚡ Publier maintenant</button>
-          <button class="btn btn-sm" style="color:var(--accent);border-color:rgba(255,59,107,0.3)" onclick="deletePost('${post.id}')">🗑 Supprimer</button>
-        `:''}
+        ${isQueue?`<button class="btn btn-sm" style="background:rgba(34,197,94,0.15);color:var(--green);border-color:rgba(34,197,94,0.3)" onclick="requestPublishNow('${post.id}')">⚡ Publier maintenant</button><button class="btn btn-sm" style="color:var(--accent);border-color:rgba(255,59,107,0.3)" onclick="deletePost('${post.id}')">🗑 Supprimer</button>`:''}
       </div>`;
   } catch {
     document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Erreur de chargement</div>';
@@ -1007,21 +1011,12 @@ async function applyAISuggestion(postId) {
   } catch { toast('Erreur','warn'); }
 }
 
-// ── 🆕 PHOTO PICKER (back office) ────────────────────────────────────────────
 async function openPhotoPicker(postId, clientId) {
   const existing=document.getElementById('modal-photo-picker');if(existing)existing.remove();
   const overlay=document.createElement('div');overlay.className='overlay open';overlay.id='modal-photo-picker';
-  overlay.innerHTML=`
-    <div class="modal" style="max-width:680px">
-      <div class="modal-header"><div class="modal-title">🖼️ Choisir une photo</div><button class="modal-close" onclick="document.getElementById('modal-photo-picker').remove()">✕</button></div>
-      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Sélectionnez une photo de la médiathèque pour ce post.</p>
-      <div id="photo-picker-loading" style="text-align:center;padding:32px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>
-      <div id="photo-picker-grid-admin" class="photo-picker-grid" style="display:none;max-height:360px;grid-auto-rows:100px"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="document.getElementById('modal-photo-picker').remove()">Annuler</button></div>
-    </div>`;
+  overlay.innerHTML=`<div class="modal" style="max-width:680px"><div class="modal-header"><div class="modal-title">🖼️ Choisir une photo</div><button class="modal-close" onclick="document.getElementById('modal-photo-picker').remove()">✕</button></div><p style="font-size:12px;color:var(--text3);margin-bottom:14px">Sélectionnez une photo de la médiathèque pour ce post.</p><div id="photo-picker-loading" style="text-align:center;padding:32px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div><div id="photo-picker-grid-admin" class="photo-picker-grid" style="display:none;max-height:360px;grid-auto-rows:100px"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="document.getElementById('modal-photo-picker').remove()">Annuler</button></div></div>`;
   overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
   document.body.appendChild(overlay);
-
   try {
     const cId=clientId||activeClient?.id;
     const r=await fetch(`/api/media/${cId}`);
@@ -1046,7 +1041,6 @@ async function applyNewPhoto(postId, newUrl, mediaId) {
   } catch { toast('Erreur changement photo','warn'); }
 }
 
-// ── 🆕 PUBLICATION FORCÉE (back office) ──────────────────────────────────────
 async function requestPublishNow(postId) {
   const adviceEl=document.getElementById('aria-publish-advice');
   adviceEl.style.display='block';
@@ -1055,29 +1049,12 @@ async function requestPublishNow(postId) {
     const r=await fetch(`/api/queue/${postId}/best-hour`);
     const data=await r.json();
     if(data.isOptimal) {
-      adviceEl.innerHTML=`
-        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">✅</span><span style="font-size:12px;font-weight:600;color:var(--green)">Aria — Moment idéal !</span></div>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:12px">${data.ariaMessage}</div>
-          <button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button>
-        </div>`;
+      adviceEl.innerHTML=`<div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">✅</span><span style="font-size:12px;font-weight:600;color:var(--green)">Aria — Moment idéal !</span></div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">${data.ariaMessage}</div><button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button></div>`;
     } else {
-      adviceEl.innerHTML=`
-        <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px;margin-top:8px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">🧠</span><span style="font-size:12px;font-weight:600;color:var(--purple)">Aria — Conseil stratégique</span></div>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">${data.ariaMessage.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-sm btn-accent" onclick="confirmPublishNow('${postId}')">⚡ Publier quand même maintenant</button>
-            <button class="btn btn-sm" onclick="document.getElementById('aria-publish-advice').style.display='none'">← Garder la planification</button>
-          </div>
-        </div>`;
+      adviceEl.innerHTML=`<div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(255,59,107,0.05));border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px;margin-top:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:20px">🧠</span><span style="font-size:12px;font-weight:600;color:var(--purple)">Aria — Conseil stratégique</span></div><div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">${data.ariaMessage.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-accent" onclick="confirmPublishNow('${postId}')">⚡ Publier quand même maintenant</button><button class="btn btn-sm" onclick="document.getElementById('aria-publish-advice').style.display='none'">← Garder la planification</button></div></div>`;
     }
   } catch(e) {
-    adviceEl.innerHTML=`
-      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:10px">Publier ce post immédiatement sur Instagram ?</div>
-        <button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button>
-      </div>`;
+    adviceEl.innerHTML=`<div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:14px;margin-top:8px"><div style="font-size:13px;color:var(--text2);margin-bottom:10px">Publier ce post immédiatement sur Instagram ?</div><button class="btn btn-sm" style="background:var(--green);color:white;border-color:var(--green)" onclick="confirmPublishNow('${postId}')">⚡ Publier maintenant</button></div>`;
   }
 }
 
@@ -1109,7 +1086,12 @@ function renderMedia(filter) {
   if(filter==='video')items=items.filter(m=>m.type==='video');
   if(filter==='analysed')items=items.filter(m=>m.analyse_data);
   if(!items.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📷</div><div class="empty-title">Aucun média</div></div>';return;}
-  grid.innerHTML=items.map(m=>`<div class="media-item" onclick="openPostDetail('${m.id}','media')"><div class="media-thumb">${m.url?`<img src="${m.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🖼️'">`:(m.type==='video'?'🎬':'🖼️')}</div><div class="media-type-badge type-${m.type}">${m.type}</div>${m.analyse_data?'<div class="media-ai-badge">IA ✓</div>':''}<div class="media-overlay"><div class="media-info">${m.filename||'média'}</div></div></div>`).join('');
+  grid.innerHTML=items.map(m=>`<div class="media-item" onclick="openPostDetail('${m.id}','media')">
+    <div class="media-thumb">${m.url?`<img src="${m.url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='${m.type==='video'?'🎬':'🖼️'}'">`:(m.type==='video'?'🎬':'🖼️')}</div>
+    <div class="media-type-badge type-${m.type}">${m.type==='video'?'🎬 vidéo':'📷 photo'}</div>
+    ${m.analyse_data?'<div class="media-ai-badge">IA ✓</div>':''}
+    <div class="media-overlay"><div class="media-info">${m.filename||'média'}</div></div>
+  </div>`).join('');
 }
 
 function filterMedia(filter,el) {
@@ -1142,30 +1124,172 @@ function renderQueueFromData(queue) {
 
 function renderQueueStatic() { document.getElementById('queue-list').innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div></div>'; }
 
-let uploadedFiles=[];
+// ══════════════════════════════════════════════════════════════
+// UPLOAD MÉDIAS — VERSION AMÉLIORÉE avec XMLHttpRequest
+// pour barre de progression réelle sur les vidéos
+// ══════════════════════════════════════════════════════════════
+let uploadedFiles = [];
+
 function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover');}
 function dragLeave(){document.getElementById('upload-zone').classList.remove('dragover');}
 function dropFiles(e){e.preventDefault();dragLeave();handleFiles(e.dataTransfer.files);}
 
+function formatFileSize(bytes) {
+  if(bytes < 1024*1024) return Math.round(bytes/1024) + ' Ko';
+  return (bytes/(1024*1024)).toFixed(1) + ' Mo';
+}
+
 function handleFiles(files) {
-  uploadedFiles=Array.from(files);if(!uploadedFiles.length)return;
-  document.getElementById('upload-preview').style.display='block';
-  document.getElementById('upload-count').textContent=`${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
-  document.getElementById('upload-list').innerHTML=uploadedFiles.slice(0,6).map(f=>`<div style="width:60px;height:60px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px">${f.type.startsWith('video')?'🎬':'🖼️'}</div>`).join('');
-  document.getElementById('btn-analyze').style.display='flex';
+  uploadedFiles = Array.from(files);
+  if(!uploadedFiles.length) return;
+
+  document.getElementById('upload-preview').style.display = 'block';
+  document.getElementById('upload-count').textContent =
+    `${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
+
+  // Afficher la liste des fichiers avec leur taille
+  document.getElementById('upload-file-list').innerHTML = uploadedFiles.map((f, i) => {
+    const isVideo = f.type.startsWith('video');
+    const size = formatFileSize(f.size);
+    return `<div class="upload-file-item" id="file-item-${i}">
+      <div class="upload-file-icon">${isVideo ? '🎬' : '🖼️'}</div>
+      <div class="upload-file-name">${f.name}</div>
+      <div class="upload-file-size">${size}</div>
+      <div class="upload-file-status" id="file-status-${i}" style="color:var(--text3)">En attente</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('upload-fill').style.width = '0%';
+  document.getElementById('upload-percent').textContent = '0%';
+  document.getElementById('upload-status').textContent = 'Prêt à importer';
+  document.getElementById('btn-analyze').style.display = 'flex';
+}
+
+function uploadFileWithProgress(file, clientId, index, total, onProgress, onDone, onError) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('client_id', clientId);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        const filePercent = Math.round((e.loaded / e.total) * 100);
+        onProgress(index, filePercent);
+      }
+    });
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onDone(index);
+        resolve(JSON.parse(xhr.responseText));
+      } else {
+        onError(index, xhr.statusText);
+        reject(new Error(xhr.statusText));
+      }
+    });
+
+    xhr.addEventListener('error', () => {
+      onError(index, 'Erreur réseau');
+      reject(new Error('Erreur réseau'));
+    });
+
+    xhr.addEventListener('timeout', () => {
+      onError(index, 'Timeout');
+      reject(new Error('Timeout'));
+    });
+
+    xhr.timeout = 5 * 60 * 1000; // 5 minutes pour les grandes vidéos
+    xhr.open('POST', '/api/media/upload');
+    xhr.send(fd);
+  });
 }
 
 async function startAnalysis() {
   if(!activeClient){toast('Sélectionnez un client','warn');return;}
-  const btn=document.getElementById('btn-analyze');const fill=document.getElementById('upload-fill');const status=document.getElementById('upload-status');
-  btn.disabled=true;btn.textContent='Analyse en cours…';let completed=0;
-  for(const file of uploadedFiles) {
-    const fd=new FormData();fd.append('file',file);fd.append('client_id',activeClient.id);
-    try{await fetch('/api/media/upload',{method:'POST',body:fd});completed++;fill.style.width=Math.round(completed/uploadedFiles.length*100)+'%';status.textContent=`${completed}/${uploadedFiles.length} traités…`;}
-    catch(e){console.error(e);}
+
+  const btn = document.getElementById('btn-analyze');
+  const closeBtn = document.getElementById('btn-close-upload');
+  btn.disabled = true;
+  btn.textContent = '⏳ Import en cours…';
+  closeBtn.disabled = true;
+
+  let completed = 0;
+  const total = uploadedFiles.length;
+
+  // Mise à jour de la barre globale
+  function updateGlobalProgress() {
+    const percent = Math.round((completed / total) * 100);
+    document.getElementById('upload-fill').style.width = percent + '%';
+    document.getElementById('upload-percent').textContent = percent + '%';
+    document.getElementById('upload-status').textContent =
+      `${completed}/${total} fichier${total>1?'s':''} importé${completed>1?'s':''}…`;
   }
-  status.textContent='✅ Terminé !';await loadMedia();
-  setTimeout(()=>{closeModal('modal-upload');btn.disabled=false;btn.textContent='🤖 Analyser →';fill.style.width='0%';status.textContent='Prêt à analyser';document.getElementById('upload-preview').style.display='none';uploadedFiles=[];toast(`${completed} média(s) analysés !`,'success');},1000);
+
+  // Uploader les fichiers UN PAR UN avec progression
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const file = uploadedFiles[i];
+    const statusEl = document.getElementById(`file-status-${i}`);
+    if(statusEl) { statusEl.textContent = '⏳ Upload…'; statusEl.style.color = 'var(--yellow)'; }
+
+    try {
+      await uploadFileWithProgress(
+        file,
+        activeClient.id,
+        i,
+        total,
+        // onProgress : mise à jour du statut du fichier
+        (idx, percent) => {
+          const el = document.getElementById(`file-status-${idx}`);
+          if(el) el.textContent = `${percent}%`;
+          // Barre globale = progression complète des fichiers précédents + progression actuelle
+          const globalPercent = Math.round(((completed + percent/100) / total) * 100);
+          document.getElementById('upload-fill').style.width = globalPercent + '%';
+          document.getElementById('upload-percent').textContent = globalPercent + '%';
+        },
+        // onDone
+        (idx) => {
+          const el = document.getElementById(`file-status-${idx}`);
+          if(el) { el.textContent = '✅'; el.style.color = 'var(--green)'; }
+        },
+        // onError
+        (idx, err) => {
+          const el = document.getElementById(`file-status-${idx}`);
+          if(el) { el.textContent = '❌'; el.style.color = 'var(--accent)'; }
+        }
+      );
+      completed++;
+    } catch(e) {
+      console.error(`Erreur upload ${file.name}:`, e.message);
+      completed++;
+    }
+
+    updateGlobalProgress();
+  }
+
+  // Terminé
+  document.getElementById('upload-fill').style.width = '100%';
+  document.getElementById('upload-percent').textContent = '100%';
+  document.getElementById('upload-status').textContent = `✅ ${completed} fichier${completed>1?'s':''} importé${completed>1?'s':''}`;
+
+  await loadMedia();
+
+  setTimeout(() => {
+    closeModal('modal-upload');
+    // Reset
+    btn.disabled = false;
+    btn.textContent = '📤 Importer →';
+    closeBtn.disabled = false;
+    btn.style.display = 'none';
+    document.getElementById('upload-preview').style.display = 'none';
+    document.getElementById('upload-file-list').innerHTML = '';
+    document.getElementById('upload-fill').style.width = '0%';
+    document.getElementById('upload-percent').textContent = '0%';
+    document.getElementById('upload-status').textContent = 'Prêt à importer';
+    uploadedFiles = [];
+    toast(`✅ ${completed} média${completed>1?'s':''} importé${completed>1?'s':''}  !`, 'success');
+  }, 1500);
 }
 
 function changeMonth(dir){calendarDate.setMonth(calendarDate.getMonth()+dir);buildCalendar();}
@@ -1276,14 +1400,12 @@ async function openStoryEditor(clientId, type, clientName) {
   const existing=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);
   const c2=existing?.content||{};
   selectedPhotoUrl=c2.photo_url||'';
-
   const forms={
     entreprise:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||clientName)}"></div><div class="form-group"><label class="form-label">Accroche</label><input class="form-input" id="st-sous_titre" value="${escHtml(c2.sous_titre||'')}"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="st-texte">${escHtml(c2.texte||'')}</textarea></div>`,
     tarifs:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Nos tarifs')}"></div><div class="form-group"><label class="form-label">Services & tarifs (un par ligne)</label><textarea class="form-input" id="st-services" style="min-height:120px">${escHtml((c2.services||'').replace(/<br>/g,'\n'))}</textarea></div>`,
     temoignage:`<div class="form-group"><label class="form-label">Témoignage *</label><textarea class="form-input" id="st-texte" style="min-height:100px">${escHtml(c2.texte||'')}</textarea></div><div class="form-group"><label class="form-label">Nom du client</label><input class="form-input" id="st-nom_client" value="${escHtml(c2.nom_client||'')}"></div><div class="form-group"><label class="form-label">Note</label><select class="form-select form-input" id="st-note">${[5,4,3].map(n=>`<option value="${n}" ${c2.note==n?'selected':''}>${'⭐'.repeat(n)}</option>`).join('')}</select></div>`,
     avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div>`
   };
-
   let photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Chargement des photos...</div>';
   try {
     const mr=await fetch(`/api/media/${clientId}`);
@@ -1297,7 +1419,6 @@ async function openStoryEditor(clientId, type, clientName) {
   } catch(e) {
     photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Erreur chargement photos</div>';
   }
-
   document.getElementById('story-modal-body').innerHTML=`
     ${forms[type]||''}
     <div class="form-group">
