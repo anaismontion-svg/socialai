@@ -21,7 +21,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // ── Multer ────────────────────────────────────────────────────────────────────
 const TMP_DIR = process.env.RAILWAY_ENVIRONMENT ? '/tmp' : path.join(__dirname, '../tmp');
 if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR, { recursive: true });
-const upload = multer({ dest: TMP_DIR, limits: { fileSize: 50 * 1024 * 1024 } });
+const upload = multer({ dest: TMP_DIR, limits: { fileSize: 100 * 1024 * 1024 } });
 
 // ─────────────────────────────────────────────
 // CATÉGORIES STORY RECONNUES PAR L'IA
@@ -213,7 +213,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         analyse_data:    analyse,
         caption:         analyse.caption || '',
         hashtags:        analyse.hashtags || [],
-        statut:          'analyse',
+        statut:          isVideo ? 'pret' : 'analyse',
         qualite:         analyse.qualite || 70,
         potentiel_viral: analyse.potentiel_viral || 60,
         story_category:  finalStoryCategory,
