@@ -108,6 +108,11 @@ setInterval(async () => {
   catch (err) { console.error('❌ Erreur stats Instagram:', err.message); }
 }, 24 * 60 * 60 * 1000);
 
+// ── Migration médias Instagram → Supabase Storage ────────────────────────────
+const { migrateInstagramMedia } = require('./routes/migrate-media');
+setTimeout(() => migrateInstagramMedia(), 3 * 60 * 1000); // 3min après démarrage
+setInterval(migrateInstagramMedia, 60 * 60 * 1000); // puis toutes les heures
+
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
