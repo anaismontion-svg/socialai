@@ -28,8 +28,6 @@ img{max-width:100%;display:block}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* ── LOGIN SCREEN ── */
 #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
 .login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-xl);padding:40px;width:100%;max-width:380px;text-align:center}
 .login-logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px}
@@ -40,8 +38,6 @@ img{max-width:100%;display:block}
 .login-btn{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:background 0.15s}
 .login-btn:hover{background:var(--accent2)}
 .login-error{font-size:12px;color:var(--accent);margin-top:10px;display:none}
-
-/* ── APP ── */
 #app{display:none}
 .app{display:flex;height:100vh;overflow:hidden}
 .sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
@@ -254,8 +250,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 .cal-day .day-num{font-size:11px;margin-bottom:2px;font-weight:500}
 .cal-day.today .day-num{color:var(--accent)}
 .cal-day.other-month{opacity:0.3}
-
-/* STORIES FIXES */
 .story-type-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
 .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:all 0.2s}
 .story-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
@@ -268,21 +262,28 @@ textarea.form-input{resize:vertical;min-height:80px}
 .story-status-ok{background:rgba(34,197,94,0.12);color:var(--green)}
 .story-status-missing{background:rgba(234,179,8,0.12);color:var(--yellow)}
 .story-status-none{background:var(--surface);color:var(--text3)}
-
-/* PHOTO PICKER GRID */
 .photo-picker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px;background:var(--bg3);grid-auto-rows:80px}
 .photo-picker-item{height:80px;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.15s;position:relative;background:var(--bg4)}
 .photo-picker-item:hover{border-color:var(--accent)}
 .photo-picker-item.selected{border-color:var(--accent)}
 .photo-picker-item.selected::after{content:'✓';position:absolute;inset:0;background:rgba(255,59,107,0.5);display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700}
 .photo-picker-item img{width:100%;height:100%;object-fit:cover;display:block}
-
-/* Upload file item */
 .upload-file-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px}
 .upload-file-icon{font-size:20px;flex-shrink:0}
 .upload-file-name{font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .upload-file-size{font-size:11px;color:var(--text3);flex-shrink:0}
 .upload-file-status{font-size:11px;flex-shrink:0;font-weight:500}
+/* STORY ASSETS */
+.story-asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px}
+.story-asset-item{position:relative;border-radius:var(--r-md);overflow:hidden;border:2px solid var(--border);transition:all 0.2s;background:var(--bg3)}
+.story-asset-item:hover{border-color:var(--accent)}
+.story-asset-thumb{aspect-ratio:9/16;width:100%;object-fit:cover;display:block}
+.story-asset-badge{position:absolute;top:6px;left:6px;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(34,197,94,0.85);color:white;font-weight:600}
+.story-asset-pos{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.7);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.story-asset-del{position:absolute;bottom:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(255,59,107,0.85);color:white;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;opacity:0;transition:opacity 0.15s}
+.story-asset-item:hover .story-asset-del{opacity:1}
+.story-asset-add{aspect-ratio:9/16;border:2px dashed var(--border2);border-radius:var(--r-md);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.2s;color:var(--text3);font-size:11px;background:var(--bg3)}
+.story-asset-add:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,59,107,0.04)}
 </style>
 </head>
 <body>
@@ -320,7 +321,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
     <div class="form-group"><label class="form-label">Nom de l'entreprise *</label><input class="form-input" id="new-client-name" type="text" placeholder="Ex: Love Queen Dolls"></div>
     <div class="form-group"><label class="form-label">Email du client</label><input class="form-input" id="new-client-email" type="email" placeholder="client@email.com"></div>
-    <div class="form-group"><label class="form-label">Secteur</label><select class="form-select form-input" id="new-client-sector"><option>Élevage / Animaux</option><option>Décoration intérieure</option><option>Restauration</option><option>Mode & Beauté</option><option>Fitness & Bien-être</option><option>Immobilier</option><option>Autre</option></select></div>
+    <div class="form-group"><label class="form-label">Secteur</label><select class="form-select form-input" id="new-client-sector"><option>Élevage / Animaux</option><option>Décoration intérieure</option><option>Restauration</option><option>Mode &amp; Beauté</option><option>Fitness &amp; Bien-être</option><option>Immobilier</option><option>Autre</option></select></div>
     <div class="grid-2" style="gap:12px;margin-bottom:16px">
       <div><label class="form-label">Instagram</label><input class="form-input" id="new-client-ig" type="text" placeholder="@compte"></div>
       <div><label class="form-label">Facebook</label><input class="form-input" id="new-client-fb" type="text" placeholder="@compte"></div>
@@ -371,7 +372,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- MODAL UPLOAD — VERSION AMÉLIORÉE avec barre de progression par fichier -->
+<!-- MODAL UPLOAD MEDIAS -->
 <div class="overlay" id="modal-upload">
   <div class="modal" style="max-width:600px">
     <div class="modal-header">
@@ -391,29 +392,48 @@ textarea.form-input{resize:vertical;min-height:80px}
         <span class="format-tag">Max 100MB/vidéo</span>
       </div>
     </div>
-
-    <!-- Liste des fichiers sélectionnés -->
     <div id="upload-preview" style="margin-top:16px;display:none">
       <div style="font-size:13px;font-weight:500;margin-bottom:10px" id="upload-count"></div>
       <div id="upload-file-list"></div>
-
-      <!-- Barre de progression globale -->
       <div style="margin-top:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-size:12px;color:var(--text2)" id="upload-status">Prêt à importer</div>
           <div style="font-size:12px;color:var(--text3)" id="upload-percent">0%</div>
         </div>
-        <div class="loading-bar">
-          <div class="loading-fill" id="upload-fill" style="width:0%"></div>
-        </div>
+        <div class="loading-bar"><div class="loading-fill" id="upload-fill" style="width:0%"></div></div>
       </div>
     </div>
-
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
       <button class="btn" id="btn-close-upload" onclick="closeModal('modal-upload')">Fermer</button>
-      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">
-        📤 Importer →
-      </button>
+      <button class="btn btn-accent" id="btn-analyze" onclick="startAnalysis()" style="display:none">📤 Importer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UPLOAD STORY ASSET (visuels validés) -->
+<div class="overlay" id="modal-story-asset-upload">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title" id="story-asset-modal-title">📤 Ajouter un visuel</div>
+      <button class="modal-close" onclick="closeModal('modal-story-asset-upload')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      Uploadez un visuel <strong style="color:var(--text)">pré-validé</strong> que Aria utilisera en rotation. Aria ne modifie jamais ces visuels.
+    </div>
+    <div class="upload-zone" onclick="document.getElementById('story-asset-file-input').click()" id="story-asset-zone" style="padding:28px">
+      <input type="file" id="story-asset-file-input" accept="image/*" style="display:none" onchange="handleStoryAssetFile(this.files[0])">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-title" style="font-size:14px" id="story-asset-filename">Cliquez pour sélectionner une image</div>
+      <div class="upload-sub">Format recommandé : 1080×1920px (format story 9:16)</div>
+    </div>
+    <div id="story-asset-preview" style="display:none;margin-top:12px">
+      <img id="story-asset-preview-img" style="width:100%;max-height:200px;object-fit:contain;border-radius:var(--r-md);border:1px solid var(--border)">
+    </div>
+    <input type="hidden" id="story-asset-type">
+    <input type="hidden" id="story-asset-client-id">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn" onclick="closeModal('modal-story-asset-upload')">Annuler</button>
+      <button class="btn btn-accent" id="btn-upload-story-asset" onclick="uploadStoryAsset()" style="display:none">📤 Ajouter ce visuel</button>
     </div>
   </div>
 </div>
@@ -425,6 +445,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div id="story-modal-body"></div>
   </div>
 </div>
+
 
 <div class="app">
   <div class="sidebar">
@@ -573,14 +594,25 @@ textarea.form-input{resize:vertical;min-height:80px}
       <!-- STORIES FIXES -->
       <div class="panel" id="panel-stories">
         <div class="section-title">📸 Stories fixes</div>
-        <div class="section-sub">Configurez les 4 stories publiées chaque jour. Elles se régénèrent automatiquement toutes les semaines.</div>
+        <div class="section-sub">Aria publie automatiquement 1 story à 6h, 1 à 6h05 et 1 à 6h10 chaque matin en rotation parmi vos visuels validés.</div>
+
+        <!-- Sélecteur de type -->
         <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
           <button class="btn story-type-btn active" onclick="selectStoryType('entreprise',this)">🏢 Présentation</button>
-          <button class="btn story-type-btn" onclick="selectStoryType('tarifs',this)">💰 Tarifs</button>
           <button class="btn story-type-btn" onclick="selectStoryType('temoignage',this)">⭐ Témoignage</button>
           <button class="btn story-type-btn" onclick="selectStoryType('avant_apres',this)">🔄 Avant/Après</button>
         </div>
-        <div id="story-templates-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px"></div>
+
+        <!-- Info planning -->
+        <div style="background:linear-gradient(135deg,rgba(20,184,166,0.08),rgba(139,92,246,0.06));border:1px solid rgba(20,184,166,0.2);border-radius:var(--r-md);padding:14px;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--teal)"></div><div style="font-size:12px"><strong style="color:var(--teal)">6h00</strong> <span style="color:var(--text2)">→ Story Présentation</span></div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--purple)"></div><div style="font-size:12px"><strong style="color:var(--purple)">6h05</strong> <span style="color:var(--text2)">→ Story Témoignage</span></div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></div><div style="font-size:12px"><strong style="color:var(--orange)">6h10</strong> <span style="color:var(--text2)">→ Story Avant/Après</span></div></div>
+          <div style="margin-left:auto;font-size:11px;color:var(--text3);align-self:center">Rotation automatique chaque jour 🔄</div>
+        </div>
+
+        <!-- Grille des visuels validés par client -->
+        <div id="story-assets-section"></div>
       </div>
 
       <!-- AUTOMATION -->
@@ -594,6 +626,7 @@ textarea.form-input{resize:vertical;min-height:80px}
             <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Génération de captions</div><div class="auto-desc">Caption + hashtags automatiques</div></div><div class="toggle on"></div></div>
             <div class="auto-status"><div class="auto-dot dot-running"></div><div><div class="auto-label">Planification intelligente</div><div class="auto-desc">Meilleure heure selon l'audience</div></div><div class="toggle on"></div></div>
             <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Publication automatique</div><div class="auto-desc">Via Meta Graph API</div></div><div class="toggle on"></div></div>
+            <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Stories fixes en rotation</div><div class="auto-desc">6h · 6h05 · 6h10 — visuels validés</div></div><div class="toggle on"></div></div>
             <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Sync historique Instagram</div><div class="auto-desc">Analyse des anciens posts</div></div><div class="toggle on"></div></div>
             <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse commentaires</div><div class="auto-desc">Courte, émotionnelle, variée</div></div><div class="toggle on"></div></div>
             <div class="auto-status"><div class="auto-dot dot-on"></div><div><div class="auto-label">Réponse DM (PRO)</div><div class="auto-desc">Conversation naturelle avec mémoire</div></div><div class="toggle on"></div></div>
@@ -609,8 +642,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
   </div>
 </div>
-
-</div><!-- fin #app -->
+</div>
 
 <div class="toast-container" id="toast-container"></div>
 
@@ -911,30 +943,22 @@ async function openPostDetail(postId, type) {
   document.getElementById('post-detail-title').textContent='Chargement…';
   document.getElementById('post-detail-content').innerHTML='<div style="text-align:center;padding:40px"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
   try {
-    const r    = await fetch(`/api/reports/post/${postId}?type=${type}`);
-    const post = await r.json();
-    const isQueue  = type==='queue';
-    const date     = post.original_post_date||post.scheduled_at;
-    const dateStr  = date ? new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : '—';
-    const score    = post.performance_score||0;
-    const mediaUrl = post.media_url||post.url||'';
-    document.getElementById('post-detail-title').textContent = isQueue?'📅 Post planifié':'📸 Publication Instagram';
+    const r=await fetch(`/api/reports/post/${postId}?type=${type}`);
+    const post=await r.json();
+    const isQueue=type==='queue';
+    const date=post.original_post_date||post.scheduled_at;
+    const dateStr=date?new Date(date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—';
+    const score=post.performance_score||0;
+    const mediaUrl=post.media_url||post.url||'';
+    document.getElementById('post-detail-title').textContent=isQueue?'📅 Post planifié':'📸 Publication Instagram';
     document.getElementById('post-detail-content').innerHTML=`
-      ${mediaUrl
-        ? `<div style="position:relative;margin-bottom:16px">
-             <img class="post-detail-img" id="detail-main-img" src="${mediaUrl}" style="display:block" onerror="this.style.display='none'">
-             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Changer la photo</button>` : ''}
-           </div>`
-        : `<div style="position:relative;margin-bottom:16px">
-             <div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>
-             ${isQueue ? `<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px dashed var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Choisir une photo</button>` : ''}
-           </div>`}
+      ${mediaUrl?`<div style="position:relative;margin-bottom:16px"><img class="post-detail-img" id="detail-main-img" src="${mediaUrl}" style="display:block" onerror="this.style.display='none'">${isQueue?`<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Changer la photo</button>`:''}</div>`:`<div style="position:relative;margin-bottom:16px"><div class="post-detail-placeholder">${isQueue?'📅':'🖼️'}</div>${isQueue?`<button onclick="openPhotoPicker('${postId}','${post.client_id||activeClient?.id||''}')" style="width:100%;margin-top:8px;padding:8px;background:var(--surface);border:1px dashed var(--border2);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">🖼️ Choisir une photo</button>`:''}</div>`}
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
         <span style="font-size:12px;color:var(--text3)">${dateStr}</span>
         ${score>=60?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,59,107,0.12);color:var(--accent);font-weight:600">⭐ Top Content</span>':''}
         ${isQueue?'<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(20,184,166,0.12);color:var(--teal);font-weight:600">📅 Planifié</span>':''}
       </div>
-      ${score>0?`<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div><div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div></div><div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px"><span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}</div></div>` : ''}
+      ${score>0?`<div style="margin-bottom:16px"><div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.8px">Performance</div><div class="score-bar"><div class="score-label">Score global</div><div class="score-bg"><div class="score-fill" style="width:${score}%;background:${score>=60?'var(--accent)':'var(--teal)'}"></div></div><div class="score-val" style="color:${score>=60?'var(--accent)':'var(--teal)'}">${score}/100</div></div><div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px"><span>❤️ ${post.likes||0}</span><span>💬 ${post.comments||0}</span>${post.reach?`<span>👁 ${post.reach}</span>`:''}</div></div>`:''}
       <div style="margin-bottom:16px">
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px">Caption</div>
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap" id="detail-caption-display">${escHtml(post.caption||'Aucune caption')}</div>
@@ -1124,10 +1148,6 @@ function renderQueueFromData(queue) {
 
 function renderQueueStatic() { document.getElementById('queue-list').innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">File vide</div></div>'; }
 
-// ══════════════════════════════════════════════════════════════
-// UPLOAD MÉDIAS — VERSION AMÉLIORÉE avec XMLHttpRequest
-// pour barre de progression réelle sur les vidéos
-// ══════════════════════════════════════════════════════════════
 let uploadedFiles = [];
 
 function dragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('dragover');}
@@ -1142,12 +1162,8 @@ function formatFileSize(bytes) {
 function handleFiles(files) {
   uploadedFiles = Array.from(files);
   if(!uploadedFiles.length) return;
-
   document.getElementById('upload-preview').style.display = 'block';
-  document.getElementById('upload-count').textContent =
-    `${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
-
-  // Afficher la liste des fichiers avec leur taille
+  document.getElementById('upload-count').textContent = `${uploadedFiles.length} fichier${uploadedFiles.length>1?'s':''} sélectionné${uploadedFiles.length>1?'s':''}`;
   document.getElementById('upload-file-list').innerHTML = uploadedFiles.map((f, i) => {
     const isVideo = f.type.startsWith('video');
     const size = formatFileSize(f.size);
@@ -1158,7 +1174,6 @@ function handleFiles(files) {
       <div class="upload-file-status" id="file-status-${i}" style="color:var(--text3)">En attente</div>
     </div>`;
   }).join('');
-
   document.getElementById('upload-fill').style.width = '0%';
   document.getElementById('upload-percent').textContent = '0%';
   document.getElementById('upload-status').textContent = 'Prêt à importer';
@@ -1170,37 +1185,17 @@ function uploadFileWithProgress(file, clientId, index, total, onProgress, onDone
     const fd = new FormData();
     fd.append('file', file);
     fd.append('client_id', clientId);
-
     const xhr = new XMLHttpRequest();
-
     xhr.upload.addEventListener('progress', (e) => {
-      if (e.lengthComputable) {
-        const filePercent = Math.round((e.loaded / e.total) * 100);
-        onProgress(index, filePercent);
-      }
+      if (e.lengthComputable) { onProgress(index, Math.round((e.loaded / e.total) * 100)); }
     });
-
     xhr.addEventListener('load', () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        onDone(index);
-        resolve(JSON.parse(xhr.responseText));
-      } else {
-        onError(index, xhr.statusText);
-        reject(new Error(xhr.statusText));
-      }
+      if (xhr.status >= 200 && xhr.status < 300) { onDone(index); resolve(JSON.parse(xhr.responseText)); }
+      else { onError(index, xhr.statusText); reject(new Error(xhr.statusText)); }
     });
-
-    xhr.addEventListener('error', () => {
-      onError(index, 'Erreur réseau');
-      reject(new Error('Erreur réseau'));
-    });
-
-    xhr.addEventListener('timeout', () => {
-      onError(index, 'Timeout');
-      reject(new Error('Timeout'));
-    });
-
-    xhr.timeout = 5 * 60 * 1000; // 5 minutes pour les grandes vidéos
+    xhr.addEventListener('error', () => { onError(index, 'Erreur réseau'); reject(new Error('Erreur réseau')); });
+    xhr.addEventListener('timeout', () => { onError(index, 'Timeout'); reject(new Error('Timeout')); });
+    xhr.timeout = 5 * 60 * 1000;
     xhr.open('POST', '/api/media/upload');
     xhr.send(fd);
   });
@@ -1208,79 +1203,44 @@ function uploadFileWithProgress(file, clientId, index, total, onProgress, onDone
 
 async function startAnalysis() {
   if(!activeClient){toast('Sélectionnez un client','warn');return;}
-
   const btn = document.getElementById('btn-analyze');
   const closeBtn = document.getElementById('btn-close-upload');
-  btn.disabled = true;
-  btn.textContent = '⏳ Import en cours…';
-  closeBtn.disabled = true;
-
+  btn.disabled = true; btn.textContent = '⏳ Import en cours…'; closeBtn.disabled = true;
   let completed = 0;
   const total = uploadedFiles.length;
-
-  // Mise à jour de la barre globale
   function updateGlobalProgress() {
     const percent = Math.round((completed / total) * 100);
     document.getElementById('upload-fill').style.width = percent + '%';
     document.getElementById('upload-percent').textContent = percent + '%';
-    document.getElementById('upload-status').textContent =
-      `${completed}/${total} fichier${total>1?'s':''} importé${completed>1?'s':''}…`;
+    document.getElementById('upload-status').textContent = `${completed}/${total} fichier${total>1?'s':''} importé${completed>1?'s':''}…`;
   }
-
-  // Uploader les fichiers UN PAR UN avec progression
   for (let i = 0; i < uploadedFiles.length; i++) {
     const file = uploadedFiles[i];
     const statusEl = document.getElementById(`file-status-${i}`);
     if(statusEl) { statusEl.textContent = '⏳ Upload…'; statusEl.style.color = 'var(--yellow)'; }
-
     try {
-      await uploadFileWithProgress(
-        file,
-        activeClient.id,
-        i,
-        total,
-        // onProgress : mise à jour du statut du fichier
+      await uploadFileWithProgress(file, activeClient.id, i, total,
         (idx, percent) => {
           const el = document.getElementById(`file-status-${idx}`);
           if(el) el.textContent = `${percent}%`;
-          // Barre globale = progression complète des fichiers précédents + progression actuelle
           const globalPercent = Math.round(((completed + percent/100) / total) * 100);
           document.getElementById('upload-fill').style.width = globalPercent + '%';
           document.getElementById('upload-percent').textContent = globalPercent + '%';
         },
-        // onDone
-        (idx) => {
-          const el = document.getElementById(`file-status-${idx}`);
-          if(el) { el.textContent = '✅'; el.style.color = 'var(--green)'; }
-        },
-        // onError
-        (idx, err) => {
-          const el = document.getElementById(`file-status-${idx}`);
-          if(el) { el.textContent = '❌'; el.style.color = 'var(--accent)'; }
-        }
+        (idx) => { const el = document.getElementById(`file-status-${idx}`); if(el) { el.textContent = '✅'; el.style.color = 'var(--green)'; } },
+        (idx, err) => { const el = document.getElementById(`file-status-${idx}`); if(el) { el.textContent = '❌'; el.style.color = 'var(--accent)'; } }
       );
       completed++;
-    } catch(e) {
-      console.error(`Erreur upload ${file.name}:`, e.message);
-      completed++;
-    }
-
+    } catch(e) { console.error(`Erreur upload ${file.name}:`, e.message); completed++; }
     updateGlobalProgress();
   }
-
-  // Terminé
   document.getElementById('upload-fill').style.width = '100%';
   document.getElementById('upload-percent').textContent = '100%';
   document.getElementById('upload-status').textContent = `✅ ${completed} fichier${completed>1?'s':''} importé${completed>1?'s':''}`;
-
   await loadMedia();
-
   setTimeout(() => {
     closeModal('modal-upload');
-    // Reset
-    btn.disabled = false;
-    btn.textContent = '📤 Importer →';
-    closeBtn.disabled = false;
+    btn.disabled = false; btn.textContent = '📤 Importer →'; closeBtn.disabled = false;
     btn.style.display = 'none';
     document.getElementById('upload-preview').style.display = 'none';
     document.getElementById('upload-file-list').innerHTML = '';
@@ -1320,7 +1280,7 @@ function nav(page) {
   if(page==='reports')loadReports();
   if(page==='calendar')buildCalendar();
   if(page==='dashboard')loadReports();
-  if(page==='stories')loadStoryTemplates();
+  if(page==='stories')loadStoryAssets();
   closeModal('modal-switch-client');
 }
 
@@ -1339,148 +1299,150 @@ function toast(msg,type='info') {
 }
 
 // ══════════════════════════════════════════════════════════════
-// STORIES FIXES
+// STORIES FIXES — VISUELS VALIDÉS (uploadés par le CM)
+// Aria ne crée rien, elle utilise en rotation
 // ══════════════════════════════════════════════════════════════
-let currentStoryType='entreprise', storyTemplatesData=[], selectedPhotoUrl='';
+let currentStoryType = 'entreprise';
+let storyAssetsData = {}; // { entreprise: [], temoignage: [], avant_apres: [] }
+let storyAssetFile = null;
 
-function selectStoryType(type,btn) {
-  currentStoryType=type;
-  document.querySelectorAll('.story-type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
-  renderStoryTemplates();
+const STORY_TYPE_LABELS = {
+  entreprise:  { label: '🏢 Présentation', heure: '6h00',  color: 'var(--teal)' },
+  temoignage:  { label: '⭐ Témoignage',   heure: '6h05',  color: 'var(--purple)' },
+  avant_apres: { label: '🔄 Avant/Après',  heure: '6h10',  color: 'var(--orange)' }
+};
+
+function selectStoryType(type, btn) {
+  currentStoryType = type;
+  document.querySelectorAll('.story-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStoryAssetsSection();
 }
 
-async function loadStoryTemplates() {
-  try{const r=await fetch('/api/story-templates');storyTemplatesData=await r.json();renderStoryTemplates();}
-  catch(e){console.error(e);}
-}
-
-function renderStoryTemplates() {
-  const grid=document.getElementById('story-templates-grid');
-  const typeLabels={entreprise:{icon:'🏢'},tarifs:{icon:'💰'},temoignage:{icon:'⭐'},avant_apres:{icon:'🔄'}};
-  const info=typeLabels[currentStoryType]||{icon:'📸'};
-  const byClient={};
-  clients.forEach((c,idx)=>{byClient[c.id]={client:c,idx,template:null};});
-  storyTemplatesData.filter(t=>t.type===currentStoryType).forEach(t=>{if(byClient[t.client_id])byClient[t.client_id].template=t;});
-  const items=Object.values(byClient);
-  if(!items.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Aucun client</div></div>';return;}
-  grid.innerHTML=items.map(({client,idx,template})=>{
-    const color=getClientColor(idx);
-    const initials=client.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    const hasVisuel=!!template?.visuel_url,hasContent=!!template?.content;
-    const genDate=template?.generated_at?new Date(template.generated_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):null;
-    const statusHtml=hasVisuel
-      ?`<span class="story-card-status story-status-ok">✅ Visuel généré${genDate?' — '+genDate:''}</span>`
-      :hasContent?`<span class="story-card-status story-status-missing">⏳ Contenu configuré</span>`
-               :`<span class="story-card-status story-status-none">⚙️ Non configuré</span>`;
-    return `<div class="story-card">
-      <div class="story-card-preview">
-        ${hasVisuel?`<img src="${template.visuel_url}" onclick="window.open('${template.visuel_url}','_blank')" onerror="this.parentElement.innerHTML='<div class=story-card-preview-placeholder>${info.icon}</div>'">`:`<div class="story-card-preview-placeholder">${info.icon}</div>`}
-        <div style="position:absolute;top:8px;left:8px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.6);padding:4px 8px;border-radius:6px">
-          <div style="width:22px;height:22px;border-radius:6px;background:${color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white">${initials}</div>
-          <span style="font-size:11px;color:white;font-weight:500">${client.name}</span>
-        </div>
-      </div>
-      <div class="story-card-body">
-        <div style="margin-bottom:8px">${statusHtml}</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-accent" onclick="openStoryEditor('${client.id}','${currentStoryType}','${escHtml(client.name)}')">✏️ ${hasContent?'Modifier':'Configurer'}</button>
-          ${hasVisuel?`<button class="btn btn-sm btn-purple" onclick="regenerateStory('${client.id}','${currentStoryType}')">🔄 Régénérer</button>`:''}
-          ${template?.actif!==false
-            ?`<button class="btn btn-sm btn-yellow" onclick="toggleStoryTemplate('${client.id}','${currentStoryType}',false)">⏸ Désactiver</button>`
-            :`<button class="btn btn-sm btn-green" onclick="toggleStoryTemplate('${client.id}','${currentStoryType}',true)">▶ Activer</button>`}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function openStoryEditor(clientId, type, clientName) {
-  const titles2={entreprise:'🏢 Présentation entreprise',tarifs:'💰 Tarifs & Services',temoignage:'⭐ Témoignage client',avant_apres:'🔄 Avant / Après'};
-  document.getElementById('story-modal-title').textContent=`${titles2[type]} — ${clientName}`;
-  const existing=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);
-  const c2=existing?.content||{};
-  selectedPhotoUrl=c2.photo_url||'';
-  const forms={
-    entreprise:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||clientName)}"></div><div class="form-group"><label class="form-label">Accroche</label><input class="form-input" id="st-sous_titre" value="${escHtml(c2.sous_titre||'')}"></div><div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="st-texte">${escHtml(c2.texte||'')}</textarea></div>`,
-    tarifs:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Nos tarifs')}"></div><div class="form-group"><label class="form-label">Services & tarifs (un par ligne)</label><textarea class="form-input" id="st-services" style="min-height:120px">${escHtml((c2.services||'').replace(/<br>/g,'\n'))}</textarea></div>`,
-    temoignage:`<div class="form-group"><label class="form-label">Témoignage *</label><textarea class="form-input" id="st-texte" style="min-height:100px">${escHtml(c2.texte||'')}</textarea></div><div class="form-group"><label class="form-label">Nom du client</label><input class="form-input" id="st-nom_client" value="${escHtml(c2.nom_client||'')}"></div><div class="form-group"><label class="form-label">Note</label><select class="form-select form-input" id="st-note">${[5,4,3].map(n=>`<option value="${n}" ${c2.note==n?'selected':''}>${'⭐'.repeat(n)}</option>`).join('')}</select></div>`,
-    avant_apres:`<div class="form-group"><label class="form-label">Titre</label><input class="form-input" id="st-titre" value="${escHtml(c2.titre||'Avant / Après')}"></div>`
-  };
-  let photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Chargement des photos...</div>';
+async function loadStoryAssets() {
+  if (!activeClient) return;
+  const section = document.getElementById('story-assets-section');
+  section.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span></div>';
   try {
-    const mr=await fetch(`/api/media/${clientId}`);
-    const medias=await mr.json();
-    const photos=medias.filter(m=>m.type==='photo'&&m.url&&m.url.includes('supabase'));
-    if(!photos.length){
-      photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Aucune photo disponible dans la médiathèque</div>';
-    } else {
-      photosHtml=`<div class="photo-picker-grid" id="photo-picker-grid">${photos.map(m=>`<div class="photo-picker-item${selectedPhotoUrl===m.url?' selected':''}" onclick="selectStoryPhoto('${m.url}',this)"><img src="${m.url}" onerror="this.parentElement.style.display='none'"></div>`).join('')}</div>`;
-    }
+    const r = await fetch(`/api/story-assets/${activeClient.id}`);
+    const assets = await r.json();
+    storyAssetsData = { entreprise: [], temoignage: [], avant_apres: [] };
+    assets.forEach(a => { if (storyAssetsData[a.type]) storyAssetsData[a.type].push(a); });
+    renderStoryAssetsSection();
   } catch(e) {
-    photosHtml='<div style="font-size:12px;color:var(--text3);padding:8px">Erreur chargement photos</div>';
+    section.innerHTML = '<div style="color:var(--accent);text-align:center;padding:20px">Erreur de chargement</div>';
   }
-  document.getElementById('story-modal-body').innerHTML=`
-    ${forms[type]||''}
-    <div class="form-group">
-      <label class="form-label">📸 Photo de fond ${selectedPhotoUrl?'<span style="color:var(--green);font-size:10px">✓ Sélectionnée</span>':''}</label>
-      ${selectedPhotoUrl?`<div style="margin-bottom:8px;border-radius:var(--r-sm);overflow:hidden;height:100px"><img id="st-photo-preview-img" src="${selectedPhotoUrl}" style="width:100%;height:100%;object-fit:cover"></div>`:''}
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Cliquez sur une photo pour la sélectionner comme fond :</div>
-      ${photosHtml}
-      ${selectedPhotoUrl?`<button class="btn btn-sm" style="margin-top:6px;font-size:11px" onclick="selectStoryPhoto('',null)">✕ Retirer la photo</button>`:''}
+}
+
+function renderStoryAssetsSection() {
+  const section = document.getElementById('story-assets-section');
+  const types = ['entreprise', 'temoignage', 'avant_apres'];
+  const typeForDisplay = currentStoryType;
+  const info = STORY_TYPE_LABELS[typeForDisplay];
+  const assets = storyAssetsData[typeForDisplay] || [];
+
+  section.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${info.label} — publiée à <strong style="color:${info.color}">${info.heure}</strong> chaque matin</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${assets.length} visuel${assets.length>1?'s':''} en rotation${assets.length>0?' — Aria choisit automatiquement':' — Ajoutez au moins 1 visuel'}</div>
+        </div>
+        <button class="btn btn-accent btn-sm" onclick="openStoryAssetUpload('${typeForDisplay}')">📤 Ajouter un visuel</button>
+      </div>
+
+      ${assets.length === 0 ? `
+        <div class="empty-state" style="padding:30px 20px">
+          <div class="empty-icon">🖼️</div>
+          <div class="empty-title">Aucun visuel pour cette catégorie</div>
+          <div class="empty-sub" style="margin-bottom:16px">Uploadez vos visuels validés. Aria les utilisera en rotation chaque jour.</div>
+          <button class="btn btn-accent" onclick="openStoryAssetUpload('${typeForDisplay}')">📤 Ajouter mon premier visuel</button>
+        </div>
+      ` : `
+        <div class="story-asset-grid">
+          ${assets.map((a, i) => `
+            <div class="story-asset-item">
+              <img class="story-asset-thumb" src="${a.url}" onerror="this.src=''" alt="Story ${i+1}">
+              <div class="story-asset-badge">✓ Validé</div>
+              <div class="story-asset-pos">${i+1}</div>
+              <button class="story-asset-del" onclick="deleteStoryAsset('${a.id}','${typeForDisplay}')" title="Supprimer">✕</button>
+            </div>
+          `).join('')}
+          <div class="story-asset-add" onclick="openStoryAssetUpload('${typeForDisplay}')">
+            <div style="font-size:24px">＋</div>
+            <div>Ajouter</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:var(--r-sm);font-size:12px;color:var(--text2)">
+          🔄 <strong style="color:var(--green)">Rotation automatique</strong> — Aujourd'hui Aria publie le visuel <strong>#${((Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/(1000*60*60*24)))%assets.length)+1}</strong> sur ${assets.length}
+        </div>
+      `}
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
-      <button class="btn" onclick="closeModal('modal-story-template')">Annuler</button>
-      <button class="btn btn-purple" onclick="saveStoryTemplate('${clientId}','${type}')">💾 Enregistrer</button>
-      <button class="btn btn-accent" onclick="saveAndGenerateStory('${clientId}','${type}')">🎨 Générer le visuel</button>
-    </div>`;
-  openModal('modal-story-template');
+  `;
 }
 
-function selectStoryPhoto(url, el) {
-  selectedPhotoUrl=url;
-  document.querySelectorAll('.photo-picker-item').forEach(i=>i.classList.remove('selected'));
-  if(el)el.classList.add('selected');
-  const previewImg=document.getElementById('st-photo-preview-img');
-  if(previewImg&&url)previewImg.src=url;
-  toast(url?'Photo sélectionnée ✓':'Photo retirée','success');
+function openStoryAssetUpload(type) {
+  storyAssetFile = null;
+  const info = STORY_TYPE_LABELS[type];
+  document.getElementById('story-asset-modal-title').textContent = `📤 Ajouter un visuel — ${info.label}`;
+  document.getElementById('story-asset-type').value = type;
+  document.getElementById('story-asset-client-id').value = activeClient?.id || '';
+  document.getElementById('story-asset-filename').textContent = 'Cliquez pour sélectionner une image';
+  document.getElementById('story-asset-preview').style.display = 'none';
+  document.getElementById('btn-upload-story-asset').style.display = 'none';
+  document.getElementById('story-asset-file-input').value = '';
+  openModal('modal-story-asset-upload');
 }
 
-function collectStoryFormData(type) {
-  const get=id=>document.getElementById(id)?.value?.trim()||'';
-  const photo_url=selectedPhotoUrl||'';
-  switch(type) {
-    case 'entreprise': return{titre:get('st-titre'),sous_titre:get('st-sous_titre'),texte:get('st-texte'),photo_url};
-    case 'tarifs':     return{titre:get('st-titre'),services:get('st-services').replace(/\n/g,'<br>'),photo_url};
-    case 'temoignage': return{texte:get('st-texte'),nom_client:get('st-nom_client'),note:parseInt(get('st-note')||'5'),photo_url};
-    case 'avant_apres':return{titre:get('st-titre'),photo_url};
-    default:           return{photo_url};
+function handleStoryAssetFile(file) {
+  if (!file) return;
+  storyAssetFile = file;
+  document.getElementById('story-asset-filename').textContent = `✓ ${file.name}`;
+  document.getElementById('btn-upload-story-asset').style.display = 'flex';
+  // Prévisualisation
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = document.getElementById('story-asset-preview-img');
+    img.src = e.target.result;
+    document.getElementById('story-asset-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadStoryAsset() {
+  if (!storyAssetFile || !activeClient) return;
+  const btn = document.getElementById('btn-upload-story-asset');
+  btn.disabled = true; btn.textContent = '⏳ Upload…';
+  try {
+    const type = document.getElementById('story-asset-type').value;
+    const fd = new FormData();
+    fd.append('file', storyAssetFile);
+    fd.append('client_id', activeClient.id);
+    fd.append('type', type);
+    const r = await fetch('/api/story-assets/upload', { method: 'POST', body: fd });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    closeModal('modal-story-asset-upload');
+    toast('✅ Visuel ajouté ! Aria l\'utilisera dès ce soir.', 'success');
+    await loadStoryAssets();
+  } catch(e) {
+    toast('Erreur : ' + e.message, 'warn');
+    btn.disabled = false; btn.textContent = '📤 Ajouter ce visuel';
   }
 }
 
-async function saveStoryTemplate(clientId, type) {
-  const content=collectStoryFormData(type);
-  try{const r=await fetch('/api/story-templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});if(!r.ok)throw new Error();await loadStoryTemplates();closeModal('modal-story-template');toast('Template enregistré ✓','success');}
-  catch{toast('Erreur sauvegarde','warn');}
+async function deleteStoryAsset(assetId, type) {
+  if (!confirm('Supprimer ce visuel ? Il ne sera plus utilisé par Aria.')) return;
+  try {
+    const r = await fetch(`/api/story-assets/${assetId}`, { method: 'DELETE' });
+    if (!r.ok) throw new Error();
+    toast('Visuel supprimé ✓', 'success');
+    await loadStoryAssets();
+  } catch(e) {
+    toast('Erreur suppression', 'warn');
+  }
 }
 
-async function saveAndGenerateStory(clientId, type) {
-  const content=collectStoryFormData(type);
-  const btn=event.target;btn.disabled=true;btn.textContent='⏳ Génération...';
-  try{const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content})});const data=await r.json();if(!r.ok)throw new Error(data.error);await loadStoryTemplates();closeModal('modal-story-template');toast('Visuel généré ! 🎨','success');}
-  catch(e){toast('Erreur: '+e.message,'warn');}
-  finally{btn.disabled=false;btn.textContent='🎨 Générer le visuel';}
-}
-
-async function regenerateStory(clientId, type) {
-  toast('Régénération...','info');
-  try{const t=storyTemplatesData.find(t=>t.client_id===clientId&&t.type===type);const r=await fetch('/api/story-templates/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,content:t?.content||{}})});if(!r.ok)throw new Error();await loadStoryTemplates();toast('Visuel régénéré ✓','success');}
-  catch{toast('Erreur régénération','warn');}
-}
-
-async function toggleStoryTemplate(clientId, type, actif) {
-  try{await fetch('/api/story-templates/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,type,actif})});await loadStoryTemplates();toast(actif?'Story activée ▶':'Story désactivée ⏸','success');}
-  catch{toast('Erreur','warn');}
-}
 </script>
 </body>
 </html>
